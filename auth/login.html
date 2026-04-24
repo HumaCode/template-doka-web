@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Login</title>
+
+  <!-- Bootstrap 5.3.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons 1.11.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-bg-start:  #e0e7ff;
+      --c-bg-mid:    #cffafe;
+      --c-bg-end:    #fce7f3;
+      --c-card:      rgba(255,255,255,0.82);
+      --c-text:      #1e1b4b;
+      --c-muted:     #6b7280;
+      --radius:      20px;
+      --shadow-card: 0 24px 64px rgba(79,70,229,.18), 0 4px 16px rgba(6,182,212,.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--c-text);
+      overflow: hidden; /* desktop: no scroll on body */
+    }
+
+    /* ── Canvas BG ── */
+    #particle-canvas {
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Gradient mesh BG ── */
+    .bg-mesh {
+      position: fixed; inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, #c7d2fe 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 90% 80%, #a5f3fc 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 50%, #fbcfe8 0%, transparent 70%),
+        linear-gradient(135deg, #e0e7ff 0%, #cffafe 50%, #fce7f3 100%);
+      animation: meshShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes meshShift {
+      0%   { filter: hue-rotate(0deg)   brightness(1.00); }
+      50%  { filter: hue-rotate(15deg)  brightness(1.03); }
+      100% { filter: hue-rotate(-10deg) brightness(1.01); }
+    }
+
+    /* ── Page wrapper — scrollable on mobile ── */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      /* allow scroll when content overflows (small phones) */
+      overflow-y: auto;
+    }
+
+    /* ── Split Card ── */
+    .login-card {
+      width: 100%;
+      max-width: 960px;
+      background: var(--c-card);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(255,255,255,0.7);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      animation: cardIn .7s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(32px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);   }
+    }
+
+    /* ── Left panel — branding ── */
+    .brand-panel {
+      background: linear-gradient(145deg, var(--c-primary) 0%, #7c3aed 50%, var(--c-pink) 100%);
+      padding: 56px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-panel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 30% 70%, rgba(255,255,255,.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.08) 0%, transparent 40%);
+    }
+    .brand-deco {
+      position: absolute;
+      border-radius: 50%;
+      opacity: .15;
+      animation: floatDeco 6s ease-in-out infinite alternate;
+    }
+    .brand-deco-1 { width: 180px; height: 180px; background: #fff; top: -60px; right: -60px; animation-delay: 0s; }
+    .brand-deco-2 { width: 120px; height: 120px; background: var(--c-accent); bottom: 60px; left: -40px; animation-delay: 1.5s; }
+    .brand-deco-3 { width: 80px;  height: 80px;  background: var(--c-secondary); bottom: -30px; right: 40px; animation-delay: 3s; }
+    @keyframes floatDeco {
+      from { transform: translate(0,0) scale(1);      }
+      to   { transform: translate(6px,-12px) scale(1.05); }
+    }
+
+    .brand-top { position: relative; z-index: 1; }
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo-icon-wrap {
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,.2);
+      border-radius: 14px;
+      display: grid; place-items: center;
+      font-size: 26px; color: #fff;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.3);
+      animation: logoSpin 8s linear infinite;
+    }
+    @keyframes logoSpin {
+      0%, 100% { transform: rotate(0deg)   scale(1);    }
+      25%       { transform: rotate(5deg)   scale(1.05); }
+      50%       { transform: rotate(0deg)   scale(1);    }
+      75%       { transform: rotate(-5deg)  scale(1.05); }
+    }
+    .brand-name {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #fff;
+      letter-spacing: -.5px;
+      line-height: 1;
+    }
+    .brand-name span { color: var(--c-accent); }
+
+    .brand-tagline {
+      margin-top: 32px;
+      color: rgba(255,255,255,.9);
+    }
+    .brand-tagline h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .brand-tagline p {
+      font-size: .95rem;
+      opacity: .8;
+      line-height: 1.6;
+    }
+
+    /* Floating feature pills */
+    .feature-pills { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; }
+    .feature-pill {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: #fff;
+      backdrop-filter: blur(8px);
+      font-size: .875rem;
+      font-weight: 600;
+      transition: transform .3s, background .3s;
+    }
+    .feature-pill:hover { background: rgba(255,255,255,.25); transform: translateX(4px); }
+    .feature-pill i { font-size: 1.2rem; color: var(--c-accent); }
+
+    /* ── Right panel — form ── */
+    .form-panel {
+      padding: 48px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto; /* scroll if needed */
+    }
+
+    .form-heading { margin-bottom: 32px; }
+    .form-heading h1 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: var(--c-text);
+      margin-bottom: 6px;
+    }
+    .form-heading p { color: var(--c-muted); font-size: .9rem; }
+
+    /* Animated icon above heading */
+    .icon-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+      display: grid; place-items: center;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(79,70,229,.35);
+      animation: iconPulse 3s ease-in-out infinite;
+      position: relative;
+    }
+    .icon-ring::after {
+      content: '';
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      border: 2px dashed rgba(79,70,229,.3);
+      animation: iconRingSpin 8s linear infinite;
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1);    box-shadow: 0 8px 24px rgba(79,70,229,.35); }
+      50%       { transform: scale(1.07); box-shadow: 0 12px 36px rgba(79,70,229,.5); }
+    }
+    @keyframes iconRingSpin { to { transform: rotate(360deg); } }
+    .icon-ring i { font-size: 2rem; color: #fff; }
+
+    /* Form controls */
+    .form-label {
+      font-weight: 600;
+      font-size: .875rem;
+      color: var(--c-text);
+      margin-bottom: 6px;
+    }
+    .input-group-custom { position: relative; margin-bottom: 20px; }
+    .input-icon {
+      position: absolute; left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--c-primary);
+      font-size: 1.1rem;
+      z-index: 2;
+      transition: color .3s;
+    }
+    .form-control-custom {
+      width: 100%;
+      padding: 13px 16px 13px 44px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: .95rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: rgba(255,255,255,.9);
+      color: var(--c-text);
+      transition: border-color .25s, box-shadow .25s;
+      outline: none;
+    }
+    .form-control-custom:focus {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 4px rgba(79,70,229,.12);
+      background: #fff;
+    }
+    .form-control-custom:focus + .input-icon,
+    .input-group-custom:focus-within .input-icon { color: var(--c-primary); }
+
+    .toggle-pw {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--c-muted); font-size: 1rem;
+      padding: 4px; z-index: 2;
+      transition: color .2s;
+    }
+    .toggle-pw:hover { color: var(--c-primary); }
+
+    /* Checkbox */
+    .form-check-custom { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .form-check-custom input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid #d1d5db;
+      border-radius: 6px;
+      display: grid; place-items: center;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      flex-shrink: 0;
+    }
+    .check-box i { font-size: .75rem; color: #fff; display: none; }
+    .form-check-custom input:checked ~ .check-box {
+      background: var(--c-primary); border-color: var(--c-primary);
+    }
+    .form-check-custom input:checked ~ .check-box i { display: block; }
+    .check-label { font-size: .875rem; color: var(--c-muted); cursor: pointer; }
+
+    /* Forgot link */
+    .link-accent {
+      color: var(--c-primary); font-weight: 600;
+      text-decoration: none; font-size: .875rem;
+      transition: color .2s;
+    }
+    .link-accent:hover { color: #7c3aed; text-decoration: underline; }
+
+    /* Submit button */
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      border: none; border-radius: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 1rem;
+      color: #fff;
+      background: linear-gradient(135deg, var(--c-primary) 0%, #7c3aed 60%, var(--c-pink) 100%);
+      background-size: 200% 100%;
+      cursor: pointer;
+      transition: background-position .4s, transform .2s, box-shadow .2s;
+      box-shadow: 0 6px 20px rgba(79,70,229,.4);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 24px;
+      letter-spacing: .3px;
+    }
+    .btn-login:hover {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(79,70,229,.5);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login i { font-size: 1.1rem; }
+
+    /* Divider */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 24px 0; color: var(--c-muted); font-size: .8rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e5e7eb;
+    }
+
+    /* Social buttons */
+    .btn-social {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 11px;
+      border: 1.5px solid #e5e7eb; border-radius: 12px;
+      background: #fff; cursor: pointer; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+      color: var(--c-text);
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .btn-social:hover { border-color: var(--c-primary); background: #f5f3ff; transform: translateY(-2px); }
+    .btn-social i { font-size: 1.1rem; }
+
+    /* Footer note */
+    .form-footer { text-align: center; margin-top: 20px; font-size: .85rem; color: var(--c-muted); }
+    .form-footer a { color: var(--c-primary); font-weight: 700; text-decoration: none; }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* ── Responsive ── */
+
+    /* Tablet landscape + small desktop: 768–1024 */
+    @media (max-width: 1024px) {
+      .login-card { max-width: 800px; }
+      .form-panel { padding: 40px 36px; }
+    }
+
+    /* Tablet portrait: 768 */
+    @media (max-width: 768px) {
+      html, body { overflow: auto; } /* allow page scroll on mobile */
+      .page-wrapper { padding: 20px 12px; align-items: flex-start; }
+      .login-card {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .brand-panel { padding: 32px 28px; }
+      .feature-pills { display: none; } /* hide pills on mobile to save space */
+      .brand-tagline h2 { font-size: 1.3rem; }
+      .brand-tagline p { font-size: .85rem; }
+      .form-panel { padding: 36px 28px; }
+    }
+
+    /* Small phone */
+    @media (max-width: 390px) {
+      .form-panel { padding: 28px 20px; }
+      .brand-panel { padding: 24px 20px; }
+    }
+
+    /* Alert styles */
+    .alert-custom {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: .875rem;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+      animation: alertIn .4s ease both;
+    }
+    @keyframes alertIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+    .alert-danger i { font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- Gradient mesh background -->
+<div class="bg-mesh"></div>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Page wrapper (scrollable) -->
+<div class="page-wrapper">
+  <div class="login-card">
+
+    <!-- LEFT: Brand Panel -->
+    <div class="brand-panel">
+      <div class="brand-deco brand-deco-1"></div>
+      <div class="brand-deco brand-deco-2"></div>
+      <div class="brand-deco brand-deco-3"></div>
+
+      <div class="brand-top">
+        <a href="#" class="brand-logo">
+          <div class="logo-icon-wrap">
+            <i class="bi bi-camera-reels-fill"></i>
+          </div>
+          <div>
+            <div class="brand-name">Doka<span>Kegiatan</span></div>
+            <div style="color:rgba(255,255,255,.6);font-size:.72rem;margin-top:2px;letter-spacing:.5px;">DOKUMENTASI KEGIATAN</div>
+          </div>
+        </a>
+
+        <div class="brand-tagline">
+          <h2>Catat Setiap<br />Momen Berharga</h2>
+          <p>Platform dokumentasi kegiatan modern — upload foto, tambahkan uraian, dan simpan kenangan dengan mudah.</p>
+        </div>
+      </div>
+
+      <div class="feature-pills">
+        <div class="feature-pill">
+          <i class="bi bi-images"></i>
+          <span>Upload foto lebih dari 1 per kegiatan</span>
+        </div>
+        <div class="feature-pill">
+          <i class="bi bi-calendar3"></i>
+          <span>Dokumentasi per hari & tanggal</span>
+        </div>
+        <div class="feature-pill">
+          <i class="bi bi-phone"></i>
+          <span>Responsif di semua perangkat</span>
+        </div>
+        <div class="feature-pill">
+          <i class="bi bi-shield-check"></i>
+          <span>Aman & terenkripsi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form Panel -->
+    <div class="form-panel">
+
+      <!-- Animated icon -->
+      <div class="icon-ring">
+        <i class="bi bi-person-fill"></i>
+      </div>
+
+      <div class="form-heading">
+        <h1>Selamat Datang 👋</h1>
+        <p>Masuk ke akun Anda untuk mulai mendokumentasikan kegiatan</p>
+      </div>
+
+      <!-- Error alert (hidden by default, shown on error) -->
+      <div class="alert-custom alert-danger d-none" id="loginAlert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span id="loginAlertMsg">Email atau password salah. Silakan coba lagi.</span>
+      </div>
+
+      <form id="loginForm" novalidate>
+
+        <!-- Email -->
+        <div>
+          <label class="form-label" for="email">Alamat Email</label>
+          <div class="input-group-custom" style="position:relative;">
+            <i class="bi bi-envelope-fill input-icon"></i>
+            <input
+              type="email" id="email" name="email"
+              class="form-control-custom"
+              placeholder="nama@instansi.go.id"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="form-label" for="password">Password</label>
+          <div class="input-group-custom" style="position:relative;">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+              type="password" id="password" name="password"
+              class="form-control-custom"
+              placeholder="Masukkan password"
+              autocomplete="current-password"
+              style="padding-right:44px;"
+            />
+            <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">
+              <i class="bi bi-eye-fill" id="pwEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember & Forgot -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <label class="form-check-custom" for="remember">
+            <input type="checkbox" id="remember" />
+            <span class="check-box"><i class="bi bi-check2"></i></span>
+            <span class="check-label">Ingat saya</span>
+          </label>
+          <a href="#" class="link-accent">Lupa password?</a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-login" id="btnLogin">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Masuk ke Sistem
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">atau masuk dengan</div>
+
+        <!-- Social -->
+        <div class="d-flex gap-3">
+          <button type="button" class="btn-social">
+            <i class="bi bi-google" style="color:#ea4335;"></i>
+            Google
+          </button>
+          <button type="button" class="btn-social">
+            <i class="bi bi-microsoft" style="color:#0078d4;"></i>
+            Microsoft
+          </button>
+        </div>
+      </form>
+
+      <div class="form-footer">
+        Belum punya akun? <a href="#">Hubungi Administrator</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bootstrap 5.3.3 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* =============================================
+   PARTICLE CANVAS
+   Theme: floating camera icons, photos, stars
+   ============================================= */
+(function () {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  const EMOJIS  = ['📷','📸','🎞','🖼','📅','✨','⭐','💫','🌟'];
+  const COLORS  = ['#4f46e5','#06b6d4','#ec4899','#f59e0b','#10b981','#7c3aed'];
+  const COUNT   = Math.min(40, Math.floor(window.innerWidth / 28));
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function randBetween(a, b) { return a + Math.random() * (b - a); }
+
+  function createParticle() {
+    const useEmoji = Math.random() > .55;
+    return {
+      x:      randBetween(0, W),
+      y:      randBetween(0, H),
+      vx:     randBetween(-.3, .3),
+      vy:     randBetween(-.5, -.1),
+      size:   randBetween(useEmoji ? 14 : 4, useEmoji ? 26 : 10),
+      alpha:  randBetween(.08, .25),
+      color:  COLORS[Math.floor(Math.random() * COLORS.length)],
+      emoji:  useEmoji ? EMOJIS[Math.floor(Math.random() * EMOJIS.length)] : null,
+      rotate: randBetween(0, Math.PI * 2),
+      rotV:   randBetween(-.01, .01),
+      pulse:  randBetween(0, Math.PI * 2),
+      pulseV: randBetween(.01, .04),
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: COUNT }, createParticle);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha + .06 * Math.sin(p.pulse);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotate);
+
+      if (p.emoji) {
+        ctx.font = `${p.size}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.emoji, 0, 0);
+      } else {
+        /* circle dot */
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+      ctx.restore();
+
+      p.x      += p.vx;
+      p.y      += p.vy;
+      p.rotate += p.rotV;
+      p.pulse  += p.pulseV;
+
+      /* wrap around */
+      if (p.y < -50)  p.y = H + 50;
+      if (p.x < -50)  p.x = W + 50;
+      if (p.x > W+50) p.x = -50;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  draw();
+})();
+
+/* =============================================
+   TOGGLE PASSWORD
+   ============================================= */
+const togglePw   = document.getElementById('togglePw');
+const pwInput    = document.getElementById('password');
+const pwEyeIcon  = document.getElementById('pwEyeIcon');
+
+togglePw.addEventListener('click', () => {
+  const isHidden = pwInput.type === 'password';
+  pwInput.type   = isHidden ? 'text' : 'password';
+  pwEyeIcon.className = isHidden ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill';
+});
+
+/* =============================================
+   FORM SUBMIT (demo validation)
+   ============================================= */
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  const alert = document.getElementById('loginAlert');
+  const alertMsg = document.getElementById('loginAlertMsg');
+  const btn   = document.getElementById('btnLogin');
+
+  alert.classList.add('d-none');
+
+  if (!email || !pass) {
+    alertMsg.textContent = 'Email dan password wajib diisi.';
+    alert.classList.remove('d-none');
+    return;
+  }
+
+  /* Loading state */
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Memverifikasi...';
+
+  setTimeout(() => {
+    /* Demo: simulate wrong credentials */
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk ke Sistem';
+    alertMsg.textContent = 'Email atau password salah. Silakan coba lagi.';
+    alert.classList.remove('d-none');
+  }, 1800);
+});
+
+/* =============================================
+   CUSTOM CHECKBOX click propagation fix
+   ============================================= */
+document.querySelectorAll('.form-check-custom').forEach(wrapper => {
+  const cb   = wrapper.querySelector('input[type=checkbox]');
+  const box  = wrapper.querySelector('.check-box');
+  const lbl  = wrapper.querySelector('.check-label');
+  [box, lbl].forEach(el => el.addEventListener('click', () => { cb.checked = !cb.checked; }));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Dashboard</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+
+      --c-primary:   #4f46e5;
+      --c-primary-d: #3730a3;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+
+      --sidebar-bg:  #ffffff;
+      --topbar-bg:   #ffffff;
+
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  20px;
+      --shadow-sm:  0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:  0 12px 40px rgba(0,0,0,.12);
+
+      --trans: .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════ */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--c-border);
+      display: flex; flex-direction: column;
+      z-index: 300;
+      transition: width var(--trans), transform var(--trans);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    body.collapsed .sidebar { width: var(--sidebar-w-collapsed); }
+
+    /* ── Sidebar Brand ── */
+    .sidebar-brand {
+      height: var(--topbar-h);
+      display: flex; align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--c-border);
+      flex-shrink: 0;
+      gap: 12px;
+      text-decoration: none;
+      overflow: hidden;
+    }
+    .brand-icon-wrap {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+      display: grid; place-items: center;
+      font-size: 1.2rem; color: #fff;
+      box-shadow: 0 4px 12px rgba(79,70,229,.35);
+      animation: brandFloat 4s ease-in-out infinite;
+      position: relative;
+    }
+    .brand-icon-wrap::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: 15px;
+      border: 2px dashed rgba(79,70,229,.25);
+      animation: brandSpin 10s linear infinite;
+    }
+    @keyframes brandFloat {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      33%      { transform: translateY(-3px) rotate(4deg); }
+      66%      { transform: translateY(2px) rotate(-3deg); }
+    }
+    @keyframes brandSpin { to { transform: rotate(360deg); } }
+    .brand-text { overflow: hidden; white-space: nowrap; }
+    .brand-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900; font-size: 1.1rem;
+      color: var(--c-text); line-height: 1;
+    }
+    .brand-title span { color: var(--c-primary); }
+    .brand-sub { font-size: .68rem; color: var(--c-muted); letter-spacing: .5px; margin-top: 2px; }
+
+    /* ── Sidebar Nav ── */
+    .sidebar-nav {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 12px 0;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 99px; }
+
+    /* Category label */
+    .nav-category {
+      font-size: .65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--c-muted);
+      padding: 16px 20px 6px;
+      white-space: nowrap; overflow: hidden;
+      transition: opacity var(--trans);
+    }
+    body.collapsed .nav-category { opacity: 0; }
+
+    /* Nav item */
+    .nav-item-wrap { padding: 2px 10px; }
+    .nav-link-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--c-text-2);
+      font-size: .875rem; font-weight: 600;
+      white-space: nowrap;
+      transition: background var(--trans), color var(--trans), box-shadow var(--trans);
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-link-item::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; border-radius: 0 3px 3px 0;
+      background: var(--c-primary);
+      transform: scaleY(0);
+      transition: transform var(--trans);
+    }
+    .nav-link-item:hover {
+      background: rgba(79,70,229,.07);
+      color: var(--c-primary);
+    }
+    .nav-link-item.active {
+      background: linear-gradient(90deg, rgba(79,70,229,.12), rgba(79,70,229,.04));
+      color: var(--c-primary);
+      font-weight: 700;
+    }
+    .nav-link-item.active::before { transform: scaleY(1); }
+    .nav-link-item .nav-icon {
+      font-size: 1.1rem; flex-shrink: 0;
+      width: 24px; text-align: center;
+      transition: transform var(--trans);
+    }
+    .nav-link-item:hover .nav-icon { transform: scale(1.15) rotate(-5deg); }
+    .nav-link-item .nav-label { overflow: hidden; transition: opacity var(--trans), max-width var(--trans); }
+    body.collapsed .nav-link-item .nav-label { opacity: 0; max-width: 0; }
+    body.collapsed .nav-link-item { justify-content: center; padding: 10px; }
+    body.collapsed .nav-item-wrap { padding: 2px 8px; }
+
+    /* Badge */
+    .nav-badge {
+      margin-left: auto; flex-shrink: 0;
+      font-size: .65rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 99px;
+      background: var(--c-primary); color: #fff;
+      animation: badgePop .3s cubic-bezier(.34,1.56,.64,1) both;
+      transition: opacity var(--trans);
+    }
+    body.collapsed .nav-badge { opacity: 0; }
+    @keyframes badgePop {
+      from { transform: scale(0); } to { transform: scale(1); }
+    }
+
+    /* Tooltip on collapsed */
+    body.collapsed .nav-link-item { position: relative; }
+    body.collapsed .nav-link-item::after {
+      content: attr(data-label);
+      position: absolute; left: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%) scale(.85);
+      background: var(--c-text); color: #fff;
+      font-size: .78rem; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px;
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity .15s, transform .15s;
+    }
+    body.collapsed .nav-link-item:hover::after {
+      opacity: 1; transform: translateY(-50%) scale(1);
+    }
+
+    /* ── Sidebar Footer ── */
+    .sidebar-footer {
+      padding: 12px; border-top: 1px solid var(--c-border);
+      flex-shrink: 0;
+    }
+    .sidebar-user-mini {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: var(--radius-sm);
+      transition: background var(--trans);
+      cursor: default; overflow: hidden;
+    }
+    .sidebar-user-mini:hover { background: var(--c-surface2); }
+    .sidebar-avatar-sm {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-pink));
+      display: grid; place-items: center; color: #fff; font-size: .85rem; font-weight: 700;
+    }
+    .sidebar-user-info { overflow: hidden; white-space: nowrap; transition: opacity var(--trans); }
+    .sidebar-user-name { font-size: .8rem; font-weight: 700; color: var(--c-text); }
+    .sidebar-user-role { font-size: .7rem; color: var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity: 0; }
+
+    /* ═══════════════════════════════════════
+       TOPBAR
+    ═══════════════════════════════════════ */
+    .topbar {
+      position: fixed; top: 0; right: 0;
+      left: var(--sidebar-w);
+      height: var(--topbar-h);
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--c-border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 16px;
+      z-index: 200;
+      transition: left var(--trans);
+      box-shadow: var(--shadow-sm);
+    }
+    body.collapsed .topbar { left: var(--sidebar-w-collapsed); }
+
+    .btn-hamburger {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      border: none; background: transparent; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      transition: background var(--trans);
+      flex-shrink: 0;
+    }
+    .btn-hamburger:hover { background: var(--c-surface2); }
+    .hamburger-line {
+      display: block; height: 2px; border-radius: 99px;
+      background: var(--c-text-2);
+      transition: transform var(--trans), opacity var(--trans), width var(--trans);
+    }
+    .hamburger-line:nth-child(1) { width: 18px; }
+    .hamburger-line:nth-child(2) { width: 14px; }
+    .hamburger-line:nth-child(3) { width: 18px; }
+    body.collapsed .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); width: 18px; }
+    body.collapsed .hamburger-line:nth-child(2) { opacity: 0; width: 0; }
+    body.collapsed .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); width: 18px; }
+
+    /* Topbar search */
+    .topbar-search {
+      flex: 1; max-width: 360px;
+      position: relative;
+    }
+    .topbar-search input {
+      width: 100%; padding: 9px 14px 9px 38px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 10px; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--c-surface2); color: var(--c-text);
+      outline: none;
+      transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    .topbar-search input:focus {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+      background: #fff;
+    }
+    .topbar-search i {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--c-muted); font-size: .95rem; pointer-events: none;
+    }
+
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    /* Icon buttons topbar */
+    .topbar-icon-btn {
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      border: none; background: transparent; cursor: pointer;
+      display: grid; place-items: center;
+      color: var(--c-text-2); font-size: 1.1rem;
+      position: relative;
+      transition: background var(--trans), color var(--trans);
+    }
+    .topbar-icon-btn:hover { background: var(--c-surface2); color: var(--c-primary); }
+    .notif-dot {
+      position: absolute; top: 7px; right: 7px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--c-pink); border: 2px solid var(--c-surface);
+      animation: dotPulse 2s ease infinite;
+    }
+    @keyframes dotPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(236,72,153,.5); }
+      50%      { box-shadow: 0 0 0 5px rgba(236,72,153,0); }
+    }
+
+    /* User dropdown */
+    .user-dropdown-wrap { position: relative; }
+    .user-trigger {
+      display: flex; align-items: center; gap: 10px;
+      padding: 5px 10px; border-radius: var(--radius-sm);
+      border: none; background: transparent; cursor: pointer;
+      transition: background var(--trans);
+    }
+    .user-trigger:hover { background: var(--c-surface2); }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-pink));
+      display: grid; place-items: center; color: #fff;
+      font-weight: 800; font-size: .9rem; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(79,70,229,.3);
+      position: relative;
+    }
+    .user-avatar::after {
+      content: '';
+      position: absolute; bottom: 0; right: 0;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--c-green); border: 2px solid var(--c-surface);
+    }
+    .user-info { text-align: left; }
+    .user-name  { font-size: .82rem; font-weight: 700; color: var(--c-text); line-height: 1.2; }
+    .user-email { font-size: .7rem; color: var(--c-muted); }
+    .user-trigger i { color: var(--c-muted); font-size: .8rem; transition: transform var(--trans); }
+    .user-trigger.open i { transform: rotate(180deg); }
+
+    /* Dropdown menu */
+    .user-dropdown-menu {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      width: 240px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 500;
+      opacity: 0; pointer-events: none;
+      transform: translateY(-8px) scale(.97);
+      transition: opacity .2s, transform .2s;
+      overflow: hidden;
+    }
+    .user-dropdown-menu.show {
+      opacity: 1; pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
+    .dropdown-header {
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(79,70,229,.07), rgba(6,182,212,.04));
+      border-bottom: 1px solid var(--c-border);
+    }
+    .dropdown-avatar-lg {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-pink));
+      display: grid; place-items: center; color: #fff;
+      font-weight: 900; font-size: 1.2rem; margin-bottom: 8px;
+      box-shadow: 0 4px 12px rgba(79,70,229,.3);
+    }
+    .dropdown-name  { font-weight: 700; font-size: .9rem; color: var(--c-text); }
+    .dropdown-email { font-size: .75rem; color: var(--c-muted); margin-top: 2px; }
+    .dropdown-items { padding: 8px; }
+    .dropdown-item-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: none; background: transparent; cursor: pointer;
+      font-size: .875rem; font-weight: 600; color: var(--c-text-2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background var(--trans), color var(--trans);
+      text-align: left;
+    }
+    .dropdown-item-btn i { font-size: 1rem; width: 18px; text-align: center; }
+    .dropdown-item-btn:hover { background: var(--c-surface2); color: var(--c-primary); }
+    .dropdown-item-btn.danger { color: #ef4444; }
+    .dropdown-item-btn.danger:hover { background: #fef2f2; }
+    .dropdown-divider { height: 1px; background: var(--c-border); margin: 4px 0; }
+
+    /* ═══════════════════════════════════════
+       MAIN CONTENT AREA
+    ═══════════════════════════════════════ */
+    .main-wrapper {
+      margin-left: var(--sidebar-w);
+      padding-top: var(--topbar-h);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      transition: margin-left var(--trans);
+    }
+    body.collapsed .main-wrapper { margin-left: var(--sidebar-w-collapsed); }
+
+    .main-content { flex: 1; padding: 24px; }
+
+    /* ═══════════════════════════════════════
+       PAGE HEADER / BREADCRUMB
+    ═══════════════════════════════════════ */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      background: var(--c-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--c-border);
+      box-shadow: var(--shadow-sm);
+      position: relative; overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--c-primary), var(--c-secondary), var(--c-pink));
+    }
+    .page-header-left h1 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900; font-size: 1.5rem;
+      color: var(--c-text); margin-bottom: 2px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-header-left h1 i {
+      font-size: 1.3rem; color: var(--c-primary);
+      animation: iconWiggle 3s ease infinite;
+    }
+    @keyframes iconWiggle {
+      0%,80%,100% { transform: rotate(0); }
+      85% { transform: rotate(-8deg); }
+      90% { transform: rotate(8deg); }
+      95% { transform: rotate(-4deg); }
+    }
+    .page-header-left p { font-size: .82rem; color: var(--c-muted); }
+    .breadcrumb-nav {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .8rem;
+    }
+    .breadcrumb-nav a {
+      color: var(--c-muted); text-decoration: none; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+      transition: color var(--trans);
+    }
+    .breadcrumb-nav a:hover { color: var(--c-primary); }
+    .breadcrumb-nav .bc-sep { color: var(--c-muted); font-size: .7rem; }
+    .breadcrumb-nav .bc-current {
+      color: var(--c-primary); font-weight: 700;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ═══════════════════════════════════════
+       STAT CARDS
+    ═══════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative; overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--trans), box-shadow var(--trans);
+      cursor: default;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card.s1::after { background: linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .stat-card.s2::after { background: linear-gradient(90deg,var(--c-green),#34d399); }
+    .stat-card.s3::after { background: linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .stat-card.s4::after { background: linear-gradient(90deg,var(--c-pink),#f472b6); }
+
+    .stat-icon-wrap {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: grid; place-items: center;
+      font-size: 1.3rem; color: #fff;
+      margin-bottom: 14px;
+      animation: statIconPulse 3s ease-in-out infinite;
+    }
+    .stat-card.s1 .stat-icon-wrap { background: linear-gradient(135deg,var(--c-primary),var(--c-secondary)); box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+    .stat-card.s2 .stat-icon-wrap { background: linear-gradient(135deg,var(--c-green),#34d399);              box-shadow: 0 4px 12px rgba(16,185,129,.3); }
+    .stat-card.s3 .stat-icon-wrap { background: linear-gradient(135deg,var(--c-accent),var(--c-orange));     box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+    .stat-card.s4 .stat-icon-wrap { background: linear-gradient(135deg,var(--c-pink),#f472b6);               box-shadow: 0 4px 12px rgba(236,72,153,.3); }
+    @keyframes statIconPulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.06); }
+    }
+    .stat-card.s2 .stat-icon-wrap { animation-delay: .4s; }
+    .stat-card.s3 .stat-icon-wrap { animation-delay: .8s; }
+    .stat-card.s4 .stat-icon-wrap { animation-delay: 1.2s; }
+
+    .stat-value {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 2rem; color: var(--c-text); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label { font-size: .8rem; color: var(--c-muted); font-weight: 600; }
+    .stat-change {
+      position: absolute; top: 16px; right: 16px;
+      font-size: .72rem; font-weight: 700; padding: 3px 8px;
+      border-radius: 99px; display: flex; align-items: center; gap: 3px;
+    }
+    .stat-change.up   { background: #f0fdf4; color: var(--c-green); }
+    .stat-change.down { background: #fef2f2; color: #ef4444; }
+    .stat-change.flat { background: #eff6ff; color: var(--c-primary); }
+
+    /* Mini sparkline bars */
+    .stat-sparkline {
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 28px; margin-top: 12px;
+    }
+    .spark-bar {
+      flex: 1; border-radius: 3px 3px 0 0;
+      opacity: .35; transition: opacity var(--trans);
+      animation: sparkGrow .6s ease both;
+    }
+    .stat-card.s1 .spark-bar { background: var(--c-primary); }
+    .stat-card.s2 .spark-bar { background: var(--c-green); }
+    .stat-card.s3 .spark-bar { background: var(--c-accent); }
+    .stat-card.s4 .spark-bar { background: var(--c-pink); }
+    .spark-bar:last-child { opacity: 1 !important; }
+    @keyframes sparkGrow {
+      from { transform: scaleY(0); transform-origin: bottom; }
+      to   { transform: scaleY(1); transform-origin: bottom; }
+    }
+
+    /* ═══════════════════════════════════════
+       CONTENT ROW — RECENT + CHART
+    ═══════════════════════════════════════ */
+    .content-row { display: grid; grid-template-columns: 1fr 340px; gap: 16px; margin-bottom: 24px; }
+
+    .panel {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .panel-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 1rem; color: var(--c-text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel-title i { color: var(--c-primary); }
+    .panel-body { padding: 20px; }
+    .panel-link {
+      font-size: .78rem; font-weight: 700; color: var(--c-primary);
+      text-decoration: none; display: flex; align-items: center; gap: 4px;
+      transition: gap var(--trans);
+    }
+    .panel-link:hover { gap: 8px; }
+
+    /* Activity list */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--c-border);
+      transition: background var(--trans);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: var(--c-surface2); }
+    .act-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 1rem; color: #fff;
+      flex-shrink: 0;
+    }
+    .act-icon.blue   { background: linear-gradient(135deg,var(--c-primary),var(--c-secondary)); }
+    .act-icon.green  { background: linear-gradient(135deg,var(--c-green),#34d399); }
+    .act-icon.amber  { background: linear-gradient(135deg,var(--c-accent),var(--c-orange)); }
+    .act-icon.pink   { background: linear-gradient(135deg,var(--c-pink),#f472b6); }
+    .act-icon.purple { background: linear-gradient(135deg,#8b5cf6,#a78bfa); }
+    .act-info { flex: 1; min-width: 0; }
+    .act-title { font-size: .875rem; font-weight: 700; color: var(--c-text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-desc  { font-size: .75rem; color: var(--c-muted); }
+    .act-time  { font-size: .72rem; color: var(--c-muted); white-space: nowrap; flex-shrink: 0; }
+    .act-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: .68rem; font-weight: 700; }
+    .act-badge.done    { background: #f0fdf4; color: var(--c-green); }
+    .act-badge.pending { background: #fffbeb; color: var(--c-accent); }
+    .act-badge.new     { background: #eff6ff; color: var(--c-primary); }
+
+    /* Mini chart bars (fake) */
+    .mini-chart { padding: 20px; }
+    .chart-legend { display: flex; flex-direction: column; gap: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; }
+    .legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label{ font-size: .8rem; color: var(--c-text-2); font-weight: 600; flex: 1; }
+    .legend-bar-wrap { flex: 2; height: 6px; background: var(--c-border); border-radius: 99px; overflow: hidden; }
+    .legend-bar {
+      height: 100%; border-radius: 99px;
+      animation: barGrow .8s ease both;
+    }
+    @keyframes barGrow {
+      from { width: 0 !important; }
+    }
+    .legend-val { font-size: .8rem; font-weight: 800; color: var(--c-text); width: 28px; text-align: right; }
+
+    /* ── Bar chart visual ── */
+    .bar-chart-wrap { margin-bottom: 20px; }
+    .bar-chart {
+      display: flex; align-items: flex-end; gap: 8px;
+      height: 120px; padding: 0 4px;
+    }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-fill {
+      width: 100%; border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--c-primary), var(--c-secondary));
+      opacity: .75;
+      animation: barFillUp .7s ease both;
+      transform-origin: bottom;
+    }
+    .bar-fill:hover { opacity: 1; }
+    .bar-fill.active { opacity: 1; background: linear-gradient(180deg, var(--c-primary), var(--c-pink)); }
+    @keyframes barFillUp {
+      from { transform: scaleY(0); }
+      to   { transform: scaleY(1); }
+    }
+    .bar-label { font-size: .65rem; color: var(--c-muted); font-weight: 600; }
+
+    /* ═══════════════════════════════════════
+       QUICK ACTIONS
+    ═══════════════════════════════════════ */
+    .quick-actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+    .qa-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 18px; text-align: center;
+      cursor: pointer; text-decoration: none;
+      transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+      box-shadow: var(--shadow-sm);
+    }
+    .qa-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--c-primary); }
+    .qa-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: grid; place-items: center; font-size: 1.4rem; color: #fff;
+      margin: 0 auto 12px;
+      transition: transform var(--trans);
+    }
+    .qa-card:hover .qa-icon { transform: rotate(-8deg) scale(1.1); }
+    .qa-icon.i1 { background: linear-gradient(135deg,var(--c-primary),#7c3aed); box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+    .qa-icon.i2 { background: linear-gradient(135deg,var(--c-green),var(--c-secondary)); box-shadow: 0 4px 12px rgba(16,185,129,.3); }
+    .qa-icon.i3 { background: linear-gradient(135deg,var(--c-accent),var(--c-orange)); box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+    .qa-icon.i4 { background: linear-gradient(135deg,var(--c-pink),#f472b6); box-shadow: 0 4px 12px rgba(236,72,153,.3); }
+    .qa-label { font-size: .82rem; font-weight: 700; color: var(--c-text-2); }
+
+    /* ═══════════════════════════════════════
+       CALENDAR MINI WIDGET
+    ═══════════════════════════════════════ */
+    .calendar-widget {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .cal-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+      color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-header h3 { font-family:'Nunito',sans-serif; font-weight:800; font-size:1rem; }
+    .cal-nav { background:rgba(255,255,255,.2); border:none; border-radius:6px; color:#fff; padding:4px 10px; cursor:pointer; font-size:.9rem; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+    .cal-day-name { text-align:center; padding:8px 0; font-size:.65rem; font-weight:800; color:var(--c-muted); text-transform:uppercase; letter-spacing:.8px; }
+    .cal-day {
+      text-align:center; padding:7px 0;
+      font-size:.78rem; font-weight:600; color:var(--c-text-2);
+      cursor:pointer; border-radius:6px; margin:1px;
+      transition:background var(--trans),color var(--trans);
+    }
+    .cal-day:hover { background:rgba(79,70,229,.1); color:var(--c-primary); }
+    .cal-day.other { color:var(--c-muted); opacity:.4; }
+    .cal-day.today {
+      background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));
+      color:#fff; font-weight:800;
+      box-shadow:0 2px 8px rgba(79,70,229,.35);
+    }
+    .cal-day.has-event { position:relative; }
+    .cal-day.has-event::after {
+      content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%);
+      width:4px; height:4px; border-radius:50%; background:var(--c-pink);
+    }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    .main-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--c-border);
+      background: var(--c-surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .footer-left { font-size: .78rem; color: var(--c-muted); }
+    .footer-left strong { color: var(--c-primary); font-weight: 700; }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a {
+      font-size: .75rem; color: var(--c-muted); text-decoration: none; font-weight: 600;
+      transition: color var(--trans);
+    }
+    .footer-links a:hover { color: var(--c-primary); }
+
+    /* ═══════════════════════════════════════
+       FLOAT ACTION BUTTON
+    ═══════════════════════════════════════ */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+      color: #fff; font-size: 1.3rem;
+      border: none; cursor: pointer;
+      display: grid; place-items: center;
+      box-shadow: 0 6px 20px rgba(79,70,229,.45);
+      z-index: 400;
+      transition: transform var(--trans), box-shadow var(--trans), opacity var(--trans);
+      opacity: 0; transform: scale(0) translateY(20px);
+    }
+    .fab.visible { opacity: 1; transform: scale(1) translateY(0); }
+    .fab:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 28px rgba(79,70,229,.6); }
+    .fab:active { transform: scale(.95); }
+    .fab i { animation: fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-3px); }
+    }
+
+    /* ═══════════════════════════════════════
+       LOGOUT MODAL
+    ═══════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,.5);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: grid; place-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .logout-modal {
+      background: var(--c-surface);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      max-width: 400px; width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(24px) scale(.95);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .modal-overlay.show .logout-modal { transform: translateY(0) scale(1); }
+    .logout-icon-wrap {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 3px solid #fecaca;
+      display: grid; place-items: center;
+      margin: 0 auto 20px;
+      animation: logoutIconPulse 2s ease-in-out infinite;
+    }
+    @keyframes logoutIconPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.3); }
+      50%      { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
+    }
+    .logout-icon-wrap i { font-size: 2.2rem; color: #ef4444; animation: logoutIconShake 3s ease infinite; }
+    @keyframes logoutIconShake {
+      0%,70%,100% { transform: rotate(0); }
+      75%  { transform: rotate(-12deg); }
+      80%  { transform: rotate(12deg); }
+      85%  { transform: rotate(-8deg); }
+      90%  { transform: rotate(8deg); }
+      95%  { transform: rotate(-4deg); }
+    }
+    .logout-modal h3 {
+      font-family:'Nunito',sans-serif; font-weight:900; font-size:1.4rem;
+      color:var(--c-text); margin-bottom:8px;
+    }
+    .logout-modal p { font-size:.875rem; color:var(--c-muted); line-height:1.6; margin-bottom:24px; }
+    .modal-actions { display:flex; gap:10px; }
+    .btn-modal-cancel {
+      flex:1; padding:12px; border-radius:12px;
+      border:2px solid var(--c-border); background:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9rem;
+      color:var(--c-text-2); cursor:pointer;
+      transition:border-color var(--trans), background var(--trans);
+    }
+    .btn-modal-cancel:hover { border-color:var(--c-primary); background:var(--c-surface2); }
+    .btn-modal-logout {
+      flex:1; padding:12px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+      font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9rem;
+      color:#fff; cursor:pointer;
+      box-shadow:0 4px 14px rgba(239,68,68,.35);
+      transition:transform var(--trans), box-shadow var(--trans);
+      display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .btn-modal-logout:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(239,68,68,.5); }
+
+    /* ═══════════════════════════════════════
+       MOBILE OVERLAY
+    ═══════════════════════════════════════ */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,.4); z-index: 250;
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .content-row { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 992px) {
+      :root { --sidebar-w: 240px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-w) !important;
+        box-shadow: var(--shadow-lg);
+      }
+      body.mobile-open .sidebar { transform: translateX(0); }
+      body.mobile-open .sidebar-overlay { display: block; }
+      .topbar { left: 0 !important; }
+      .main-wrapper { margin-left: 0 !important; }
+      .topbar-search { display: none; }
+      .user-info { display: none; }
+      .main-content { padding: 16px; }
+      .fab { bottom: 20px; right: 20px; width: 46px; height: 46px; font-size: 1.1rem; }
+    }
+    @media (max-width: 576px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(2,1fr); }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .modal-actions { flex-direction: column; }
+      .main-footer { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Entrance animations */
+    .fade-up {
+      opacity: 0; transform: translateY(16px);
+      animation: fadeUp .5s ease forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity:1; transform:translateY(0); }
+    }
+    .fade-up:nth-child(1) { animation-delay: .05s; }
+    .fade-up:nth-child(2) { animation-delay: .10s; }
+    .fade-up:nth-child(3) { animation-delay: .15s; }
+    .fade-up:nth-child(4) { animation-delay: .20s; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <a href="#" class="sidebar-brand">
+    <div class="brand-icon-wrap">
+      <i class="bi bi-camera-reels-fill"></i>
+    </div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+
+  <!-- Nav -->
+  <nav class="sidebar-nav" id="sidebarNav">
+
+    <!-- MAIN -->
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item active" data-label="Dashboard">
+        <i class="bi bi-grid-1x2-fill nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+    </div>
+
+    <!-- MASTER -->
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Pengguna">
+        <i class="bi bi-people-fill nav-icon"></i>
+        <span class="nav-label">Pengguna</span>
+        <span class="nav-badge">5</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Kategori">
+        <i class="bi bi-tags-fill nav-icon"></i>
+        <span class="nav-label">Kategori</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Unit Kerja">
+        <i class="bi bi-building-fill nav-icon"></i>
+        <span class="nav-label">Unit Kerja</span>
+      </a>
+    </div>
+
+    <!-- KEGIATAN -->
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Semua Kegiatan">
+        <i class="bi bi-calendar3-fill nav-icon"></i>
+        <span class="nav-label">Semua Kegiatan</span>
+        <span class="nav-badge" style="background:var(--c-green);">24</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Tambah Kegiatan">
+        <i class="bi bi-plus-circle-fill nav-icon"></i>
+        <span class="nav-label">Tambah Kegiatan</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Galeri Foto">
+        <i class="bi bi-images nav-icon"></i>
+        <span class="nav-label">Galeri Foto</span>
+      </a>
+    </div>
+
+    <!-- LAPORAN -->
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Laporan Bulanan">
+        <i class="bi bi-bar-chart-fill nav-icon"></i>
+        <span class="nav-label">Laporan Bulanan</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Export PDF">
+        <i class="bi bi-file-earmark-pdf-fill nav-icon"></i>
+        <span class="nav-label">Export PDF</span>
+      </a>
+    </div>
+
+    <!-- PENGATURAN -->
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Profil Saya">
+        <i class="bi bi-person-fill-gear nav-icon"></i>
+        <span class="nav-label">Profil Saya</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-item" data-label="Pengaturan Sistem">
+        <i class="bi bi-gear-wide-connected nav-icon"></i>
+        <span class="nav-label">Pengaturan Sistem</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar footer -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin User</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar" id="topbar">
+
+  <!-- Hamburger -->
+  <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebar()">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
+  <!-- Search -->
+  <div class="topbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Cari kegiatan, laporan..." />
+  </div>
+
+  <!-- Right -->
+  <div class="topbar-right">
+
+    <!-- Notifications -->
+    <button class="topbar-icon-btn">
+      <i class="bi bi-bell-fill"></i>
+      <span class="notif-dot"></span>
+    </button>
+
+    <!-- Messages -->
+    <button class="topbar-icon-btn">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <!-- User dropdown -->
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name">Admin Doka</div>
+          <div class="user-email">admin@dokaKegiatan.id</div>
+        </div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar-lg">A</div>
+          <div class="dropdown-name">Admin Doka</div>
+          <div class="dropdown-email">admin@dokaKegiatan.id</div>
+        </div>
+        <div class="dropdown-items">
+          <button class="dropdown-item-btn">
+            <i class="bi bi-person-fill"></i> Profil Saya
+          </button>
+          <button class="dropdown-item-btn">
+            <i class="bi bi-gear-fill"></i> Pengaturan
+          </button>
+          <button class="dropdown-item-btn">
+            <i class="bi bi-shield-lock-fill"></i> Keamanan Akun
+          </button>
+          <button class="dropdown-item-btn">
+            <i class="bi bi-question-circle-fill"></i> Bantuan
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item-btn danger" onclick="showLogoutModal()">
+            <i class="bi bi-box-arrow-right"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ═══════════ MAIN WRAPPER ═══════════ -->
+<div class="main-wrapper">
+  <main class="main-content" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header fade-up">
+      <div class="page-header-left">
+        <h1><i class="bi bi-grid-1x2-fill"></i> Dashboard</h1>
+        <p>Selamat datang kembali, Admin Doka! Berikut ringkasan aktivitas hari ini.</p>
+      </div>
+      <nav class="breadcrumb-nav">
+        <a href="#"><i class="bi bi-house-fill"></i> Home</a>
+        <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+        <span class="bc-current"><i class="bi bi-grid-1x2-fill"></i> Dashboard</span>
+      </nav>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card s1 fade-up">
+        <div class="stat-change up"><i class="bi bi-arrow-up"></i> 12%</div>
+        <div class="stat-icon-wrap"><i class="bi bi-calendar3-fill"></i></div>
+        <div class="stat-value" id="cnt1">0</div>
+        <div class="stat-label">Total Kegiatan</div>
+        <div class="stat-sparkline" id="spark1"></div>
+      </div>
+      <div class="stat-card s2 fade-up">
+        <div class="stat-change up"><i class="bi bi-arrow-up"></i> 8%</div>
+        <div class="stat-icon-wrap"><i class="bi bi-images"></i></div>
+        <div class="stat-value" id="cnt2">0</div>
+        <div class="stat-label">Total Foto Uploaded</div>
+        <div class="stat-sparkline" id="spark2"></div>
+      </div>
+      <div class="stat-card s3 fade-up">
+        <div class="stat-change flat"><i class="bi bi-dash"></i> 0%</div>
+        <div class="stat-icon-wrap"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-value" id="cnt3">0</div>
+        <div class="stat-label">Pengguna Aktif</div>
+        <div class="stat-sparkline" id="spark3"></div>
+      </div>
+      <div class="stat-card s4 fade-up">
+        <div class="stat-change down"><i class="bi bi-arrow-down"></i> 3%</div>
+        <div class="stat-icon-wrap"><i class="bi bi-calendar-check-fill"></i></div>
+        <div class="stat-value" id="cnt4">0</div>
+        <div class="stat-label">Kegiatan Bulan Ini</div>
+        <div class="stat-sparkline" id="spark4"></div>
+      </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="content-row">
+
+      <!-- Recent Activities -->
+      <div class="panel fade-up">
+        <div class="panel-header">
+          <div class="panel-title"><i class="bi bi-clock-history"></i> Aktivitas Terbaru</div>
+          <a href="#" class="panel-link">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-icon blue"><i class="bi bi-camera-fill"></i></div>
+            <div class="act-info">
+              <div class="act-title">Kegiatan Rapat Koordinasi Dinkes</div>
+              <div class="act-desc">12 foto diupload &nbsp;·&nbsp; <span class="act-badge done">Selesai</span></div>
+            </div>
+            <div class="act-time">2j lalu</div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon green"><i class="bi bi-person-plus-fill"></i></div>
+            <div class="act-info">
+              <div class="act-title">Pengguna baru terdaftar</div>
+              <div class="act-desc">Budi Santoso — Dinas Kominfo &nbsp;·&nbsp; <span class="act-badge new">Baru</span></div>
+            </div>
+            <div class="act-time">4j lalu</div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon amber"><i class="bi bi-calendar-plus-fill"></i></div>
+            <div class="act-info">
+              <div class="act-title">Kegiatan Pelatihan SDM Ditambahkan</div>
+              <div class="act-desc">5 foto &nbsp;·&nbsp; <span class="act-badge pending">Draft</span></div>
+            </div>
+            <div class="act-time">6j lalu</div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon pink"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+            <div class="act-info">
+              <div class="act-title">Laporan Bulanan April Diekspor</div>
+              <div class="act-desc">PDF · 2.4 MB &nbsp;·&nbsp; <span class="act-badge done">Selesai</span></div>
+            </div>
+            <div class="act-time">Kemarin</div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon purple"><i class="bi bi-images"></i></div>
+            <div class="act-info">
+              <div class="act-title">Galeri Kunjungan Lapangan Diperbarui</div>
+              <div class="act-desc">8 foto baru ditambahkan &nbsp;·&nbsp; <span class="act-badge done">Selesai</span></div>
+            </div>
+            <div class="act-time">Kemarin</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar widgets -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Bar chart -->
+        <div class="panel fade-up">
+          <div class="panel-header">
+            <div class="panel-title"><i class="bi bi-bar-chart-fill"></i> Kegiatan / Bulan</div>
+          </div>
+          <div class="panel-body" style="padding-bottom:8px;">
+            <div class="bar-chart-wrap">
+              <div class="bar-chart" id="barChart"></div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--c-primary);"></div>
+                <div class="legend-label">Rapat</div>
+                <div class="legend-bar-wrap"><div class="legend-bar" style="width:72%;background:linear-gradient(90deg,var(--c-primary),var(--c-secondary));"></div></div>
+                <div class="legend-val">72</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--c-green);"></div>
+                <div class="legend-label">Pelatihan</div>
+                <div class="legend-bar-wrap"><div class="legend-bar" style="width:45%;background:linear-gradient(90deg,var(--c-green),#34d399);"></div></div>
+                <div class="legend-val">45</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--c-pink);"></div>
+                <div class="legend-label">Kunjungan</div>
+                <div class="legend-bar-wrap"><div class="legend-bar" style="width:31%;background:linear-gradient(90deg,var(--c-pink),#f472b6);"></div></div>
+                <div class="legend-val">31</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--c-accent);"></div>
+                <div class="legend-label">Lainnya</div>
+                <div class="legend-bar-wrap"><div class="legend-bar" style="width:18%;background:linear-gradient(90deg,var(--c-accent),var(--c-orange));"></div></div>
+                <div class="legend-val">18</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar mini -->
+        <div class="calendar-widget fade-up">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="calPrev()"><i class="bi bi-chevron-left"></i></button>
+            <h3 id="calTitle"></h3>
+            <button class="cal-nav" onclick="calNext()"><i class="bi bi-chevron-right"></i></button>
+          </div>
+          <div style="padding:8px 12px;">
+            <div class="cal-grid" id="calDayNames"></div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <h2 style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--c-text);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+      <i class="bi bi-lightning-fill" style="color:var(--c-accent);"></i> Aksi Cepat
+    </h2>
+    <div class="quick-actions fade-up">
+      <a href="#" class="qa-card">
+        <div class="qa-icon i1"><i class="bi bi-plus-circle-fill"></i></div>
+        <div class="qa-label">Tambah Kegiatan</div>
+      </a>
+      <a href="#" class="qa-card">
+        <div class="qa-icon i2"><i class="bi bi-cloud-upload-fill"></i></div>
+        <div class="qa-label">Upload Foto</div>
+      </a>
+      <a href="#" class="qa-card">
+        <div class="qa-icon i3"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+        <div class="qa-label">Export Laporan</div>
+      </a>
+      <a href="#" class="qa-card">
+        <div class="qa-icon i4"><i class="bi bi-person-plus-fill"></i></div>
+        <div class="qa-label">Tambah Pengguna</div>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-left">
+      &copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan. All rights reserved.
+    </div>
+    <div class="footer-links">
+      <a href="#">Bantuan</a>
+      <a href="#">Kebijakan Privasi</a>
+      <a href="#">Ketentuan Layanan</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════ FAB ═══════════ -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()" title="Kembali ke atas">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<!-- ═══════════ LOGOUT MODAL ═══════════ -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="logout-modal">
+    <div class="logout-icon-wrap">
+      <i class="bi bi-box-arrow-right"></i>
+    </div>
+    <h3>Konfirmasi Keluar</h3>
+    <p>Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan diakhiri dan Anda perlu login kembali.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="hideLogoutModal()">
+        <i class="bi bi-x-circle"></i> Batal
+      </button>
+      <button class="btn-modal-logout" onclick="doLogout()">
+        <i class="bi bi-box-arrow-right"></i> Ya, Keluar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   SIDEBAR TOGGLE
+═══════════════════════════════════════ */
+const isMobile = () => window.innerWidth <= 768;
+
+function toggleSidebar() {
+  if (isMobile()) {
+    document.body.classList.toggle('mobile-open');
+  } else {
+    document.body.classList.toggle('collapsed');
+  }
+}
+function closeMobileSidebar() {
+  document.body.classList.remove('mobile-open');
+}
+
+/* ═══════════════════════════════════════
+   USER DROPDOWN
+═══════════════════════════════════════ */
+const userTrigger  = document.getElementById('userTrigger');
+const userDropdown = document.getElementById('userDropdown');
+
+function toggleUserDropdown() {
+  const open = userDropdown.classList.toggle('show');
+  userTrigger.classList.toggle('open', open);
+}
+document.addEventListener('click', e => {
+  if (!document.querySelector('.user-dropdown-wrap').contains(e.target)) {
+    userDropdown.classList.remove('show');
+    userTrigger.classList.remove('open');
+  }
+});
+
+/* ═══════════════════════════════════════
+   LOGOUT MODAL
+═══════════════════════════════════════ */
+function showLogoutModal() {
+  userDropdown.classList.remove('show');
+  userTrigger.classList.remove('open');
+  document.getElementById('logoutModal').classList.add('show');
+}
+function hideLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('show');
+}
+function doLogout() {
+  const btn = document.querySelector('.btn-modal-logout');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Keluar...';
+  setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+}
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+  if (e.target === this) hideLogoutModal();
+});
+
+/* ═══════════════════════════════════════
+   FAB — SCROLL TO TOP
+═══════════════════════════════════════ */
+const fabBtn = document.getElementById('fabBtn');
+window.addEventListener('scroll', () => {
+  fabBtn.classList.toggle('visible', window.scrollY > 300);
+}, { passive: true });
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══════════════════════════════════════
+   ANIMATED COUNTERS
+═══════════════════════════════════════ */
+function animateCounter(id, target, suffix='') {
+  const el = document.getElementById(id);
+  const dur = 1400;
+  const step = 16;
+  const steps = dur / step;
+  let cur = 0;
+  const inc = target / steps;
+  const timer = setInterval(() => {
+    cur += inc;
+    if (cur >= target) { cur = target; clearInterval(timer); }
+    el.textContent = Math.floor(cur).toLocaleString('id-ID') + suffix;
+  }, step);
+}
+animateCounter('cnt1', 148);
+animateCounter('cnt2', 1247);
+animateCounter('cnt3', 32);
+animateCounter('cnt4', 24);
+
+/* ═══════════════════════════════════════
+   SPARKLINE BARS
+═══════════════════════════════════════ */
+function buildSparkline(id, data) {
+  const el = document.getElementById(id);
+  const max = Math.max(...data);
+  data.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'spark-bar';
+    bar.style.height = (v / max * 100) + '%';
+    bar.style.animationDelay = (i * .06) + 's';
+    el.appendChild(bar);
+  });
+}
+buildSparkline('spark1', [30,55,40,80,60,90,148]);
+buildSparkline('spark2', [200,400,380,600,700,900,1247]);
+buildSparkline('spark3', [20,22,25,28,30,31,32]);
+buildSparkline('spark4', [5,8,12,10,15,20,24]);
+
+/* ═══════════════════════════════════════
+   BAR CHART
+═══════════════════════════════════════ */
+(function buildBarChart() {
+  const chart = document.getElementById('barChart');
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Apr'];
+  const vals   = [8,12,10,15,9,18,14,20,13,16,11,24];
+  const max    = Math.max(...vals);
+  const now    = 11; // current month index
+
+  months.forEach((m, i) => {
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill' + (i === now ? ' active' : '');
+    fill.style.height = (vals[i] / max * 100) + '%';
+    fill.style.animationDelay = (i * .05) + 's';
+    const lbl = document.createElement('div');
+    lbl.className = 'bar-label';
+    lbl.textContent = m;
+    col.appendChild(fill);
+    col.appendChild(lbl);
+    chart.appendChild(col);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   MINI CALENDAR
+═══════════════════════════════════════ */
+let calDate = new Date();
+const DAYS  = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const EVENT_DAYS = [5, 12, 17, 21, 26]; // demo event dates
+
+function renderCalendar() {
+  const y = calDate.getFullYear();
+  const m = calDate.getMonth();
+  const today = new Date();
+
+  document.getElementById('calTitle').textContent = `${MONTHS[m]} ${y}`;
+
+  const dayNames = document.getElementById('calDayNames');
+  dayNames.innerHTML = '';
+  DAYS.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name'; el.textContent = d;
+    dayNames.appendChild(el);
+  });
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDays = new Date(y, m, 0).getDate();
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const el = document.createElement('div');
+    el.className = 'cal-day other';
+    el.textContent = prevDays - i;
+    grid.appendChild(el);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) el.classList.add('today');
+    if (EVENT_DAYS.includes(d)) el.classList.add('has-event');
+    el.textContent = d;
+    el.onclick = () => {};
+    grid.appendChild(el);
+  }
+}
+function calPrev() { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function calNext() { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+renderCalendar();
+
+/* ═══════════════════════════════════════
+   NAV ACTIVE STATE
+═══════════════════════════════════════ */
+document.querySelectorAll('.nav-link-item').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.nav-link-item').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    if (isMobile()) closeMobileSidebar();
+  });
+});
+</script>
+</body>
+</html>
