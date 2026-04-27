@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Pengaturan Sistem</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══════════════════════════════════════════
+       TOPBAR
+    ═══════════════════════════════════════════ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:background var(--trans); flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1) { width:18px; } .hline:nth-child(2) { width:14px; } .hline:nth-child(3) { width:18px; }
+    body.collapsed .hline:nth-child(1) { transform:translateY(7px) rotate(45deg); width:18px; }
+    body.collapsed .hline:nth-child(2) { opacity:0; width:0; }
+    body.collapsed .hline:nth-child(3) { transform:translateY(-7px) rotate(-45deg); width:18px; }
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    /* ═══════════════════════════════════════════
+       PAGE HEADER
+    ═══════════════════════════════════════════ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:20px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .ph-left h1 { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); margin-bottom:2px; display:flex; align-items:center; gap:10px; }
+    .ph-left h1 i { font-size:1.3rem; color:var(--c-primary); animation:iconWiggle 3s ease infinite; }
+    @keyframes iconWiggle { 0%,80%,100%{transform:rotate(0)} 85%{transform:rotate(-8deg)} 90%{transform:rotate(8deg)} 95%{transform:rotate(-4deg)} }
+    .ph-left p { font-size:.82rem; color:var(--c-muted); }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ═══════════════════════════════════════════
+       SETTINGS LAYOUT — vertical tab sidebar
+    ═══════════════════════════════════════════ */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── Settings Nav (left) ── */
+    .settings-nav {
+      background: #fff; border: 1px solid var(--c-border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      position: sticky; top: calc(var(--topbar-h) + 24px);
+      animation: fadeUp .4s ease .05s both;
+    }
+    .settings-nav-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--c-border);
+      font-size: .7rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--c-muted);
+    }
+    .snav-btn {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; padding: 12px 16px;
+      border: none; background: transparent; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .875rem; font-weight: 600; color: var(--c-text-2);
+      text-align: left; position: relative; overflow: hidden;
+      transition: background var(--trans), color var(--trans);
+    }
+    .snav-btn::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; border-radius: 0 3px 3px 0;
+      background: var(--c-primary); transform: scaleY(0);
+      transition: transform var(--trans);
+    }
+    .snav-btn:hover { background: rgba(79,70,229,.05); color: var(--c-primary); }
+    .snav-btn.active { background: linear-gradient(90deg,rgba(79,70,229,.1),rgba(79,70,229,.03)); color: var(--c-primary); font-weight: 700; }
+    .snav-btn.active::before { transform: scaleY(1); }
+    .snav-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: grid; place-items: center; font-size: .95rem; color: #fff;
+      flex-shrink: 0; transition: transform var(--trans);
+    }
+    .snav-btn:hover .snav-icon { transform: scale(1.1) rotate(-5deg); }
+    .snav-label { flex: 1; min-width: 0; }
+    .snav-desc { font-size: .68rem; color: var(--c-muted); font-weight: 500; margin-top: 1px; display: block; }
+    .snav-badge { font-size: .6rem; font-weight: 800; padding: 2px 6px; border-radius: 99px; color: #fff; flex-shrink: 0; }
+
+    /* ── Settings Panels (right) ── */
+    .settings-content { display: flex; flex-direction: column; gap: 0; }
+    .settings-panel {
+      display: none;
+      animation: panelIn .35s cubic-bezier(.22,1,.36,1) both;
+    }
+    .settings-panel.active { display: flex; flex-direction: column; gap: 20px; }
+    @keyframes panelIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+
+    /* ── Card ── */
+    .scard {
+      background: #fff; border: 1px solid var(--c-border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .scard-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--c-border);
+    }
+    .scard-title {
+      font-family: 'Nunito', sans-serif; font-weight: 800;
+      font-size: .95rem; color: var(--c-text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .scard-title i { color: var(--c-primary); font-size: 1rem; }
+    .scard-desc { font-size: .75rem; color: var(--c-muted); margin-top: 2px; }
+    .scard-body { padding: 20px; }
+
+    /* ── Setting row ── */
+    .setting-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid var(--c-border);
+    }
+    .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .setting-row:first-child { padding-top: 0; }
+    .setting-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 1rem; color: #fff;
+      flex-shrink: 0;
+    }
+    .setting-info { flex: 1; min-width: 0; }
+    .setting-label { font-size: .875rem; font-weight: 700; color: var(--c-text); margin-bottom: 2px; }
+    .setting-hint  { font-size: .75rem; color: var(--c-muted); line-height: 1.5; }
+    .setting-control { flex-shrink: 0; }
+
+    /* ── Toggle Switch ── */
+    .ts-wrap { position: relative; width: 46px; height: 26px; cursor: pointer; }
+    .ts-wrap input { display: none; }
+    .ts-track {
+      position: absolute; inset: 0; border-radius: 99px;
+      background: var(--c-border); transition: background var(--trans);
+    }
+    .ts-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2);
+      transition: transform var(--trans);
+    }
+    .ts-wrap input:checked ~ .ts-track { background: var(--c-green); }
+    .ts-wrap input:checked ~ .ts-track .ts-thumb { transform: translateX(20px); }
+    .ts-wrap input:checked[data-color="blue"]   ~ .ts-track { background: var(--c-primary); }
+    .ts-wrap input:checked[data-color="amber"]  ~ .ts-track { background: var(--c-accent); }
+    .ts-wrap input:checked[data-color="red"]    ~ .ts-track { background: var(--c-red); }
+    .ts-wrap input:checked[data-color="purple"] ~ .ts-track { background: var(--c-purple); }
+
+    /* ── Form fields ── */
+    .frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fgroup { margin-bottom: 16px; }
+    .fgroup:last-child { margin-bottom: 0; }
+    .flabel { font-size: .8rem; font-weight: 700; color: var(--c-text); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+    .flabel .req { color: var(--c-pink); }
+    .fwrap { position: relative; }
+    .ficon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--c-muted); font-size: .9rem; pointer-events: none; transition: color var(--trans); }
+    .fwrap:focus-within .ficon { color: var(--c-primary); }
+    .fctrl {
+      width: 100%; padding: 11px 13px 11px 38px;
+      border: 1.5px solid var(--c-border); border-radius: 10px;
+      font-size: .875rem; font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--c-surface2); color: var(--c-text);
+      outline: none; transition: border-color var(--trans), box-shadow var(--trans), background var(--trans);
+    }
+    .fctrl:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); background: #fff; }
+    .fctrl.no-icon { padding-left: 13px; }
+    .fhint { font-size: .72rem; color: var(--c-muted); margin-top: 4px; }
+    textarea.fctrl { resize: vertical; min-height: 80px; padding-top: 10px; }
+    select.fctrl { cursor: pointer; }
+
+    /* ── Buttons ── */
+    .btn-save {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 22px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg,var(--c-primary),var(--c-purple));
+      color: #fff; font-weight: 700; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.3);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(79,70,229,.45); }
+    .btn-save:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 18px; border-radius: 10px;
+      border: 1.5px solid var(--c-border); background: #fff;
+      color: var(--c-text-2); font-weight: 700; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer;
+      transition: border-color var(--trans), color var(--trans);
+    }
+    .btn-outline:hover { border-color: var(--c-primary); color: var(--c-primary); }
+    .btn-danger {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 18px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg,var(--c-red),#dc2626);
+      color: #fff; font-weight: 700; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(239,68,68,.3);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(239,68,68,.45); }
+    .btn-success {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 18px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg,var(--c-green),var(--c-secondary));
+      color: #fff; font-weight: 700; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,.3);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,.45); }
+    .btn-amber {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 18px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg,var(--c-accent),var(--c-orange));
+      color: #fff; font-weight: 700; font-size: .875rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(245,158,11,.3);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-amber:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(245,158,11,.45); }
+    .card-footer-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      padding: 14px 20px; border-top: 1px solid var(--c-border);
+      background: var(--c-surface2);
+    }
+
+    /* ── Theme selector ── */
+    .theme-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .theme-card {
+      border: 2px solid var(--c-border); border-radius: 12px;
+      padding: 14px 10px; text-align: center; cursor: pointer;
+      transition: border-color var(--trans), background var(--trans), transform var(--trans);
+      position: relative;
+    }
+    .theme-card:hover { border-color: var(--c-primary); transform: translateY(-2px); }
+    .theme-card.selected { border-color: var(--c-primary); background: rgba(79,70,229,.05); }
+    .theme-card.selected::after {
+      content: '\F26A'; font-family: 'bootstrap-icons';
+      position: absolute; top: -8px; right: -8px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--c-primary); color: #fff;
+      font-size: .8rem; display: grid; place-items: center;
+    }
+    .theme-preview {
+      width: 100%; height: 50px; border-radius: 8px; margin-bottom: 8px;
+      display: flex; overflow: hidden;
+    }
+    .theme-preview-sidebar { width: 30%; }
+    .theme-preview-main   { flex: 1; }
+    .theme-name { font-size: .75rem; font-weight: 700; color: var(--c-text); }
+
+    /* ── Color swatch ── */
+    .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+    .color-swatch {
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform var(--trans), border-color var(--trans), box-shadow var(--trans);
+      position: relative;
+    }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 3px currentColor; }
+    .color-swatch.selected::after {
+      content: '\F26A'; font-family: 'bootstrap-icons';
+      position: absolute; inset: 0; display: grid; place-items: center;
+      color: #fff; font-size: .8rem;
+    }
+
+    /* ── Font size slider ── */
+    .fsize-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 99px; background: var(--c-border); outline: none; cursor: pointer; }
+    .fsize-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--c-primary); cursor: pointer; box-shadow: 0 2px 8px rgba(79,70,229,.4); border: 3px solid #fff; }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      border: 2px dashed var(--c-border); border-radius: 12px;
+      padding: 24px; text-align: center; cursor: pointer;
+      transition: border-color var(--trans), background var(--trans);
+      background: var(--c-surface2); position: relative; overflow: hidden;
+    }
+    .upload-zone:hover { border-color: var(--c-primary); background: rgba(79,70,229,.03); }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-zone i { font-size: 2rem; color: var(--c-muted); margin-bottom: 8px; }
+    .upload-zone .uz-title { font-size: .875rem; font-weight: 700; color: var(--c-text); margin-bottom: 4px; }
+    .upload-zone .uz-sub   { font-size: .75rem; color: var(--c-muted); }
+
+    /* ── Logo preview ── */
+    .logo-preview-box {
+      display: flex; align-items: center; justify-content: center;
+      height: 80px; border-radius: 12px;
+      background: linear-gradient(135deg,#f8fafc,#f1f5f9);
+      border: 1.5px solid var(--c-border); margin-bottom: 12px;
+    }
+
+    /* ── Email test badge ── */
+    .email-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 99px; font-size: .75rem; font-weight: 700;
+    }
+    .email-status.success { background: #f0fdf4; color: var(--c-green); border: 1px solid #bbf7d0; }
+    .email-status.error   { background: #fef2f2; color: var(--c-red);   border: 1px solid #fecaca; }
+    .email-status.idle    { background: var(--c-surface2); color: var(--c-muted); border: 1px solid var(--c-border); }
+
+    /* ── Backup items ── */
+    .backup-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid var(--c-border);
+    }
+    .backup-item:last-child { border-bottom: none; }
+    .backup-file-icon { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; font-size: 1.1rem; color: #fff; flex-shrink: 0; }
+    .backup-info { flex: 1; min-width: 0; }
+    .backup-name { font-size: .875rem; font-weight: 700; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .backup-meta { font-size: .72rem; color: var(--c-muted); margin-top: 2px; }
+    .backup-size { font-family: 'DM Mono', monospace; font-size: .78rem; color: var(--c-text-2); font-weight: 500; flex-shrink: 0; }
+    .backup-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-sm-icon {
+      width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--c-border);
+      background: #fff; cursor: pointer; display: grid; place-items: center;
+      font-size: .85rem; color: var(--c-text-2);
+      transition: border-color var(--trans), color var(--trans), background var(--trans);
+    }
+    .btn-sm-icon:hover { border-color: var(--c-primary); color: var(--c-primary); background: #f5f3ff; }
+    .btn-sm-icon.red:hover { border-color: var(--c-red); color: var(--c-red); background: #fef2f2; }
+
+    /* ── Log table ── */
+    .log-table { width: 100%; border-collapse: collapse; }
+    .log-table th { background: var(--c-surface2); padding: 10px 14px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--c-muted); border-bottom: 1px solid var(--c-border); text-align: left; white-space: nowrap; }
+    .log-table td { padding: 12px 14px; font-size: .82rem; border-bottom: 1px solid var(--c-border); vertical-align: middle; }
+    .log-table tr:last-child td { border-bottom: none; }
+    .log-table tr:hover td { background: rgba(79,70,229,.02); }
+    .log-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; font-size: .68rem; font-weight: 700; }
+    .log-info    { background: #eff6ff; color: var(--c-primary); }
+    .log-success { background: #f0fdf4; color: var(--c-green); }
+    .log-warning { background: #fffbeb; color: #d97706; }
+    .log-error   { background: #fef2f2; color: var(--c-red); }
+    .log-user-cell { display: flex; align-items: center; gap: 8px; }
+    .log-avatar { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: .72rem; font-weight: 800; flex-shrink: 0; }
+
+    /* ── Progress bar ── */
+    .progress-bar-wrap { height: 8px; background: var(--c-border); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; border-radius: 99px; animation: fillGrow .8s ease both; }
+    @keyframes fillGrow { from{width:0!important} }
+
+    /* ── Storage usage ── */
+    .storage-ring-wrap { display: flex; align-items: center; gap: 20px; }
+    .storage-ring { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
+    .storage-ring svg { transform: rotate(-90deg); }
+    .storage-ring-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+    .storage-pct { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: var(--c-text); }
+    .storage-label { font-size: .62rem; color: var(--c-muted); font-weight: 600; }
+
+    /* ── Alert info box ── */
+    .alert-info-box {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 14px 16px; border-radius: 12px;
+      font-size: .82rem; line-height: 1.6; color: var(--c-text-2);
+    }
+    .alert-info-box i { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-blue   { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .alert-blue i { color: #3b82f6; }
+    .alert-amber  { background: #fffbeb; border: 1px solid #fde68a; }
+    .alert-amber i { color: #d97706; }
+    .alert-red    { background: #fef2f2; border: 1px solid #fecaca; }
+    .alert-red i  { color: var(--c-red); }
+    .alert-green  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .alert-green i { color: var(--c-green); }
+
+    /* ── Danger zone ── */
+    .danger-zone {
+      border: 1.5px solid rgba(239,68,68,.25);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .danger-zone-head {
+      padding: 14px 18px;
+      background: linear-gradient(90deg,rgba(239,68,68,.08),rgba(239,68,68,.03));
+      border-bottom: 1.5px solid rgba(239,68,68,.15);
+      font-family: 'Nunito', sans-serif; font-weight: 800;
+      font-size: .9rem; color: var(--c-red);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .danger-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 18px; border-bottom: 1px solid rgba(239,68,68,.1);
+    }
+    .danger-row:last-child { border-bottom: none; }
+    .danger-info { flex: 1; min-width: 0; }
+    .danger-title { font-size: .875rem; font-weight: 700; color: var(--c-text); margin-bottom: 3px; }
+    .danger-desc  { font-size: .75rem; color: var(--c-muted); line-height: 1.5; }
+
+    /* ── Maintenance countdown ── */
+    .countdown-boxes { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+    .cd-box { text-align: center; }
+    .cd-num { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 1.8rem; color: var(--c-text); background: var(--c-surface2); border: 1.5px solid var(--c-border); border-radius: 10px; padding: 8px 14px; min-width: 56px; display: block; animation: cdPulse 1s ease-in-out infinite alternate; }
+    .cd-lbl { font-size: .65rem; color: var(--c-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-top: 5px; }
+    @keyframes cdPulse { from{border-color:var(--c-border)} to{border-color:rgba(79,70,229,.3)} }
+
+    /* ─── Modal ─── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); z-index:1000; display:grid; place-items:center; opacity:0; pointer-events:none; transition:opacity .25s; padding:16px; }
+    .modal-overlay.show { opacity:1; pointer-events:all; }
+    .modal-box { background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); width:100%; max-width:420px; text-align:center; padding:36px 28px; transform:translateY(24px) scale(.96); transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .modal-overlay.show .modal-box { transform:translateY(0) scale(1); }
+    .modal-icon { width:80px; height:80px; border-radius:50%; display:grid; place-items:center; margin:0 auto 16px; }
+    .modal-icon i { font-size:2.2rem; }
+    .modal-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.3rem; color:var(--c-text); margin-bottom:8px; }
+    .modal-desc  { font-size:.875rem; color:var(--c-muted); line-height:1.6; margin-bottom:24px; }
+    .modal-btns  { display:flex; gap:10px; }
+    .btn-modal-cancel { flex:1; padding:12px; border-radius:10px; border:1.5px solid var(--c-border); background:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9rem; color:var(--c-text-2); cursor:pointer; transition:border-color var(--trans); }
+    .btn-modal-cancel:hover { border-color:var(--c-primary); color:var(--c-primary); }
+    .btn-modal-confirm { flex:1; padding:12px; border-radius:10px; border:none; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9rem; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-modal-confirm:hover { transform:translateY(-1px); }
+
+    /* ─── Toast ─── */
+    .toast-wrap { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:2000; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; }
+    .toast-item { display:flex; align-items:center; gap:10px; padding:12px 20px; border-radius:12px; font-size:.875rem; font-weight:600; color:#fff; box-shadow:0 6px 20px rgba(0,0,0,.15); animation:toastIn .4s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes toastIn { from{opacity:0;transform:translateY(16px) scale(.9)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .toast-item.out { animation:toastOut .3s ease both; }
+    @keyframes toastOut { to{opacity:0;transform:translateY(8px) scale(.9)} }
+    .toast-success { background:linear-gradient(135deg,var(--c-green),#059669); }
+    .toast-error   { background:linear-gradient(135deg,var(--c-red),#dc2626); }
+    .toast-info    { background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); }
+    .toast-warning { background:linear-gradient(135deg,var(--c-accent),var(--c-orange)); }
+
+    /* ─── FAB ─── */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(79,70,229,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(79,70,229,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* ─── Footer ─── */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1024px) { .settings-grid { grid-template-columns: 200px 1fr; } .frow2 { grid-template-columns: 1fr; } }
+    @media(max-width:900px) { .settings-grid { grid-template-columns: 1fr; } .settings-nav { position:static; } }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;} .main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;} .user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .theme-grid{grid-template-columns:repeat(2,1fr);}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+    }
+    @media(max-width:576px) {
+      .page-header{flex-direction:column;align-items:flex-start;}
+      .main-footer{flex-direction:column;align-items:flex-start;}
+      .modal-btns{flex-direction:column;}
+      .countdown-boxes{gap:6px;}
+      .cd-num{font-size:1.4rem;padding:6px 10px;min-width:44px;}
+      .storage-ring-wrap{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item active" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari pengaturan..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger" onclick="showModal('logout')"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1><i class="bi bi-gear-wide-connected"></i> Pengaturan Sistem</h1>
+      <p>Konfigurasi, keamanan, tampilan, dan pengelolaan sistem DokaKegiatan.</p>
+    </div>
+    <nav class="breadcrumb-nav">
+      <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <span class="bc-current"><i class="bi bi-gear-wide-connected"></i> Pengaturan Sistem</span>
+    </nav>
+  </div>
+
+  <!-- Settings Layout -->
+  <div class="settings-grid">
+
+    <!-- ── Settings Nav ── -->
+    <div class="settings-nav">
+      <div class="settings-nav-head">Menu Pengaturan</div>
+
+      <button class="snav-btn active" onclick="switchSection('umum')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-sliders2"></i></div>
+        <div class="snav-label"><span>Umum</span><span class="snav-desc">Info & konfigurasi dasar</span></div>
+      </button>
+      <button class="snav-btn" onclick="switchSection('tampilan')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,var(--c-pink),#f472b6);"><i class="bi bi-palette-fill"></i></div>
+        <div class="snav-label"><span>Tampilan</span><span class="snav-desc">Tema, warna & logo</span></div>
+      </button>
+      <button class="snav-btn" onclick="switchSection('email')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-envelope-fill"></i></div>
+        <div class="snav-label"><span>Email & Notifikasi</span><span class="snav-desc">SMTP & template</span></div>
+      </button>
+      <button class="snav-btn" onclick="switchSection('storage')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,var(--c-green),var(--c-secondary));"><i class="bi bi-hdd-stack-fill"></i></div>
+        <div class="snav-label"><span>Storage & Backup</span><span class="snav-desc">File & cadangan data</span></div>
+      </button>
+      <button class="snav-btn" onclick="switchSection('keamanan')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,var(--c-purple),var(--c-pink));"><i class="bi bi-shield-lock-fill"></i></div>
+        <div class="snav-label"><span>Keamanan</span><span class="snav-desc">Akses & proteksi</span></div>
+        <span class="snav-badge" style="background:var(--c-red);">!</span>
+      </button>
+      <button class="snav-btn" onclick="switchSection('log')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,#6b7280,#9ca3af);"><i class="bi bi-journal-text"></i></div>
+        <div class="snav-label"><span>Log Aktivitas</span><span class="snav-desc">Riwayat sistem</span></div>
+      </button>
+      <button class="snav-btn" onclick="switchSection('maintenance')">
+        <div class="snav-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4);"><i class="bi bi-tools"></i></div>
+        <div class="snav-label"><span>Pemeliharaan</span><span class="snav-desc">Cache & mode maintenance</span></div>
+      </button>
+    </div>
+
+    <!-- ── Settings Content ── -->
+    <div class="settings-content">
+
+      <!-- ══════ UMUM ══════ -->
+      <div class="settings-panel active" id="sec-umum">
+
+        <!-- Info Aplikasi -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-info-circle-fill"></i> Informasi Aplikasi</div><div class="scard-desc">Identitas dan konfigurasi dasar sistem</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-type" style="color:var(--c-muted);font-size:.85rem;"></i> Nama Aplikasi <span class="req">*</span></div>
+                <div class="fwrap"><i class="bi bi-type ficon"></i><input type="text" class="fctrl" value="DokaKegiatan" /></div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-globe" style="color:var(--c-muted);font-size:.85rem;"></i> URL Aplikasi <span class="req">*</span></div>
+                <div class="fwrap"><i class="bi bi-globe ficon"></i><input type="url" class="fctrl" value="https://dokaKegiatan.pekalongan.go.id" /></div>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-card-text" style="color:var(--c-muted);font-size:.85rem;"></i> Deskripsi Aplikasi</div>
+              <div class="fwrap"><textarea class="fctrl no-icon">Sistem Dokumentasi Kegiatan Pemerintah Kota Pekalongan — platform digital untuk mencatat, mengarsipkan, dan mengelola dokumentasi kegiatan seluruh OPD.</textarea></div>
+            </div>
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-translate" style="color:var(--c-muted);font-size:.85rem;"></i> Bahasa Default</div>
+                <div class="fwrap"><i class="bi bi-translate ficon"></i>
+                  <select class="fctrl"><option>Bahasa Indonesia</option><option>English</option></select>
+                </div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-clock" style="color:var(--c-muted);font-size:.85rem;"></i> Zona Waktu</div>
+                <div class="fwrap"><i class="bi bi-clock ficon"></i>
+                  <select class="fctrl"><option>Asia/Jakarta (WIB)</option><option>Asia/Makassar (WITA)</option><option>Asia/Jayapura (WIT)</option></select>
+                </div>
+              </div>
+            </div>
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-calendar3" style="color:var(--c-muted);font-size:.85rem;"></i> Format Tanggal</div>
+                <div class="fwrap"><i class="bi bi-calendar3 ficon"></i>
+                  <select class="fctrl"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option><option>DD MMMM YYYY</option></select>
+                </div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel"><i class="bi bi-currency-dollar" style="color:var(--c-muted);font-size:.85rem;"></i> Nomor Versi</div>
+                <div class="fwrap"><i class="bi bi-hash ficon"></i><input type="text" class="fctrl" value="1.2.0" readonly style="background:var(--c-surface2);color:var(--c-muted);" /></div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-outline" onclick="showToast('Perubahan dibatalkan','info')"><i class="bi bi-x-circle"></i> Batal</button>
+            <button class="btn-save" onclick="save('Pengaturan umum')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+        <!-- Fitur Sistem -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-toggles"></i> Fitur Sistem</div><div class="scard-desc">Aktifkan atau nonaktifkan fitur yang tersedia</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-person-plus-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Pendaftaran Pengguna</div><div class="setting-hint">Izinkan pengguna baru mendaftar secara mandiri tanpa undangan admin.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-green),#34d399);"><i class="bi bi-envelope-check-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Verifikasi Email Wajib</div><div class="setting-hint">Pengguna harus verifikasi email sebelum dapat login ke sistem.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Export PDF</div><div class="setting-hint">Izinkan pengguna mengunduh laporan dalam format PDF.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-pink),#f472b6);"><i class="bi bi-images"></i></div>
+              <div class="setting-info"><div class="setting-label">Galeri Publik</div><div class="setting-hint">Tampilkan galeri foto kegiatan yang dapat diakses tanpa login.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-purple),#a78bfa);"><i class="bi bi-bell-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Notifikasi Real-time</div><div class="setting-hint">Aktifkan notifikasi push untuk aktivitas kegiatan terbaru.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Pengaturan fitur')"><i class="bi bi-check2-circle"></i> Simpan Fitur</button>
+          </div>
+        </div>
+
+        <!-- Batas Upload -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-cloud-upload-fill"></i> Batas Upload</div><div class="scard-desc">Konfigurasi ukuran dan jenis file yang diizinkan</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel">Ukuran Maks. per File</div>
+                <div class="fwrap"><i class="bi bi-hdd-fill ficon"></i><input type="number" class="fctrl" value="10" /><span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:.78rem;color:var(--c-muted);font-weight:600;">MB</span></div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Maks. Foto per Kegiatan</div>
+                <div class="fwrap"><i class="bi bi-images ficon"></i><input type="number" class="fctrl" value="20" /></div>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel">Tipe File Diizinkan</div>
+              <div class="fwrap"><i class="bi bi-file-earmark-fill ficon"></i><input type="text" class="fctrl" value="jpg, jpeg, png, webp, gif, mp4, pdf" /></div>
+              <div class="fhint"><i class="bi bi-info-circle"></i> Pisahkan dengan koma. Contoh: jpg, png, pdf</div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Batas upload')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-umum -->
+
+      <!-- ══════ TAMPILAN ══════ -->
+      <div class="settings-panel" id="sec-tampilan">
+
+        <!-- Logo & Favicon -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-image-fill"></i> Logo & Favicon</div><div class="scard-desc">Identitas visual aplikasi</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel">Logo Utama</div>
+                <div class="logo-preview-box">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));display:grid;place-items:center;color:#fff;font-size:1.1rem;"><i class="bi bi-camera-reels-fill"></i></div>
+                    <span style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--c-text);">Doka<span style="color:var(--c-primary);">Kegiatan</span></span>
+                  </div>
+                </div>
+                <div class="upload-zone">
+                  <input type="file" accept="image/*" />
+                  <i class="bi bi-cloud-upload-fill"></i>
+                  <div class="uz-title">Upload Logo</div>
+                  <div class="uz-sub">PNG, SVG · Maks. 2MB</div>
+                </div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Favicon</div>
+                <div class="logo-preview-box">
+                  <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));display:grid;place-items:center;color:#fff;font-size:1.2rem;"><i class="bi bi-camera-reels-fill"></i></div>
+                </div>
+                <div class="upload-zone">
+                  <input type="file" accept="image/x-icon,image/png" />
+                  <i class="bi bi-cloud-upload-fill"></i>
+                  <div class="uz-title">Upload Favicon</div>
+                  <div class="uz-sub">ICO, PNG 32×32 · Maks. 512KB</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Logo & favicon')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+        <!-- Tema -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-palette-fill"></i> Tema Tampilan</div><div class="scard-desc">Pilih skema warna antarmuka</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="flabel" style="margin-bottom:12px;">Pilih Tema</div>
+            <div class="theme-grid">
+              <!-- Light -->
+              <div class="theme-card selected" onclick="selectTheme(this,'Light')">
+                <div class="theme-preview">
+                  <div class="theme-preview-sidebar" style="background:#fff;border-right:1px solid #e2e8f0;"></div>
+                  <div class="theme-preview-main" style="background:#f1f5f9;display:flex;flex-direction:column;gap:4px;padding:6px;">
+                    <div style="height:8px;background:#fff;border-radius:3px;"></div>
+                    <div style="height:16px;background:#fff;border-radius:3px;"></div>
+                    <div style="height:8px;background:#fff;border-radius:3px;width:60%;"></div>
+                  </div>
+                </div>
+                <div class="theme-name">☀️ Light</div>
+              </div>
+              <!-- Dark -->
+              <div class="theme-card" onclick="selectTheme(this,'Dark')">
+                <div class="theme-preview">
+                  <div class="theme-preview-sidebar" style="background:#1e293b;"></div>
+                  <div class="theme-preview-main" style="background:#0f172a;display:flex;flex-direction:column;gap:4px;padding:6px;">
+                    <div style="height:8px;background:#1e293b;border-radius:3px;"></div>
+                    <div style="height:16px;background:#1e293b;border-radius:3px;"></div>
+                    <div style="height:8px;background:#1e293b;border-radius:3px;width:60%;"></div>
+                  </div>
+                </div>
+                <div class="theme-name">🌙 Dark</div>
+              </div>
+              <!-- Auto -->
+              <div class="theme-card" onclick="selectTheme(this,'Auto')">
+                <div class="theme-preview">
+                  <div class="theme-preview-sidebar" style="background:linear-gradient(to bottom,#fff 50%,#1e293b 50%);"></div>
+                  <div class="theme-preview-main" style="background:linear-gradient(to bottom,#f1f5f9 50%,#0f172a 50%);display:flex;flex-direction:column;gap:4px;padding:6px;">
+                    <div style="height:8px;background:linear-gradient(to right,#fff,#1e293b);border-radius:3px;"></div>
+                    <div style="height:16px;background:linear-gradient(to right,#fff,#1e293b);border-radius:3px;"></div>
+                  </div>
+                </div>
+                <div class="theme-name">🔄 Auto</div>
+              </div>
+            </div>
+
+            <!-- Primary color -->
+            <div class="flabel" style="margin:20px 0 10px;">Warna Utama</div>
+            <div class="color-swatches" id="colorSwatches">
+              <div class="color-swatch selected" style="background:#4f46e5;color:#4f46e5;" data-color="#4f46e5" onclick="selectColor(this)" title="Indigo"></div>
+              <div class="color-swatch" style="background:#0891b2;color:#0891b2;" data-color="#0891b2" onclick="selectColor(this)" title="Cyan"></div>
+              <div class="color-swatch" style="background:#10b981;color:#10b981;" data-color="#10b981" onclick="selectColor(this)" title="Emerald"></div>
+              <div class="color-swatch" style="background:#f59e0b;color:#f59e0b;" data-color="#f59e0b" onclick="selectColor(this)" title="Amber"></div>
+              <div class="color-swatch" style="background:#ec4899;color:#ec4899;" data-color="#ec4899" onclick="selectColor(this)" title="Pink"></div>
+              <div class="color-swatch" style="background:#ef4444;color:#ef4444;" data-color="#ef4444" onclick="selectColor(this)" title="Red"></div>
+              <div class="color-swatch" style="background:#8b5cf6;color:#8b5cf6;" data-color="#8b5cf6" onclick="selectColor(this)" title="Violet"></div>
+              <div class="color-swatch" style="background:#f97316;color:#f97316;" data-color="#f97316" onclick="selectColor(this)" title="Orange"></div>
+            </div>
+
+            <!-- Font size -->
+            <div class="flabel" style="margin:20px 0 10px;">Ukuran Font <span id="fontSizeVal" style="font-family:'DM Mono',monospace;color:var(--c-primary);">14px</span></div>
+            <input type="range" class="fsize-slider" min="12" max="18" value="14" oninput="document.getElementById('fontSizeVal').textContent=this.value+'px'" />
+            <div style="display:flex;justify-content:space-between;margin-top:4px;">
+              <span style="font-size:.7rem;color:var(--c-muted);">Kecil (12px)</span>
+              <span style="font-size:.7rem;color:var(--c-muted);">Besar (18px)</span>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-outline" onclick="showToast('Tema direset ke default','info')"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+            <button class="btn-save" onclick="save('Pengaturan tampilan')"><i class="bi bi-check2-circle"></i> Terapkan</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-tampilan -->
+
+      <!-- ══════ EMAIL ══════ -->
+      <div class="settings-panel" id="sec-email">
+
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-server"></i> Konfigurasi SMTP</div><div class="scard-desc">Server email untuk pengiriman notifikasi</div></div>
+            <div id="emailStatusBadge" class="email-status idle"><i class="bi bi-circle-fill" style="font-size:.5rem;"></i> Belum diuji</div>
+          </div>
+          <div class="scard-body">
+            <div class="alert-info-box alert-blue" style="margin-bottom:18px;">
+              <i class="bi bi-info-circle-fill"></i>
+              <span>Konfigurasi SMTP diperlukan agar sistem dapat mengirimkan email verifikasi, reset password, dan notifikasi ke pengguna.</span>
+            </div>
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel"><span class="req">*</span> Host SMTP</div>
+                <div class="fwrap"><i class="bi bi-server ficon"></i><input type="text" class="fctrl" value="smtp.gmail.com" /></div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel"><span class="req">*</span> Port</div>
+                <div class="fwrap"><i class="bi bi-hash ficon"></i><input type="number" class="fctrl" value="587" /></div>
+              </div>
+            </div>
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel"><span class="req">*</span> Username</div>
+                <div class="fwrap"><i class="bi bi-person-fill ficon"></i><input type="text" class="fctrl" value="noreply@pekalongan.go.id" /></div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel"><span class="req">*</span> Password</div>
+                <div class="fwrap"><i class="bi bi-lock-fill ficon"></i><input type="password" class="fctrl" value="**************" /></div>
+              </div>
+            </div>
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel">Enkripsi</div>
+                <div class="fwrap"><i class="bi bi-shield-fill ficon"></i><select class="fctrl"><option>TLS</option><option>SSL</option><option>None</option></select></div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Nama Pengirim</div>
+                <div class="fwrap"><i class="bi bi-type ficon"></i><input type="text" class="fctrl" value="DokaKegiatan System" /></div>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel">Email Pengirim</div>
+              <div class="fwrap"><i class="bi bi-envelope-fill ficon"></i><input type="email" class="fctrl" value="noreply@pekalongan.go.id" /></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-amber" onclick="testEmail()"><i class="bi bi-send-fill"></i> Test Kirim Email</button>
+            <button class="btn-save" onclick="save('Konfigurasi SMTP')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-bell-fill"></i> Pengaturan Notifikasi Email</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-person-plus-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Email Selamat Datang</div><div class="setting-hint">Kirim email selamat datang saat pengguna baru terdaftar.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-key-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Reset Password</div><div class="setting-hint">Kirim email tautan reset password saat diminta.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-green),#34d399);"><i class="bi bi-calendar-check-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Notifikasi Kegiatan</div><div class="setting-hint">Kirim email saat kegiatan baru ditambahkan oleh tim.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-pink),#f472b6);"><i class="bi bi-file-earmark-text-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Laporan Mingguan</div><div class="setting-hint">Kirim rangkuman laporan aktivitas setiap minggu ke admin.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Notifikasi email')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-email -->
+
+      <!-- ══════ STORAGE ══════ -->
+      <div class="settings-panel" id="sec-storage">
+
+        <!-- Storage usage -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-hdd-fill"></i> Penggunaan Storage</div><div class="scard-desc">Ringkasan kapasitas penyimpanan sistem</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="storage-ring-wrap" style="margin-bottom:20px;">
+              <div class="storage-ring">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="url(#stGrad)" stroke-width="8"
+                    stroke-dasharray="238.76" stroke-dashoffset="71.6"
+                    stroke-linecap="round" style="transition:stroke-dashoffset .8s ease;"/>
+                  <defs><linearGradient id="stGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+                </svg>
+                <div class="storage-ring-center">
+                  <div class="storage-pct">70%</div>
+                  <div class="storage-label">Used</div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.8rem;font-weight:600;"><span style="color:var(--c-text);">Foto Kegiatan</span><span style="color:var(--c-primary);font-family:'DM Mono',monospace;">6.8 GB</span></div>
+                    <div class="progress-bar-wrap"><div class="progress-fill" style="width:68%;background:linear-gradient(90deg,var(--c-primary),var(--c-secondary));"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.8rem;font-weight:600;"><span style="color:var(--c-text);">Dokumen PDF</span><span style="color:var(--c-green);font-family:'DM Mono',monospace;">1.1 GB</span></div>
+                    <div class="progress-bar-wrap"><div class="progress-fill" style="width:11%;background:linear-gradient(90deg,var(--c-green),#34d399);"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.8rem;font-weight:600;"><span style="color:var(--c-text);">Backup Data</span><span style="color:var(--c-accent);font-family:'DM Mono',monospace;">1.1 GB</span></div>
+                    <div class="progress-bar-wrap"><div class="progress-fill" style="width:11%;background:linear-gradient(90deg,var(--c-accent),var(--c-orange));"></div></div>
+                  </div>
+                </div>
+                <div style="margin-top:14px;font-size:.78rem;color:var(--c-muted);">Total: <strong style="color:var(--c-text);">9.0 GB</strong> dari <strong style="color:var(--c-text);">10 GB</strong></div>
+              </div>
+            </div>
+            <div class="alert-info-box alert-amber">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Storage hampir penuh. Pertimbangkan untuk meningkatkan kapasitas atau menghapus file lama yang tidak diperlukan.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backup -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-cloud-arrow-down-fill"></i> Backup & Restore</div><div class="scard-desc">Cadangan database dan file sistem</div></div>
+            <button class="btn-success" onclick="showModal('backup')"><i class="bi bi-cloud-plus-fill"></i> Buat Backup</button>
+          </div>
+          <div class="scard-body">
+            <!-- Auto backup settings -->
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-green),var(--c-secondary));"><i class="bi bi-arrow-repeat"></i></div>
+              <div class="setting-info"><div class="setting-label">Backup Otomatis</div><div class="setting-hint">Buat backup secara otomatis setiap hari pukul 02.00 WIB.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div style="height:1px;background:var(--c-border);margin:4px 0 14px;"></div>
+            <!-- Backup list -->
+            <div class="backup-item">
+              <div class="backup-file-icon" style="background:linear-gradient(135deg,var(--c-green),#34d399);"><i class="bi bi-database-fill-check"></i></div>
+              <div class="backup-info"><div class="backup-name">backup_2025-04-24_02-00.sql.gz</div><div class="backup-meta">Database · <strong>Hari ini 02:00</strong> · Otomatis</div></div>
+              <div class="backup-size">128 MB</div>
+              <div class="backup-actions">
+                <button class="btn-sm-icon" title="Download"><i class="bi bi-download"></i></button>
+                <button class="btn-sm-icon" title="Restore" onclick="showModal('restore')"><i class="bi bi-arrow-counterclockwise"></i></button>
+                <button class="btn-sm-icon red" title="Hapus" onclick="showModal('delbackup')"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            </div>
+            <div class="backup-item">
+              <div class="backup-file-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-archive-fill"></i></div>
+              <div class="backup-info"><div class="backup-name">backup_full_2025-04-23_02-00.tar.gz</div><div class="backup-meta">Database + File · <strong>Kemarin 02:00</strong> · Otomatis</div></div>
+              <div class="backup-size">2.1 GB</div>
+              <div class="backup-actions">
+                <button class="btn-sm-icon" title="Download"><i class="bi bi-download"></i></button>
+                <button class="btn-sm-icon" title="Restore" onclick="showModal('restore')"><i class="bi bi-arrow-counterclockwise"></i></button>
+                <button class="btn-sm-icon red" title="Hapus" onclick="showModal('delbackup')"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            </div>
+            <div class="backup-item">
+              <div class="backup-file-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-database-fill"></i></div>
+              <div class="backup-info"><div class="backup-name">backup_2025-04-22_02-00.sql.gz</div><div class="backup-meta">Database · <strong>22 Apr 2025</strong> · Otomatis</div></div>
+              <div class="backup-size">125 MB</div>
+              <div class="backup-actions">
+                <button class="btn-sm-icon" title="Download"><i class="bi bi-download"></i></button>
+                <button class="btn-sm-icon" title="Restore" onclick="showModal('restore')"><i class="bi bi-arrow-counterclockwise"></i></button>
+                <button class="btn-sm-icon red" title="Hapus" onclick="showModal('delbackup')"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /sec-storage -->
+
+      <!-- ══════ KEAMANAN ══════ -->
+      <div class="settings-panel" id="sec-keamanan">
+
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-shield-lock-fill"></i> Kebijakan Password</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-key-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Minimum Panjang Password</div><div class="setting-hint">Pengguna harus membuat password minimal sepanjang karakter ini.</div></div>
+              <div class="setting-control"><select class="fctrl no-icon" style="width:80px;padding:8px 10px;font-size:.82rem;"><option>6</option><option selected>8</option><option>10</option><option>12</option></select></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-green),#34d399);"><i class="bi bi-asterisk"></i></div>
+              <div class="setting-info"><div class="setting-label">Wajib Karakter Khusus</div><div class="setting-hint">Password harus mengandung simbol seperti !@#$%.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-clock-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Kadaluarsa Password</div><div class="setting-hint">Paksa pengguna mengganti password setiap 90 hari.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-red),#f87171);"><i class="bi bi-shield-x-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Blokir Setelah Gagal Login</div><div class="setting-hint">Kunci akun setelah 5 kali percobaan login yang gagal.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Kebijakan password')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-shield-fill-check"></i> Proteksi & Akses</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4);"><i class="bi bi-recaptcha"></i></div>
+              <div class="setting-info"><div class="setting-label">Google reCAPTCHA</div><div class="setting-hint">Aktifkan proteksi bot pada form login dan registrasi.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-purple),#a78bfa);"><i class="bi bi-phone-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Autentikasi 2 Faktor (2FA)</div><div class="setting-hint">Wajibkan 2FA untuk semua akun administrator.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-green),var(--c-secondary));"><i class="bi bi-globe2"></i></div>
+              <div class="setting-info"><div class="setting-label">Whitelist IP</div><div class="setting-hint">Batasi akses admin hanya dari IP tertentu.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,var(--c-pink),#f472b6);"><i class="bi bi-broadcast-pin"></i></div>
+              <div class="setting-info"><div class="setting-label">Force HTTPS</div><div class="setting-hint">Alihkan semua koneksi HTTP ke HTTPS secara otomatis.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Proteksi sistem')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+        <!-- Session -->
+        <div class="scard">
+          <div class="scard-head"><div><div class="scard-title"><i class="bi bi-clock-history"></i> Manajemen Sesi</div></div></div>
+          <div class="scard-body">
+            <div class="frow2">
+              <div class="fgroup">
+                <div class="flabel">Durasi Sesi (menit)</div>
+                <div class="fwrap"><i class="bi bi-clock ficon"></i><input type="number" class="fctrl" value="120" /></div>
+                <div class="fhint">0 = tidak pernah kadaluarsa</div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Maks. Login Per Akun</div>
+                <div class="fwrap"><i class="bi bi-people-fill ficon"></i><input type="number" class="fctrl" value="3" /></div>
+                <div class="fhint">0 = tidak dibatasi</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-danger" onclick="showModal('killsession')"><i class="bi bi-x-circle-fill"></i> Akhiri Semua Sesi</button>
+            <button class="btn-save" onclick="save('Pengaturan sesi')"><i class="bi bi-check2-circle"></i> Simpan</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-keamanan -->
+
+      <!-- ══════ LOG ══════ -->
+      <div class="settings-panel" id="sec-log">
+
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-journal-text"></i> Log Aktivitas Sistem</div><div class="scard-desc">Riwayat 30 hari terakhir</div></div>
+            <div style="display:flex;gap:8px;">
+              <select class="fctrl no-icon" style="width:120px;padding:8px 10px;font-size:.78rem;">
+                <option>Semua Level</option><option>Info</option><option>Warning</option><option>Error</option>
+              </select>
+              <button class="btn-outline" style="padding:8px 14px;font-size:.78rem;" onclick="showToast('Log diekspor!','success')"><i class="bi bi-download"></i> Export</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="log-table" id="logTable"></table>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="scard-head"><div><div class="scard-title"><i class="bi bi-trash3-fill"></i> Pembersihan Log</div></div></div>
+          <div class="scard-body">
+            <div class="setting-row">
+              <div class="setting-icon" style="background:linear-gradient(135deg,#6b7280,#9ca3af);"><i class="bi bi-calendar-x-fill"></i></div>
+              <div class="setting-info"><div class="setting-label">Hapus Log Otomatis</div><div class="setting-hint">Hapus log yang lebih dari 30 hari secara otomatis.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" checked data-color="blue" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-danger" onclick="showModal('clearlog')"><i class="bi bi-trash3-fill"></i> Hapus Semua Log</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-log -->
+
+      <!-- ══════ MAINTENANCE ══════ -->
+      <div class="settings-panel" id="sec-maintenance">
+
+        <!-- Mode maintenance -->
+        <div class="scard">
+          <div class="scard-head">
+            <div><div class="scard-title"><i class="bi bi-tools"></i> Mode Pemeliharaan</div><div class="scard-desc">Nonaktifkan akses publik sementara</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="alert-info-box alert-amber" style="margin-bottom:18px;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Saat mode pemeliharaan aktif, hanya administrator yang dapat mengakses sistem. Pengguna lain akan melihat halaman 503.</span>
+            </div>
+            <div class="setting-row" style="padding-top:0;">
+              <div class="setting-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4);"><i class="bi bi-tools"></i></div>
+              <div class="setting-info"><div class="setting-label">Aktifkan Mode Pemeliharaan</div><div class="setting-hint">Sistem akan menampilkan halaman pemeliharaan ke semua pengguna.</div></div>
+              <div class="setting-control"><label class="ts-wrap"><input type="checkbox" id="toggleMaintenance" onchange="onMaintenanceToggle(this)" data-color="amber" /><div class="ts-track"><div class="ts-thumb"></div></div></label></div>
+            </div>
+            <div id="maintenanceCountdown" style="display:none;margin-top:16px;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(249,115,22,.04));border:1px solid rgba(245,158,11,.2);border-radius:12px;">
+              <div style="font-size:.8rem;color:var(--c-muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Mode Pemeliharaan Aktif — Berakhir Dalam</div>
+              <div class="countdown-boxes">
+                <div class="cd-box"><span class="cd-num" id="cdH">02</span><div class="cd-lbl">Jam</div></div>
+                <div class="cd-box" style="align-self:center;margin-bottom:16px;font-size:1.5rem;color:var(--c-accent);">:</div>
+                <div class="cd-box"><span class="cd-num" id="cdM">30</span><div class="cd-lbl">Menit</div></div>
+                <div class="cd-box" style="align-self:center;margin-bottom:16px;font-size:1.5rem;color:var(--c-accent);">:</div>
+                <div class="cd-box"><span class="cd-num" id="cdS">00</span><div class="cd-lbl">Detik</div></div>
+              </div>
+              <button class="btn-danger" onclick="document.getElementById('toggleMaintenance').checked=false;onMaintenanceToggle(document.getElementById('toggleMaintenance'));" style="margin-top:4px;">
+                <i class="bi bi-x-circle-fill"></i> Nonaktifkan Sekarang
+              </button>
+            </div>
+            <div class="fgroup" style="margin-top:16px;">
+              <div class="flabel">Pesan Pemeliharaan</div>
+              <div class="fwrap"><textarea class="fctrl no-icon" rows="3">Sistem DokaKegiatan sedang dalam pemeliharaan terjadwal. Kami akan kembali dalam beberapa saat. Terima kasih atas pengertian Anda.</textarea></div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-save" onclick="save('Pesan pemeliharaan')"><i class="bi bi-check2-circle"></i> Simpan Pesan</button>
+          </div>
+        </div>
+
+        <!-- Cache & Optimisasi -->
+        <div class="scard">
+          <div class="scard-head"><div><div class="scard-title"><i class="bi bi-lightning-fill"></i> Cache & Optimisasi</div></div></div>
+          <div class="scard-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <button class="btn-outline" style="justify-content:center;padding:14px;" onclick="clearCache('Config')">
+                <i class="bi bi-arrow-clockwise" style="color:var(--c-primary);"></i> Clear Config Cache
+              </button>
+              <button class="btn-outline" style="justify-content:center;padding:14px;" onclick="clearCache('Route')">
+                <i class="bi bi-arrow-clockwise" style="color:var(--c-green);"></i> Clear Route Cache
+              </button>
+              <button class="btn-outline" style="justify-content:center;padding:14px;" onclick="clearCache('View')">
+                <i class="bi bi-arrow-clockwise" style="color:var(--c-accent);"></i> Clear View Cache
+              </button>
+              <button class="btn-outline" style="justify-content:center;padding:14px;" onclick="clearCache('Application')">
+                <i class="bi bi-arrow-clockwise" style="color:var(--c-pink);"></i> Clear App Cache
+              </button>
+            </div>
+            <button class="btn-success" style="width:100%;justify-content:center;margin-top:12px;" onclick="clearCache('Semua')">
+              <i class="bi bi-lightning-fill"></i> Clear All Cache
+            </button>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="danger-zone">
+          <div class="danger-zone-head"><i class="bi bi-exclamation-triangle-fill"></i> Zona Berbahaya</div>
+          <div class="danger-row">
+            <div class="danger-info">
+              <div class="danger-title">Reset Pengaturan ke Default</div>
+              <div class="danger-desc">Mengembalikan semua konfigurasi sistem ke pengaturan awal. Data pengguna dan kegiatan tidak akan dihapus.</div>
+            </div>
+            <button class="btn-amber" onclick="showModal('resetconfig')"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+          </div>
+          <div class="danger-row">
+            <div class="danger-info">
+              <div class="danger-title">Hapus Cache & Data Sementara</div>
+              <div class="danger-desc">Menghapus semua file cache, session, dan data sementara dari server.</div>
+            </div>
+            <button class="btn-danger" onclick="showModal('clearcache')"><i class="bi bi-trash3-fill"></i> Hapus</button>
+          </div>
+          <div class="danger-row">
+            <div class="danger-info">
+              <div class="danger-title" style="color:var(--c-red);">Hapus Semua Data Sistem</div>
+              <div class="danger-desc">⚠️ PERHATIAN! Tindakan ini akan menghapus SEMUA data termasuk pengguna, kegiatan, dan foto. Tidak dapat dipulihkan.</div>
+            </div>
+            <button class="btn-danger" onclick="showModal('nuke')"><i class="bi bi-nuclear"></i> Hapus Semua</button>
+          </div>
+        </div>
+
+      </div><!-- /sec-maintenance -->
+
+    </div><!-- /settings-content -->
+  </div><!-- /settings-grid -->
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan. v1.2.0</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Dokumentasi API</a><a href="#">Kebijakan Privasi</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-icon" id="mIcon"></div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-desc" id="mDesc"></div>
+    <div class="modal-btns">
+      <button class="btn-modal-cancel" onclick="closeModal()"><i class="bi bi-x-circle"></i> Batal</button>
+      <button class="btn-modal-confirm" id="mConfirm" onclick="doConfirm()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile = () => window.innerWidth <= 768;
+function toggleSidebar() { isMobile() ? document.body.classList.toggle('mobile-open') : document.body.classList.toggle('collapsed'); }
+function closeMobileSidebar() { document.body.classList.remove('mobile-open'); }
+const userTrigger = document.getElementById('userTrigger');
+const userDropdown = document.getElementById('userDropdown');
+function toggleUserDropdown() { const o = userDropdown.classList.toggle('show'); userTrigger.classList.toggle('open', o); }
+document.addEventListener('click', e => { if (!document.querySelector('.user-dropdown-wrap').contains(e.target)) { userDropdown.classList.remove('show'); userTrigger.classList.remove('open'); } });
+
+/* ════════════════════════════════════
+   SECTION SWITCHER
+════════════════════════════════════ */
+function switchSection(id) {
+  document.querySelectorAll('.snav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('sec-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ════════════════════════════════════
+   THEME & COLOR SELECTORS
+════════════════════════════════════ */
+function selectTheme(card, name) {
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  showToast(`Tema "${name}" dipilih. Klik Terapkan untuk menyimpan.`, 'info');
+}
+function selectColor(swatch) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  swatch.classList.add('selected');
+  const hex = swatch.dataset.color;
+  document.documentElement.style.setProperty('--c-primary', hex);
+  showToast('Warna utama diubah. Klik Terapkan untuk menyimpan.', 'info');
+}
+
+/* ════════════════════════════════════
+   SAVE (generic)
+════════════════════════════════════ */
+function save(ctx) {
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    showToast(`${ctx} berhasil disimpan!`, 'success');
+  }, 1200);
+}
+
+/* ════════════════════════════════════
+   EMAIL TEST
+════════════════════════════════════ */
+function testEmail() {
+  const badge = document.getElementById('emailStatusBadge');
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Mengirim...';
+  badge.className = 'email-status idle';
+  badge.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;border-width:2px;"></span> Mengirim...';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    badge.className = 'email-status success';
+    badge.innerHTML = '<i class="bi bi-check-circle-fill"></i> Berhasil';
+    showToast('Email test berhasil terkirim! Cek inbox admin.', 'success');
+  }, 2000);
+}
+
+/* ════════════════════════════════════
+   MAINTENANCE COUNTDOWN
+════════════════════════════════════ */
+let cdInterval = null;
+let cdSecs = 2 * 3600 + 30 * 60;
+
+function onMaintenanceToggle(cb) {
+  const box = document.getElementById('maintenanceCountdown');
+  if (cb.checked) {
+    box.style.display = 'block';
+    showToast('⚠️ Mode pemeliharaan AKTIF!', 'warning');
+    startCountdown();
+  } else {
+    box.style.display = 'none';
+    clearInterval(cdInterval);
+    showToast('Mode pemeliharaan dinonaktifkan.', 'success');
+  }
+}
+function startCountdown() {
+  clearInterval(cdInterval);
+  cdInterval = setInterval(() => {
+    if (cdSecs <= 0) { clearInterval(cdInterval); return; }
+    cdSecs--;
+    document.getElementById('cdH').textContent = String(Math.floor(cdSecs / 3600)).padStart(2, '0');
+    document.getElementById('cdM').textContent = String(Math.floor((cdSecs % 3600) / 60)).padStart(2, '0');
+    document.getElementById('cdS').textContent = String(cdSecs % 60).padStart(2, '0');
+  }, 1000);
+}
+
+/* ════════════════════════════════════
+   CLEAR CACHE
+════════════════════════════════════ */
+function clearCache(type) {
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    showToast(`${type} cache berhasil dibersihkan!`, 'success');
+  }, 1000);
+}
+
+/* ════════════════════════════════════
+   LOG TABLE
+════════════════════════════════════ */
+const LOGS = [
+  { time:'2025-04-24 09:42:17', user:'Ahmad Fauzi', action:'Login berhasil', detail:'Chrome · Windows 11', level:'info' },
+  { time:'2025-04-24 09:15:03', user:'Siti Rahayu', action:'Upload 8 foto kegiatan', detail:'Rapat Koordinasi Dinkes', level:'success' },
+  { time:'2025-04-24 08:30:45', user:'Sistem', action:'Backup otomatis selesai', detail:'128 MB · database', level:'success' },
+  { time:'2025-04-23 17:22:11', user:'Budi Santoso', action:'Gagal login (3x)', detail:'IP: 103.x.x.x', level:'warning' },
+  { time:'2025-04-23 16:50:09', user:'Ahmad Fauzi', action:'Hapus pengguna', detail:'ID: usr_1234', level:'warning' },
+  { time:'2025-04-23 14:05:33', user:'Sistem', action:'Error upload foto', detail:'Ukuran melebihi batas (15MB)', level:'error' },
+  { time:'2025-04-23 12:10:27', user:'Dewi Kusuma', action:'Export laporan PDF', detail:'Laporan April 2025', level:'success' },
+  { time:'2025-04-23 10:30:00', user:'Ahmad Fauzi', action:'Perubahan pengaturan', detail:'SMTP konfigurasi diperbarui', level:'info' },
+  { time:'2025-04-22 08:01:00', user:'Sistem', action:'Backup otomatis selesai', detail:'2.1 GB · full backup', level:'success' },
+  { time:'2025-04-22 07:55:12', user:'Rizal Pratama', action:'Login berhasil', detail:'Firefox · MacOS', level:'info' },
+];
+const LEVEL_BADGE = {
+  info:    '<span class="log-badge log-info"><i class="bi bi-info-circle-fill"></i> Info</span>',
+  success: '<span class="log-badge log-success"><i class="bi bi-check-circle-fill"></i> Sukses</span>',
+  warning: '<span class="log-badge log-warning"><i class="bi bi-exclamation-triangle-fill"></i> Warning</span>',
+  error:   '<span class="log-badge log-error"><i class="bi bi-x-circle-fill"></i> Error</span>',
+};
+const GRAD = ['linear-gradient(135deg,#4f46e5,#7c3aed)','linear-gradient(135deg,#10b981,#06b6d4)','linear-gradient(135deg,#f59e0b,#f97316)','linear-gradient(135deg,#ec4899,#f472b6)','linear-gradient(135deg,#8b5cf6,#a78bfa)'];
+const tbl = document.getElementById('logTable');
+tbl.innerHTML = `<thead><tr><th>Waktu</th><th>Pengguna</th><th>Aktivitas</th><th>Detail</th><th>Level</th></tr></thead>`;
+const tbody = document.createElement('tbody');
+LOGS.forEach((l, i) => {
+  const init = l.user === 'Sistem' ? '⚙' : l.user.split(' ').map(w=>w[0]).join('').slice(0,2);
+  tbody.innerHTML += `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--c-muted);white-space:nowrap;">${l.time}</td>
+      <td><div class="log-user-cell"><div class="log-avatar" style="background:${GRAD[i%5]};">${init}</div><span style="font-weight:600;">${l.user}</span></div></td>
+      <td style="font-weight:600;color:var(--c-text);">${l.action}</td>
+      <td style="font-size:.78rem;color:var(--c-muted);">${l.detail}</td>
+      <td>${LEVEL_BADGE[l.level]}</td>
+    </tr>`;
+});
+tbl.appendChild(tbody);
+
+/* ════════════════════════════════════
+   MODAL SYSTEM
+════════════════════════════════════ */
+const MODALS = {
+  logout:      { icon:'bi-box-arrow-right', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'Konfirmasi Keluar', desc:'Apakah Anda yakin ingin keluar dari sistem?', cgrad:'linear-gradient(135deg,#ef4444,#dc2626)', cshadow:'rgba(239,68,68,.4)', clabel:'<i class="bi bi-box-arrow-right"></i> Keluar', action:'logout' },
+  backup:      { icon:'bi-cloud-plus-fill', igrad:'linear-gradient(135deg,#f0fdf4,#dcfce7)', icolor:'#10b981', iborder:'#bbf7d0', title:'Buat Backup Baru', desc:'Sistem akan membuat salinan lengkap database dan file. Proses ini mungkin memerlukan beberapa menit.', cgrad:'linear-gradient(135deg,#10b981,#059669)', cshadow:'rgba(16,185,129,.4)', clabel:'<i class="bi bi-cloud-plus-fill"></i> Buat Backup', action:'backup' },
+  restore:     { icon:'bi-arrow-counterclockwise', igrad:'linear-gradient(135deg,#fffbeb,#fef3c7)', icolor:'#d97706', iborder:'#fde68a', title:'Restore Backup', desc:'Sistem akan dikembalikan ke kondisi saat backup dibuat. Semua perubahan setelah tanggal backup akan HILANG.', cgrad:'linear-gradient(135deg,#d97706,#f59e0b)', cshadow:'rgba(217,119,6,.4)', clabel:'<i class="bi bi-arrow-counterclockwise"></i> Restore Sekarang', action:'restore' },
+  delbackup:   { icon:'bi-trash3-fill', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'Hapus File Backup', desc:'File backup ini akan dihapus permanen dan tidak bisa dipulihkan. Lanjutkan?', cgrad:'linear-gradient(135deg,#ef4444,#dc2626)', cshadow:'rgba(239,68,68,.4)', clabel:'<i class="bi bi-trash3-fill"></i> Ya, Hapus', action:'delbackup' },
+  killsession: { icon:'bi-x-circle-fill', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'Akhiri Semua Sesi', desc:'Semua pengguna yang sedang login akan dikeluarkan dari sistem secara paksa, termasuk Anda sendiri.', cgrad:'linear-gradient(135deg,#ef4444,#dc2626)', cshadow:'rgba(239,68,68,.4)', clabel:'<i class="bi bi-x-circle-fill"></i> Akhiri Semua Sesi', action:'killsession' },
+  clearlog:    { icon:'bi-journal-x', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'Hapus Semua Log', desc:'Seluruh riwayat log aktivitas sistem akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.', cgrad:'linear-gradient(135deg,#ef4444,#dc2626)', cshadow:'rgba(239,68,68,.4)', clabel:'<i class="bi bi-trash3-fill"></i> Hapus Log', action:'clearlog' },
+  resetconfig: { icon:'bi-arrow-counterclockwise', igrad:'linear-gradient(135deg,#fffbeb,#fef3c7)', icolor:'#d97706', iborder:'#fde68a', title:'Reset Pengaturan', desc:'Semua konfigurasi sistem akan direset ke nilai default. Data pengguna dan kegiatan tidak terpengaruh.', cgrad:'linear-gradient(135deg,#d97706,#f59e0b)', cshadow:'rgba(217,119,6,.4)', clabel:'<i class="bi bi-arrow-counterclockwise"></i> Reset Sekarang', action:'resetconfig' },
+  clearcache:  { icon:'bi-trash3-fill', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'Hapus Cache & Data Sementara', desc:'Semua cache, session, dan file temporary akan dihapus. Pengguna yang sedang login mungkin perlu login ulang.', cgrad:'linear-gradient(135deg,#ef4444,#dc2626)', cshadow:'rgba(239,68,68,.4)', clabel:'<i class="bi bi-trash3-fill"></i> Hapus Cache', action:'clearcache' },
+  nuke:        { icon:'bi-nuclear', igrad:'linear-gradient(135deg,#fef2f2,#fee2e2)', icolor:'#ef4444', iborder:'#fecaca', title:'⚠️ HAPUS SEMUA DATA', desc:'PERINGATAN KERAS: Tindakan ini akan menghapus SELURUH data sistem secara permanen. Tidak dapat dipulihkan. Pastikan Anda memiliki backup terbaru.', cgrad:'linear-gradient(135deg,#ef4444,#b91c1c)', cshadow:'rgba(239,68,68,.5)', clabel:'<i class="bi bi-nuclear"></i> Saya Mengerti, Hapus Semua', action:'nuke' },
+};
+
+let currentAction = null;
+function showModal(type) {
+  const m = MODALS[type];
+  if (!m) return;
+  currentAction = m.action;
+  const icon = document.getElementById('mIcon');
+  icon.style.cssText = `background:${m.igrad};border:3px solid ${m.iborder};animation:mIconPulse 2s ease infinite;`;
+  icon.innerHTML = `<i class="bi ${m.icon}" style="font-size:2.2rem;color:${m.icolor};"></i>`;
+  document.getElementById('mTitle').textContent = m.title;
+  document.getElementById('mDesc').textContent = m.desc;
+  const btn = document.getElementById('mConfirm');
+  btn.style.cssText = `background:${m.cgrad};box-shadow:0 4px 14px ${m.cshadow};`;
+  btn.innerHTML = m.clabel;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+// Add modal icon pulse to stylesheet
+const style = document.createElement('style');
+style.textContent = '@keyframes mIconPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}';
+document.head.appendChild(style);
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+
+function doConfirm() {
+  const btn = document.getElementById('mConfirm');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses...';
+  const msgs = {
+    logout: ['Keluar...', 'info', () => { window.location.href = 'login.html'; }],
+    backup: ['Backup berhasil dibuat!', 'success', null],
+    restore: ['Sistem sedang direstore...', 'warning', null],
+    delbackup: ['File backup dihapus!', 'success', null],
+    killsession: ['Semua sesi telah diakhiri!', 'success', null],
+    clearlog: ['Semua log berhasil dihapus!', 'success', null],
+    resetconfig: ['Pengaturan direset ke default!', 'info', null],
+    clearcache: ['Cache berhasil dihapus!', 'success', null],
+    nuke: ['Semua data berhasil dihapus!', 'error', null],
+  };
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    closeModal();
+    const [msg, type, cb] = msgs[currentAction] || ['Selesai!', 'info', null];
+    showToast(msg, type);
+    if (cb) setTimeout(cb, 1000);
+  }, 1500);
+}
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+function showToast(msg, type = 'info') {
+  const wrap = document.getElementById('toastWrap');
+  const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill', warning:'bi-exclamation-triangle-fill' };
+  const el = document.createElement('div');
+  el.className = `toast-item toast-${type}`;
+  el.innerHTML = `<i class="bi ${icons[type]||icons.info}"></i> ${msg}`;
+  wrap.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 3200);
+}
+
+/* ════════════════════════════════════
+   FAB
+════════════════════════════════════ */
+const fabBtn = document.getElementById('fabBtn');
+window.addEventListener('scroll', () => fabBtn.classList.toggle('visible', window.scrollY > 280), { passive: true });
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+</script>
+</body>
+</html>

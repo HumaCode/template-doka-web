@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Detail Kegiatan</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:background var(--trans); flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1){width:18px;}.hline:nth-child(2){width:14px;}.hline:nth-child(3){width:18px;}
+    body.collapsed .hline:nth-child(1){transform:translateY(7px) rotate(45deg);width:18px;}
+    body.collapsed .hline:nth-child(2){opacity:0;width:0;}
+    body.collapsed .hline:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:18px;}
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══ MAIN ═══ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    /* ═══ PAGE HEADER ═══ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:18px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .ph-back { display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:10px; border:1.5px solid var(--c-border); background:#fff; color:var(--c-text-2); font-weight:700; font-size:.85rem; text-decoration:none; transition:all var(--trans); }
+    .ph-back:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; transform:translateX(-3px); }
+    .ph-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Action Buttons ── */
+    .btn-act { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:10px; font-size:.82rem; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer; border:none; transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-act:hover { transform:translateY(-1px); }
+    .btn-edit-act { background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.3); }
+    .btn-edit-act:hover { box-shadow:0 6px 18px rgba(79,70,229,.45); }
+    .btn-export-act { background:#fff; color:var(--c-text-2); border:1.5px solid var(--c-border); }
+    .btn-export-act:hover { border-color:var(--c-green); color:var(--c-green); background:#f0fdf4; }
+    .btn-print-act { background:#fff; color:var(--c-text-2); border:1.5px solid var(--c-border); }
+    .btn-print-act:hover { border-color:var(--c-secondary); color:var(--c-secondary); background:#ecfeff; }
+    .btn-delete-act { background:#fff; color:var(--c-red); border:1.5px solid rgba(239,68,68,.25); }
+    .btn-delete-act:hover { background:#fef2f2; border-color:var(--c-red); }
+
+    /* ═══════════════════════════════════
+       HERO COVER
+    ═══════════════════════════════════ */
+    .hero-cover {
+      position: relative; border-radius: var(--radius-lg); overflow: hidden;
+      margin-bottom: 24px; background: var(--c-surface2);
+      animation: fadeUp .4s ease .05s both;
+    }
+    .hero-cover-img {
+      width: 100%; height: 420px; object-fit: cover; display: block;
+      transition: transform .6s ease;
+    }
+    .hero-cover:hover .hero-cover-img { transform: scale(1.02); }
+    .hero-cover-placeholder {
+      width: 100%; height: 420px;
+      background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-purple) 40%, var(--c-pink) 70%, var(--c-secondary) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem; position: relative; overflow: hidden;
+    }
+    .hero-cover-placeholder::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 30% 60%, rgba(255,255,255,.15), transparent 65%),
+                  radial-gradient(ellipse 50% 60% at 80% 30%, rgba(255,255,255,.1), transparent 60%);
+      animation: heroBgShift 8s ease-in-out infinite alternate;
+    }
+    @keyframes heroBgShift { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(25deg)} }
+
+    /* Cover overlay with info */
+    .hero-cover-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,15,50,.85) 0%, rgba(10,15,50,.3) 45%, transparent 100%);
+    }
+    .hero-cover-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px 32px;
+    }
+    .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 13px; border-radius: 99px; font-size: .72rem; font-weight: 800;
+      backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.25);
+    }
+    .hb-status-selesai  { background: rgba(16,185,129,.85);  color: #fff; }
+    .hb-status-berjalan { background: rgba(79,70,229,.85);   color: #fff; }
+    .hb-status-draft    { background: rgba(245,158,11,.85);  color: #fff; }
+    .hb-kat { background: rgba(255,255,255,.18); color: #fff; }
+    .hero-title {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: clamp(1.4rem, 3vw, 2.1rem); color: #fff; line-height: 1.3;
+      margin-bottom: 12px; text-shadow: 0 2px 12px rgba(0,0,0,.35);
+    }
+    .hero-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .hero-meta-item { display: flex; align-items: center; gap: 6px; font-size: .82rem; color: rgba(255,255,255,.8); }
+    .hero-meta-item i { font-size: .85rem; }
+
+    /* Foto counter pill on cover */
+    .cover-foto-pill {
+      position: absolute; top: 16px; right: 16px;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+      color: #fff; font-size: .78rem; font-weight: 700;
+      padding: 6px 14px; border-radius: 99px; border: 1px solid rgba(255,255,255,.2);
+      cursor: pointer; transition: background var(--trans);
+    }
+    .cover-foto-pill:hover { background: rgba(79,70,229,.8); }
+
+    /* ═══════════════════════════════════
+       CONTENT GRID
+    ═══════════════════════════════════ */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ═══ CARD BASE ═══ */
+    .det-card {
+      background: var(--c-surface); border: 1px solid var(--c-border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;
+      margin-bottom: 20px; animation: fadeUp .45s ease .1s both;
+    }
+    .det-card:last-child { margin-bottom: 0; }
+    .det-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px; border-bottom: 1px solid var(--c-border);
+      position: relative;
+    }
+    .det-card-head::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
+    .dch-indigo::before { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .dch-green::before  { background:linear-gradient(90deg,var(--c-green),var(--c-secondary)); }
+    .dch-amber::before  { background:linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .dch-pink::before   { background:linear-gradient(90deg,var(--c-pink),var(--c-purple)); }
+    .dch-slate::before  { background:linear-gradient(90deg,#64748b,#94a3b8); }
+    .det-card-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem; color:var(--c-text); display:flex; align-items:center; gap:8px; }
+    .det-card-title i { color:var(--c-primary); }
+    .det-card-body { padding: 22px; }
+
+    /* ═══ URAIAN CONTENT ═══ */
+    .uraian-content {
+      font-size: .9rem; color: var(--c-text-2); line-height: 1.85;
+    }
+    .uraian-content h2 { font-family:'Nunito',sans-serif; font-weight:800; font-size:1.1rem; color:var(--c-text); margin:20px 0 8px; padding-bottom:6px; border-bottom:2px solid rgba(79,70,229,.12); }
+    .uraian-content h3 { font-family:'Nunito',sans-serif; font-weight:800; font-size:.98rem; color:var(--c-text); margin:16px 0 6px; }
+    .uraian-content p  { margin-bottom:12px; }
+    .uraian-content p:last-child { margin-bottom:0; }
+    .uraian-content ul, .uraian-content ol { padding-left:20px; margin-bottom:12px; }
+    .uraian-content li { margin-bottom:5px; }
+    .uraian-content blockquote { border-left:4px solid var(--c-primary); padding:12px 16px; margin:14px 0; background:rgba(79,70,229,.05); border-radius:0 8px 8px 0; font-style:italic; }
+    .uraian-content strong { color:var(--c-text); font-weight:700; }
+    .uraian-content table { width:100%; border-collapse:collapse; margin:14px 0; font-size:.85rem; }
+    .uraian-content th { background:rgba(79,70,229,.08); padding:10px 12px; font-weight:700; text-align:left; border:1px solid var(--c-border); }
+    .uraian-content td { padding:9px 12px; border:1px solid var(--c-border); }
+    .uraian-content tr:nth-child(even) td { background:rgba(79,70,229,.02); }
+
+    /* Reading progress bar */
+    .reading-progress {
+      position: fixed; top: var(--topbar-h); left: var(--sidebar-w); right: 0;
+      height: 3px; z-index: 199; transition: left var(--trans);
+    }
+    body.collapsed .reading-progress { left: var(--sidebar-w-collapsed); }
+    .reading-progress-fill {
+      height: 100%; border-radius: 0 99px 99px 0;
+      background: linear-gradient(90deg, var(--c-primary), var(--c-secondary), var(--c-pink));
+      width: 0%; transition: width .1s linear;
+    }
+
+    /* ═══ PHOTO GALLERY ═══ */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .gallery-item {
+      aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+      cursor: pointer; position: relative; background: var(--c-surface2);
+      border: 2px solid var(--c-border);
+      transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+    }
+    .gallery-item:hover { transform: scale(1.04); box-shadow: var(--shadow-md); border-color: var(--c-primary); }
+    .gallery-item img { width:100%; height:100%; object-fit:cover; display:block; transition: transform .4s ease; }
+    .gallery-item:hover img { transform: scale(1.08); }
+    .gallery-item-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+    .gallery-item-overlay {
+      position: absolute; inset: 0; background: rgba(79,70,229,.65);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s; font-size: 1.3rem; color: #fff;
+    }
+    .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+    .gallery-item-num {
+      position: absolute; top: 5px; left: 5px;
+      background: rgba(0,0,0,.6); color: #fff; font-size: .6rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 99px;
+    }
+    .gallery-main-badge {
+      position: absolute; bottom: 0; left: 0; right: 0; text-align: center;
+      background: linear-gradient(135deg,var(--c-primary),var(--c-secondary));
+      color: #fff; font-size: .6rem; font-weight: 800; padding: 3px 0;
+    }
+    .gallery-show-more {
+      aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+      cursor: pointer; position: relative; background: rgba(79,70,229,.08);
+      border: 2px dashed rgba(79,70,229,.3);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--c-primary); font-size: .8rem; font-weight: 700;
+      transition: background var(--trans);
+    }
+    .gallery-show-more:hover { background: rgba(79,70,229,.15); }
+    .gallery-show-more i { font-size: 1.5rem; margin-bottom: 4px; }
+
+    /* ═══ LIGHTBOX ═══ */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(5,8,30,.95); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .lightbox.show { opacity: 1; pointer-events: all; }
+    .lightbox-inner { position: relative; max-width: 90vw; max-height: 88vh; }
+    .lightbox-img {
+      max-width: 90vw; max-height: 84vh;
+      border-radius: 14px; object-fit: contain;
+      box-shadow: 0 24px 80px rgba(0,0,0,.6);
+      transform: scale(.88); opacity: 0;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .28s;
+    }
+    .lightbox.show .lightbox-img { transform: scale(1); opacity: 1; }
+    .lightbox-close {
+      position: fixed; top: 20px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: 1.1rem; cursor: pointer;
+      display: grid; place-items: center;
+      transition: background var(--trans); z-index: 2001;
+    }
+    .lightbox-close:hover { background: rgba(239,68,68,.7); }
+    .lightbox-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: grid; place-items: center;
+      transition: background var(--trans); z-index: 2001;
+    }
+    .lightbox-nav:hover { background: rgba(79,70,229,.7); }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+    .lightbox-counter {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.6); color: #fff;
+      font-size: .78rem; font-weight: 700; padding: 6px 18px; border-radius: 99px;
+      backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.15);
+    }
+    .lightbox-caption {
+      position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.7); color: rgba(255,255,255,.9);
+      font-size: .8rem; padding: 8px 20px; border-radius: 10px;
+      max-width: 60vw; text-align: center; backdrop-filter: blur(6px);
+    }
+
+    /* ═══ INFO SIDEBAR CARDS ═══ */
+    .side-info-card {
+      background: var(--c-surface); border: 1px solid var(--c-border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      overflow: hidden; margin-bottom: 16px;
+      animation: fadeUp .45s ease .1s both;
+    }
+    .side-info-card:last-child { margin-bottom: 0; }
+    .sic-head { padding: 14px 18px; border-bottom: 1px solid var(--c-border); display:flex; align-items:center; gap:8px; }
+    .sic-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem; color:var(--c-text); display:flex; align-items:center; gap:7px; }
+    .sic-title i { color:var(--c-primary); }
+    .sic-body { padding: 16px 18px; }
+
+    /* Info rows */
+    .info-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--c-border); }
+    .info-item:last-child { border-bottom:none; padding-bottom:0; }
+    .info-item:first-child { padding-top:0; }
+    .info-icon { width:34px; height:34px; border-radius:9px; background:rgba(79,70,229,.08); display:grid; place-items:center; color:var(--c-primary); font-size:.88rem; flex-shrink:0; }
+    .info-label { font-size:.68rem; color:var(--c-muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
+    .info-val { font-size:.875rem; font-weight:600; color:var(--c-text); line-height:1.5; }
+
+    /* Tags */
+    .tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+    .tag-chip { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:99px; font-size:.72rem; font-weight:700; background:rgba(79,70,229,.08); color:var(--c-primary); border:1px solid rgba(79,70,229,.15); cursor:pointer; transition:all var(--trans); }
+    .tag-chip:hover { background:var(--c-primary); color:#fff; }
+
+    /* Status badge */
+    .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:99px; font-size:.78rem; font-weight:800; }
+    .sb-selesai  { background:#f0fdf4; color:var(--c-green);  border:1.5px solid #bbf7d0; }
+    .sb-berjalan { background:#eff6ff; color:var(--c-primary); border:1.5px solid #bfdbfe; }
+    .sb-draft    { background:#fffbeb; color:#d97706;          border:1.5px solid #fde68a; }
+    .sb-selesai::before  { content:''; width:7px; height:7px; border-radius:50%; background:var(--c-green); animation:dotPulse 2s ease infinite; }
+    .sb-berjalan::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--c-primary); animation:dotPulse 2s ease infinite; }
+    .sb-draft::before    { content:''; width:7px; height:7px; border-radius:50%; background:#f59e0b; }
+
+    /* Kat pill */
+    .kat-pill { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:99px; font-size:.72rem; font-weight:800; }
+
+    /* Petugas list */
+    .petugas-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--c-border); }
+    .petugas-item:last-child { border-bottom:none; padding-bottom:0; }
+    .petugas-item:first-child { padding-top:0; }
+    .p-av { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; color:#fff; font-size:.82rem; font-weight:800; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.25); }
+    .p-name { font-size:.875rem; font-weight:700; color:var(--c-text); }
+    .p-role { font-size:.72rem; color:var(--c-muted); }
+
+    /* Stats row */
+    .stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-box { background:var(--c-surface2); border:1px solid var(--c-border); border-radius:10px; padding:12px; text-align:center; }
+    .stat-box-val { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.4rem; color:var(--c-text); }
+    .stat-box-lbl { font-size:.7rem; color:var(--c-muted); font-weight:600; margin-top:2px; }
+
+    /* ═══ ACTIVITY TIMELINE ═══ */
+    .timeline { display:flex; flex-direction:column; gap:0; }
+    .tl-item { display:flex; gap:14px; padding:12px 0; position:relative; }
+    .tl-dot-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+    .tl-dot { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:.75rem; color:#fff; flex-shrink:0; }
+    .tl-line { width:2px; flex:1; background:var(--c-border); margin-top:5px; min-height:16px; }
+    .tl-item:last-child .tl-line { display:none; }
+    .tl-content { flex:1; min-width:0; padding-top:3px; }
+    .tl-title { font-size:.82rem; font-weight:700; color:var(--c-text); margin-bottom:2px; }
+    .tl-desc  { font-size:.73rem; color:var(--c-muted); }
+    .tl-time  { font-size:.7rem; color:var(--c-muted); white-space:nowrap; flex-shrink:0; padding-top:4px; }
+
+    /* ═══ COMMENTS ═══ */
+    .comment-input-wrap {
+      display:flex; gap:10px; align-items:flex-start; margin-bottom:20px;
+      padding-bottom:20px; border-bottom:1px solid var(--c-border);
+    }
+    .comment-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.85rem; flex-shrink:0; }
+    .comment-input-area { flex:1; }
+    .comment-textarea { width:100%; padding:11px 14px; border:1.5px solid var(--c-border); border-radius:12px; font-size:.85rem; font-family:'Plus Jakarta Sans',sans-serif; color:var(--c-text); background:var(--c-surface2); outline:none; resize:none; transition:border-color var(--trans),box-shadow var(--trans); min-height:80px; }
+    .comment-textarea:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .comment-actions { display:flex; justify-content:flex-end; margin-top:6px; gap:8px; }
+    .btn-comment { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; font-size:.82rem; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer; box-shadow:0 3px 10px rgba(79,70,229,.3); transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-comment:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(79,70,229,.45); }
+
+    .comment-item { display:flex; gap:10px; padding:14px 0; border-bottom:1px solid var(--c-border); }
+    .comment-item:last-child { border-bottom:none; padding-bottom:0; }
+    .c-av { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#fff; font-size:.75rem; font-weight:800; flex-shrink:0; }
+    .c-body { flex:1; min-width:0; }
+    .c-header { display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap; }
+    .c-name { font-size:.85rem; font-weight:800; color:var(--c-text); }
+    .c-role { font-size:.7rem; color:var(--c-muted); }
+    .c-time { font-size:.7rem; color:var(--c-muted); margin-left:auto; }
+    .c-text { font-size:.83rem; color:var(--c-text-2); line-height:1.65; }
+    .c-actions { display:flex; gap:8px; margin-top:6px; }
+    .c-act-btn { background:none; border:none; cursor:pointer; font-size:.72rem; font-weight:700; color:var(--c-muted); font-family:'Plus Jakarta Sans',sans-serif; transition:color var(--trans); display:flex; align-items:center; gap:3px; }
+    .c-act-btn:hover { color:var(--c-primary); }
+
+    /* ═══ DOKUMEN LAMPIRAN ═══ */
+    .doc-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--c-border); }
+    .doc-item:last-child { border-bottom:none; padding-bottom:0; }
+    .doc-icon { width:38px; height:38px; border-radius:9px; display:grid; place-items:center; font-size:1.1rem; color:#fff; flex-shrink:0; }
+    .doc-info { flex:1; min-width:0; }
+    .doc-name { font-size:.875rem; font-weight:700; color:var(--c-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .doc-size { font-size:.72rem; color:var(--c-muted); margin-top:2px; }
+    .btn-doc-dl { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:8px; border:1.5px solid var(--c-border); background:#fff; color:var(--c-text-2); font-size:.75rem; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer; transition:all var(--trans); flex-shrink:0; }
+    .btn-doc-dl:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; }
+
+    /* ═══ RELATED CARDS ═══ */
+    .related-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+    .related-card { background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); overflow:hidden; cursor:pointer; transition:transform var(--trans),box-shadow var(--trans); text-decoration:none; }
+    .related-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+    .rc-cover { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .rc-body { padding:12px; }
+    .rc-kat { font-size:.65rem; font-weight:800; color:var(--c-primary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+    .rc-title { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .rc-date { font-size:.7rem; color:var(--c-muted); margin-top:5px; }
+
+    /* FAB */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(79,70,229,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(79,70,229,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Footer */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* Print styles */
+    @media print {
+      .sidebar,.topbar,.reading-progress,.fab,.ph-actions,.det-card-head .btn-act,
+      .comment-input-wrap,.lightbox,.main-footer { display:none!important; }
+      .main-wrapper { margin-left:0!important; padding-top:0!important; }
+      .main-content { padding:0!important; }
+      body { background:#fff; }
+    }
+
+    /* Responsive */
+    @media(max-width:1100px) { .detail-grid { grid-template-columns:1fr; } }
+    @media(max-width:992px)  { :root{--sidebar-w:240px;} }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;}.main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;}.user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+      .hero-cover-img,.hero-cover-placeholder{height:260px;}
+      .hero-title{font-size:1.3rem;}
+      .lightbox-nav{width:40px;height:40px;}
+      .ph-actions{width:100%;}
+      .ph-actions .btn-act{flex:1;justify-content:center;}
+    }
+    @media(max-width:576px) {
+      .page-header{flex-direction:column;align-items:flex-start;}
+      .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));}
+      .related-grid{grid-template-columns:1fr 1fr;}
+      .main-footer{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Reading Progress Bar -->
+<div class="reading-progress"><div class="reading-progress-fill" id="readingBar"></div></div>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="semua-kegiatan.html" class="nav-link-item active" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="tambah-kegiatan.html" class="nav-link-item" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="pengaturan-sistem.html" class="nav-link-item" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari kegiatan..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content" id="mainContent">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <a href="semua-kegiatan.html" class="ph-back"><i class="bi bi-arrow-left"></i> Kembali</a>
+      <nav class="breadcrumb-nav">
+        <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+        <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+        <a href="semua-kegiatan.html">Semua Kegiatan</a>
+        <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+        <span class="bc-current"><i class="bi bi-calendar3-fill"></i> Detail</span>
+      </nav>
+    </div>
+    <div class="ph-actions">
+      <button class="btn-act btn-print-act" onclick="printPage()"><i class="bi bi-printer-fill"></i> Cetak</button>
+      <button class="btn-act btn-export-act" onclick="exportPDF()"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</button>
+      <button class="btn-act btn-edit-act" onclick="editKegiatan()"><i class="bi bi-pencil-fill"></i> Edit</button>
+      <button class="btn-act btn-delete-act" onclick="deleteKegiatan()"><i class="bi bi-trash3-fill"></i> Hapus</button>
+    </div>
+  </div>
+
+  <!-- ═══ HERO COVER ═══ -->
+  <div class="hero-cover" id="heroCover">
+    <div class="hero-cover-placeholder">📷</div>
+    <div class="hero-cover-overlay"></div>
+    <div class="cover-foto-pill" onclick="openLightbox(0)">
+      <i class="bi bi-images"></i> <span id="fotoCount">12 foto</span> — Klik untuk lihat semua
+    </div>
+    <div class="hero-cover-info">
+      <div class="hero-badges">
+        <span class="hero-badge hb-status-selesai"><i class="bi bi-check-circle-fill" style="font-size:.5rem;"></i> Selesai</span>
+        <span class="hero-badge hb-kat"><i class="bi bi-people-fill" style="font-size:.7rem;"></i> Rapat / Koordinasi</span>
+        <span class="hero-badge hb-kat"><i class="bi bi-building-fill" style="font-size:.7rem;"></i> Dinas Kominfo</span>
+      </div>
+      <h1 class="hero-title" id="heroTitle">Rapat Koordinasi Dinas Kominfo Kota Pekalongan Triwulan II 2025</h1>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><i class="bi bi-calendar3"></i> <span id="heroDate">24 April 2025</span></div>
+        <div class="hero-meta-item"><i class="bi bi-clock-fill"></i> 09:00 WIB</div>
+        <div class="hero-meta-item"><i class="bi bi-geo-alt-fill"></i> Ruang Rapat Lantai 3, Gedung A</div>
+        <div class="hero-meta-item"><i class="bi bi-person-fill"></i> Ahmad Fauzi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DETAIL GRID ═══ -->
+  <div class="detail-grid">
+
+    <!-- ══ LEFT: MAIN CONTENT ══ -->
+    <div>
+
+      <!-- Uraian Kegiatan -->
+      <div class="det-card">
+        <div class="det-card-head dch-indigo">
+          <div class="det-card-title"><i class="bi bi-file-text-fill"></i> Uraian Kegiatan</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--c-muted);" id="wordCount">~420 kata</div>
+        </div>
+        <div class="det-card-body">
+          <div class="uraian-content" id="uraianContent">
+            <h2>Latar Belakang</h2>
+            <p>Rapat koordinasi ini diselenggarakan dalam rangka evaluasi capaian program kerja Dinas Komunikasi dan Informatika Kota Pekalongan pada triwulan kedua tahun 2025. Kegiatan ini merupakan bagian dari siklus perencanaan dan pengendalian kinerja yang dilaksanakan secara berkala setiap tiga bulan.</p>
+
+            <h2>Tujuan Kegiatan</h2>
+            <ul>
+              <li>Mengevaluasi realisasi program dan kegiatan triwulan II 2025</li>
+              <li>Mengidentifikasi permasalahan dan hambatan dalam pelaksanaan program</li>
+              <li>Menyusun rencana tindak lanjut dan perbaikan program</li>
+              <li>Sinkronisasi data capaian kinerja antar bidang</li>
+            </ul>
+
+            <h2>Pelaksanaan</h2>
+            <p>Kegiatan dilaksanakan pada <strong>Kamis, 24 April 2025</strong>, pukul <strong>09.00–12.30 WIB</strong>, bertempat di <strong>Ruang Rapat Lantai 3, Gedung A, Dinas Kominfo Kota Pekalongan</strong>. Rapat dipimpin langsung oleh Kepala Dinas Kominfo, Bapak Ahmad Fauzi, dan dihadiri oleh seluruh Kepala Bidang beserta staf terkait.</p>
+
+            <p>Rapat dibuka dengan paparan Kepala Dinas tentang gambaran umum capaian kinerja semester pertama, dilanjutkan dengan presentasi masing-masing bidang mengenai realisasi program dan anggaran. Sesi diskusi dan tanya jawab berlangsung dinamis dengan berbagai masukan konstruktif dari peserta.</p>
+
+            <h2>Hasil Rapat</h2>
+            <p>Beberapa keputusan penting yang dihasilkan dalam rapat koordinasi ini antara lain:</p>
+            <ol>
+              <li>Realisasi anggaran triwulan II mencapai <strong>68,4%</strong> dari total pagu yang ditetapkan</li>
+              <li>Program digitalisasi pelayanan publik berhasil diimplementasikan di <strong>12 dari 18</strong> kelurahan target</li>
+              <li>Percepatan pelaksanaan pengadaan infrastruktur IT untuk mengejar target semester kedua</li>
+              <li>Pembentukan tim monitoring dan evaluasi khusus yang akan bekerja secara mingguan</li>
+            </ol>
+
+            <blockquote>
+              "Sinergi antar bidang menjadi kunci keberhasilan program digitalisasi Kota Pekalongan. Kita perlu meningkatkan koordinasi dan komunikasi agar target tahun 2025 dapat tercapai secara optimal." — Kepala Dinas Kominfo, Ahmad Fauzi
+            </blockquote>
+
+            <h2>Tindak Lanjut</h2>
+            <p>Berdasarkan hasil diskusi, disepakati beberapa rencana tindak lanjut yang akan dilaksanakan dalam satu bulan ke depan:</p>
+            <ul>
+              <li>Bidang TIK akan menyusun roadmap percepatan infrastruktur paling lambat <strong>30 April 2025</strong></li>
+              <li>Bidang Aptika akan melakukan sosialisasi lanjutan di 6 kelurahan yang belum terjangkau</li>
+              <li>Seluruh bidang wajib melaporkan progres mingguan melalui aplikasi SiPeDas</li>
+              <li>Rapat koordinasi berikutnya dijadwalkan pada <strong>24 Juli 2025</strong></li>
+            </ul>
+
+            <h2>Kesimpulan</h2>
+            <p>Rapat koordinasi triwulan II 2025 berjalan lancar dan produktif. Capaian kinerja secara umum berada dalam jalur yang baik meskipun terdapat beberapa program yang perlu percepatan. Komitmen seluruh jajaran Dinas Kominfo untuk mencapai target tahun 2025 terefleksi dengan baik dalam diskusi yang berlangsung.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Galeri Foto -->
+      <div class="det-card">
+        <div class="det-card-head dch-amber">
+          <div class="det-card-title"><i class="bi bi-images"></i> Galeri Foto Dokumentasi</div>
+          <button class="btn-act btn-export-act" style="padding:7px 14px;font-size:.75rem;" onclick="downloadAllPhotos()">
+            <i class="bi bi-download"></i> Unduh Semua
+          </button>
+        </div>
+        <div class="det-card-body">
+          <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+      </div>
+
+      <!-- Komentar -->
+      <div class="det-card">
+        <div class="det-card-head dch-pink">
+          <div class="det-card-title"><i class="bi bi-chat-square-dots-fill"></i> Komentar & Catatan</div>
+          <span style="font-size:.75rem;color:var(--c-muted);" id="commentCount">3 komentar</span>
+        </div>
+        <div class="det-card-body">
+          <!-- Input -->
+          <div class="comment-input-wrap">
+            <div class="comment-avatar">A</div>
+            <div class="comment-input-area">
+              <textarea class="comment-textarea" id="commentInput" placeholder="Tulis komentar atau catatan..." rows="3"></textarea>
+              <div class="comment-actions">
+                <button class="btn-act btn-export-act" style="padding:7px 14px;font-size:.78rem;" onclick="document.getElementById('commentInput').value=''">Batal</button>
+                <button class="btn-comment" onclick="addComment()"><i class="bi bi-send-fill"></i> Kirim Komentar</button>
+              </div>
+            </div>
+          </div>
+          <!-- Comment list -->
+          <div id="commentList"></div>
+        </div>
+      </div>
+
+      <!-- Kegiatan Terkait -->
+      <div class="det-card">
+        <div class="det-card-head dch-slate">
+          <div class="det-card-title"><i class="bi bi-grid-3x2-gap-fill"></i> Kegiatan Terkait</div>
+          <a href="semua-kegiatan.html" style="font-size:.78rem;font-weight:700;color:var(--c-primary);text-decoration:none;display:flex;align-items:center;gap:4px;">
+            Lihat Semua <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+        <div class="det-card-body">
+          <div class="related-grid" id="relatedGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT: INFO SIDEBAR ══ -->
+    <div>
+
+      <!-- Informasi Umum -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-info-circle-fill"></i> Informasi Kegiatan</div></div>
+        <div class="sic-body">
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-circle-fill" style="font-size:.55rem;"></i></div>
+            <div>
+              <div class="info-label">Status</div>
+              <div class="info-val"><span class="status-badge sb-selesai"><i class="bi bi-check-circle-fill" style="font-size:.65rem;"></i> Selesai</span></div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-calendar3"></i></div>
+            <div>
+              <div class="info-label">Tanggal</div>
+              <div class="info-val">Kamis, 24 April 2025</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-clock-fill"></i></div>
+            <div>
+              <div class="info-label">Waktu</div>
+              <div class="info-val">09.00 – 12.30 WIB</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+              <div class="info-label">Lokasi</div>
+              <div class="info-val">Ruang Rapat Lantai 3, Gedung A, Dinas Kominfo</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-tags-fill"></i></div>
+            <div>
+              <div class="info-label">Kategori</div>
+              <div class="info-val">
+                <span class="kat-pill" style="background:rgba(79,70,229,.1);color:var(--c-primary);">
+                  <i class="bi bi-people-fill"></i> Rapat / Koordinasi
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-building-fill"></i></div>
+            <div>
+              <div class="info-label">Unit Kerja</div>
+              <div class="info-val">Dinas Komunikasi dan Informatika</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-people-fill"></i></div>
+            <div>
+              <div class="info-label">Jumlah Peserta</div>
+              <div class="info-val">28 orang</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon"><i class="bi bi-person-video3"></i></div>
+            <div>
+              <div class="info-label">Narasumber</div>
+              <div class="info-val">Ahmad Fauzi, S.Kom., M.T.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistik -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-bar-chart-fill"></i> Statistik Dokumentasi</div></div>
+        <div class="sic-body">
+          <div class="stats-row" style="margin-bottom:10px;">
+            <div class="stat-box">
+              <div class="stat-box-val" id="statFoto">12</div>
+              <div class="stat-box-lbl">Total Foto</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">420</div>
+              <div class="stat-box-lbl">Kata Uraian</div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-box-val">3</div>
+              <div class="stat-box-lbl">Komentar</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-val">2</div>
+              <div class="stat-box-lbl">Lampiran</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="font-size:.7rem;color:var(--c-muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Dibuat</div>
+            <div style="font-size:.82rem;color:var(--c-text-2);font-weight:600;">24 Apr 2025, 14:23 WIB</div>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:.7rem;color:var(--c-muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Terakhir Diupdate</div>
+            <div style="font-size:.82rem;color:var(--c-text-2);font-weight:600;">24 Apr 2025, 16:47 WIB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Petugas -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-person-badge-fill"></i> Petugas Dokumentasi</div></div>
+        <div class="sic-body">
+          <div id="petugasList"></div>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-hash"></i> Tag</div></div>
+        <div class="sic-body">
+          <div class="tag-list">
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> rapat-koordinasi</span>
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> triwulan-2</span>
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> 2025</span>
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> kominfo</span>
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> evaluasi-kinerja</span>
+            <span class="tag-chip"><i class="bi bi-hash" style="font-size:.65rem;"></i> smart-city</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dokumen Lampiran -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-paperclip"></i> Dokumen Lampiran</div></div>
+        <div class="sic-body">
+          <div class="doc-item">
+            <div class="doc-icon" style="background:linear-gradient(135deg,#ef4444,#f87171);"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+            <div class="doc-info">
+              <div class="doc-name">Notulen_Rapat_Apr2025.pdf</div>
+              <div class="doc-size">PDF · 1.2 MB</div>
+            </div>
+            <button class="btn-doc-dl" onclick="DKA.toast({type:'success',title:'Mengunduh...',message:'Notulen_Rapat_Apr2025.pdf',position:'bottom-right'})">
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6);"><i class="bi bi-file-earmark-word-fill"></i></div>
+            <div class="doc-info">
+              <div class="doc-name">Presentasi_Evaluasi_TW2.docx</div>
+              <div class="doc-size">DOCX · 3.4 MB</div>
+            </div>
+            <button class="btn-doc-dl" onclick="DKA.toast({type:'success',title:'Mengunduh...',message:'Presentasi_Evaluasi_TW2.docx',position:'bottom-right'})">
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riwayat Aktivitas -->
+      <div class="side-info-card">
+        <div class="sic-head"><div class="sic-title"><i class="bi bi-clock-history"></i> Riwayat Aktivitas</div></div>
+        <div class="sic-body">
+          <div class="timeline" id="actTimeline"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan.</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a><a href="#">Ketentuan Layanan</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<!-- ═══════════ LIGHTBOX ═══════════ -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();navLightbox(-1)"><i class="bi bi-chevron-left"></i></button>
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <img src="" id="lightboxImg" class="lightbox-img" alt="" />
+  </div>
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();navLightbox(1)"><i class="bi bi-chevron-right"></i></button>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+  <div class="lightbox-counter" id="lightboxCounter">1 / 12</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+<script>
+/* ════════════════════════════════════
+   DATA
+════════════════════════════════════ */
+const KEGIATAN = {
+  id: 1,
+  judul: 'Rapat Koordinasi Dinas Kominfo Kota Pekalongan Triwulan II 2025',
+  tanggal: '24 April 2025',
+  status: 'selesai',
+  kategori: 'Rapat',
+  unit: 'Dinas Kominfo',
+  lokasi: 'Ruang Rapat Lantai 3, Gedung A',
+  peserta: 28,
+};
+
+const FOTO_EMOJIS = ['📷','📸','🎞','🖼','📅','👥','🏛','📋','🎓','🌏','🏢','🎤'];
+const FOTO_CAPTIONS = [
+  'Pembukaan rapat oleh Kepala Dinas',
+  'Paparan Bidang TIK — Capaian Infrastruktur',
+  'Sesi diskusi Bidang Aptika',
+  'Presentasi realisasi anggaran triwulan II',
+  'Foto bersama peserta rapat',
+  'Proses penandatanganan notulen',
+  'Sesi coffee break dan networking',
+  'Paparan Kepala Bidang Humas',
+  'Diskusi kelompok bidang-bidang',
+  'Penutupan rapat oleh Sekretaris Dinas',
+  'Penyerahan dokumen tindak lanjut',
+  'Foto dokumentasi ruang rapat',
+];
+const FOTO_GRADS = [
+  'linear-gradient(135deg,#4f46e5,#7c3aed)',
+  'linear-gradient(135deg,#10b981,#06b6d4)',
+  'linear-gradient(135deg,#f59e0b,#f97316)',
+  'linear-gradient(135deg,#ec4899,#f472b6)',
+  'linear-gradient(135deg,#8b5cf6,#a78bfa)',
+  'linear-gradient(135deg,#ef4444,#f87171)',
+  'linear-gradient(135deg,#0891b2,#22d3ee)',
+  'linear-gradient(135deg,#059669,#34d399)',
+  'linear-gradient(135deg,#d97706,#fbbf24)',
+  'linear-gradient(135deg,#7c3aed,#ec4899)',
+  'linear-gradient(135deg,#1d4ed8,#38bdf8)',
+  'linear-gradient(135deg,#064e3b,#10b981)',
+];
+
+const PETUGAS_DATA = [
+  { name:'Ahmad Fauzi',   role:'Kepala Dinas',   grad:'linear-gradient(135deg,#4f46e5,#7c3aed)', main: true },
+  { name:'Siti Rahayu',   role:'Staff Dokumentasi', grad:'linear-gradient(135deg,#10b981,#06b6d4)' },
+  { name:'Budi Santoso',  role:'Fotografer',     grad:'linear-gradient(135deg,#f59e0b,#f97316)' },
+];
+
+const COMMENTS_DATA = [
+  { name:'Ahmad Fauzi',  role:'Administrator', grad:'linear-gradient(135deg,#4f46e5,#7c3aed)', init:'AF', time:'24 Apr 2025, 15:30', text:'Dokumentasi kegiatan sudah lengkap. Mohon untuk notulen rapat yang sudah ditandatangani segera diupload sebagai lampiran.', likes:3 },
+  { name:'Siti Rahayu',  role:'Operator',      grad:'linear-gradient(135deg,#10b981,#06b6d4)', init:'SR', time:'24 Apr 2025, 16:12', text:'Siap Pak, notulen sudah diupload di bagian lampiran dokumen. Untuk foto tambahan dari bidang Aptika sudah saya sertakan juga.', likes:1 },
+  { name:'Wahyu Nugroho',role:'Kabid Humas',   grad:'linear-gradient(135deg,#8b5cf6,#a78bfa)', init:'WN', time:'24 Apr 2025, 16:55', text:'Dokumentasi ini sangat lengkap dan rapi. Akan digunakan sebagai bahan laporan ke Walikota. Terima kasih tim dokumentasi.', likes:5 },
+];
+
+const ACTIVITIES = [
+  { icon:'bi-eye-fill',          grad:'linear-gradient(135deg,#4f46e5,#7c3aed)', title:'Dibuat', desc:'Ahmad Fauzi · Upload 12 foto', time:'24 Apr, 14:23' },
+  { icon:'bi-pencil-fill',       grad:'linear-gradient(135deg,#10b981,#06b6d4)', title:'Diperbarui', desc:'Siti Rahayu · Update lampiran', time:'24 Apr, 16:47' },
+  { icon:'bi-chat-fill',         grad:'linear-gradient(135deg,#f59e0b,#f97316)', title:'3 komentar', desc:'Ahmad, Siti, Wahyu', time:'24 Apr, 15–17' },
+  { icon:'bi-file-earmark-fill', grad:'linear-gradient(135deg,#ec4899,#f472b6)', title:'Lampiran ditambah', desc:'Notulen & Presentasi', time:'24 Apr, 16:50' },
+  { icon:'bi-check-circle-fill', grad:'linear-gradient(135deg,#059669,#34d399)', title:'Status: Selesai', desc:'Diverifikasi Administrator', time:'24 Apr, 17:00' },
+];
+
+const RELATED = [
+  { judul:'Pelatihan SDM Digitalisasi', kat:'Pelatihan', tanggal:'22 Apr 2025', emoji:'🎓', grad:'linear-gradient(135deg,#10b981,#06b6d4)' },
+  { judul:'Sosialisasi Aplikasi SiPeDas', kat:'Sosialisasi', tanggal:'18 Apr 2025', emoji:'🎤', grad:'linear-gradient(135deg,#f59e0b,#f97316)' },
+  { judul:'Kunjungan Lapangan IT', kat:'Kunjungan', tanggal:'20 Apr 2025', emoji:'🌏', grad:'linear-gradient(135deg,#4f46e5,#7c3aed)' },
+  { judul:'Upacara Hari Kartini', kat:'Upacara', tanggal:'21 Apr 2025', emoji:'🏆', grad:'linear-gradient(135deg,#ec4899,#f472b6)' },
+];
+
+/* ════════════════════════════════════
+   RENDER GALLERY
+════════════════════════════════════ */
+const MAX_VISIBLE = 9;
+
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  const total = FOTO_EMOJIS.length;
+  const show  = Math.min(total, MAX_VISIBLE);
+
+  grid.innerHTML = FOTO_EMOJIS.slice(0, show).map((em, i) => `
+    <div class="gallery-item" onclick="openLightbox(${i})">
+      <div class="gallery-item-placeholder" style="background:${FOTO_GRADS[i]};">${em}</div>
+      <div class="gallery-item-overlay"><i class="bi bi-zoom-in"></i></div>
+      <div class="gallery-item-num">${i+1}</div>
+      ${i===0?'<div class="gallery-main-badge">Foto Utama</div>':''}
+    </div>`).join('') +
+    (total > MAX_VISIBLE ? `
+    <div class="gallery-show-more" onclick="openLightbox(${MAX_VISIBLE})">
+      <i class="bi bi-images"></i>
+      +${total - MAX_VISIBLE} foto lagi
+    </div>` : '');
+}
+renderGallery();
+
+/* ════════════════════════════════════
+   LIGHTBOX
+════════════════════════════════════ */
+let lbIndex = 0;
+
+function openLightbox(idx) {
+  lbIndex = idx;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function navLightbox(dir) {
+  lbIndex = (lbIndex + dir + FOTO_EMOJIS.length) % FOTO_EMOJIS.length;
+  updateLightbox();
+}
+function updateLightbox() {
+  const img    = document.getElementById('lightboxImg');
+  const cnt    = document.getElementById('lightboxCounter');
+  const cap    = document.getElementById('lightboxCaption');
+  // Show placeholder as canvas (no real image in demo)
+  img.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='500'>
+    <defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'>
+    <stop offset='0%25' stop-color='%234f46e5'/><stop offset='100%25' stop-color='%2306b6d4'/></linearGradient></defs>
+    <rect width='800' height='500' fill='url(%23g)'/>
+    <text x='50%25' y='48%25' text-anchor='middle' font-size='80' fill='white'>${encodeURIComponent(FOTO_EMOJIS[lbIndex])}</text>
+    <text x='50%25' y='68%25' text-anchor='middle' font-size='22' fill='rgba(255,255,255,0.7)' font-family='sans-serif'>Foto ${lbIndex+1}</text>
+  </svg>`;
+  cnt.textContent = `${lbIndex + 1} / ${FOTO_EMOJIS.length}`;
+  cap.textContent = FOTO_CAPTIONS[lbIndex] || '';
+}
+
+/* Keyboard nav */
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('show')) return;
+  if (e.key === 'ArrowRight') navLightbox(1);
+  if (e.key === 'ArrowLeft')  navLightbox(-1);
+  if (e.key === 'Escape')     closeLightbox();
+});
+
+/* ════════════════════════════════════
+   PETUGAS
+════════════════════════════════════ */
+document.getElementById('petugasList').innerHTML = PETUGAS_DATA.map(p => {
+  const init = p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  return `
+    <div class="petugas-item">
+      <div class="p-av" style="background:${p.grad};">${init}</div>
+      <div>
+        <div class="p-name">${p.name} ${p.main?'<span style="font-size:.62rem;background:rgba(79,70,229,.1);color:var(--c-primary);padding:2px 6px;border-radius:99px;font-weight:800;margin-left:4px;">Utama</span>':''}</div>
+        <div class="p-role">${p.role}</div>
+      </div>
+    </div>`;
+}).join('');
+
+/* ════════════════════════════════════
+   COMMENTS
+════════════════════════════════════ */
+let comments = [...COMMENTS_DATA];
+
+function renderComments() {
+  const list = document.getElementById('commentList');
+  const cnt  = document.getElementById('commentCount');
+  cnt.textContent = `${comments.length} komentar`;
+  document.getElementById('statFoto').textContent = FOTO_EMOJIS.length;
+
+  list.innerHTML = comments.map((c, i) => `
+    <div class="comment-item">
+      <div class="c-av" style="background:${c.grad};">${c.init}</div>
+      <div class="c-body">
+        <div class="c-header">
+          <span class="c-name">${c.name}</span>
+          <span class="c-role">${c.role}</span>
+          <span class="c-time">${c.time}</span>
+        </div>
+        <div class="c-text">${c.text}</div>
+        <div class="c-actions">
+          <button class="c-act-btn" onclick="likeComment(${i})">
+            <i class="bi bi-hand-thumbs-up"></i> Suka (${c.likes})
+          </button>
+          <button class="c-act-btn"><i class="bi bi-reply-fill"></i> Balas</button>
+          <button class="c-act-btn" style="color:var(--c-red);" onclick="deleteComment(${i})"><i class="bi bi-trash3-fill"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+renderComments();
+
+function addComment() {
+  const input = document.getElementById('commentInput');
+  const text  = input.value.trim();
+  if (!text) { DKA.toast({type:'warning',title:'Komentar kosong',message:'Tulis komentar terlebih dahulu.',position:'top-right'}); return; }
+  comments.push({ name:'Admin Doka', role:'Administrator', grad:'linear-gradient(135deg,#4f46e5,#7c3aed)', init:'AD', time:'Baru saja', text, likes:0 });
+  input.value = '';
+  renderComments();
+  DKA.toast({type:'success',title:'Komentar dikirim!',message:'Komentar Anda berhasil ditambahkan.',position:'bottom-right'});
+}
+
+function likeComment(idx) { comments[idx].likes++; renderComments(); }
+function deleteComment(idx) {
+  DKA.deleteConfirm({ title:'Hapus Komentar?', message:'Komentar ini akan dihapus.', itemName:'Komentar ini', confirm:'Ya, Hapus' })
+    .then(r => { if (r) { comments.splice(idx,1); renderComments(); DKA.toast({type:'success',title:'Komentar dihapus',position:'bottom-right'}); }});
+}
+
+/* ════════════════════════════════════
+   ACTIVITY TIMELINE
+════════════════════════════════════ */
+document.getElementById('actTimeline').innerHTML = ACTIVITIES.map((a,i) => `
+  <div class="tl-item">
+    <div class="tl-dot-wrap">
+      <div class="tl-dot" style="background:${a.grad};"><i class="bi ${a.icon}"></i></div>
+      ${i<ACTIVITIES.length-1?'<div class="tl-line"></div>':''}
+    </div>
+    <div class="tl-content">
+      <div class="tl-title">${a.title}</div>
+      <div class="tl-desc">${a.desc}</div>
+    </div>
+    <div class="tl-time">${a.time}</div>
+  </div>`).join('');
+
+/* ════════════════════════════════════
+   RELATED
+════════════════════════════════════ */
+document.getElementById('relatedGrid').innerHTML = RELATED.map(r => `
+  <a href="detail-kegiatan.html" class="related-card">
+    <div class="rc-cover" style="background:${r.grad};">${r.emoji}</div>
+    <div class="rc-body">
+      <div class="rc-kat">${r.kat}</div>
+      <div class="rc-title">${r.judul}</div>
+      <div class="rc-date"><i class="bi bi-calendar3"></i> ${r.tanggal}</div>
+    </div>
+  </a>`).join('');
+
+/* ════════════════════════════════════
+   ACTIONS
+════════════════════════════════════ */
+function editKegiatan() {
+  DKA.dialog({ type:'info', title:'Edit Kegiatan', message:'Anda akan diarahkan ke halaman edit kegiatan ini.', confirm:'Ya, Edit Sekarang' })
+    .then(r => { if(r) window.location.href='tambah-kegiatan.html'; });
+}
+
+function deleteKegiatan() {
+  DKA.deleteConfirm({
+    title   : 'Hapus Kegiatan Ini?',
+    message : 'Kegiatan beserta seluruh foto (12 foto) dan lampirannya akan dihapus permanen.',
+    itemName: KEGIATAN.judul.slice(0,60) + '...',
+    confirm : 'Ya, Hapus Kegiatan',
+  }).then(result => {
+    if (!result) return;
+    const l = DKA.loading({ title:'Menghapus kegiatan...', message:'Membersihkan semua data terkait.', style:'dots' });
+    setTimeout(() => {
+      l.close();
+      DKA.notify({ type:'success', title:'Kegiatan Berhasil Dihapus', message:'Kegiatan ini telah dihapus dari sistem.', duration:5000 });
+      setTimeout(() => window.location.href='semua-kegiatan.html', 2000);
+    }, 1800);
+  });
+}
+
+function exportPDF() {
+  const l = DKA.loading({ title:'Membuat laporan PDF...', message:'Mengumpulkan data & foto.', style:'ring' });
+  setTimeout(()=>l.update('Menyusun halaman PDF...'),1000);
+  setTimeout(()=>{ l.close(); DKA.toast({type:'success',title:'PDF Siap Diunduh',message:'Detail_Kegiatan_Apr2025.pdf (2.8 MB)',position:'top-right',duration:5000}); },2500);
+}
+
+function printPage() { window.print(); }
+
+function downloadAllPhotos() {
+  DKA.dialog({ type:'info', title:'Unduh Semua Foto?', message:'Semua 12 foto akan diunduh dalam format ZIP.', confirm:'Ya, Unduh Sekarang' })
+    .then(r => {
+      if (!r) return;
+      const l = DKA.loading({ title:'Mengemas foto...', message:'Menyiapkan file ZIP.', style:'dots' });
+      setTimeout(()=>{ l.close(); DKA.toast({type:'success',title:'Foto Siap Diunduh',message:'foto_rapat_apr2025.zip (18.4 MB)',position:'top-right',duration:5000}); },1800);
+    });
+}
+
+/* ════════════════════════════════════
+   READING PROGRESS BAR
+════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+  const el     = document.getElementById('mainContent');
+  const total  = el.scrollHeight - window.innerHeight;
+  const progress = total > 0 ? (window.scrollY / total) * 100 : 0;
+  document.getElementById('readingBar').style.width = Math.min(progress, 100) + '%';
+  document.getElementById('fabBtn').classList.toggle('visible', window.scrollY > 300);
+}, { passive: true });
+
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile = () => window.innerWidth <= 768;
+function toggleSidebar() { isMobile()?document.body.classList.toggle('mobile-open'):document.body.classList.toggle('collapsed'); }
+function closeMobileSidebar() { document.body.classList.remove('mobile-open'); }
+const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+function toggleUserDropdown() { const o=userDropdown.classList.toggle('show'); userTrigger.classList.toggle('open',o); }
+document.addEventListener('click',e=>{ if(!document.querySelector('.user-dropdown-wrap').contains(e.target)){userDropdown.classList.remove('show');userTrigger.classList.remove('open');} });
+
+function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
+</script>
+</body>
+</html>

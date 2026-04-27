@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Kategori</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:background var(--trans); flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1){width:18px;}.hline:nth-child(2){width:14px;}.hline:nth-child(3){width:18px;}
+    body.collapsed .hline:nth-child(1){transform:translateY(7px) rotate(45deg);width:18px;}
+    body.collapsed .hline:nth-child(2){opacity:0;width:0;}
+    body.collapsed .hline:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:18px;}
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══ MAIN ═══ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    /* ═══ PAGE HEADER ═══ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:20px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .ph-left h1 { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); margin-bottom:2px; display:flex; align-items:center; gap:10px; }
+    .ph-left h1 i { font-size:1.3rem; color:var(--c-primary); animation:iconWiggle 3s ease infinite; }
+    @keyframes iconWiggle { 0%,80%,100%{transform:rotate(0)} 85%{transform:rotate(-8deg)} 90%{transform:rotate(8deg)} 95%{transform:rotate(-4deg)} }
+    .ph-left p { font-size:.82rem; color:var(--c-muted); }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ═══ STAT CARDS ═══ */
+    .mini-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; animation:fadeUp .45s ease .05s both; }
+    .mini-stat { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); padding:16px 18px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-sm); transition:transform var(--trans),box-shadow var(--trans); cursor:default; position:relative; overflow:hidden; }
+    .mini-stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .mini-stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
+    .ms1::after { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .ms2::after { background:linear-gradient(90deg,var(--c-green),#34d399); }
+    .ms3::after { background:linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .ms4::after { background:linear-gradient(90deg,var(--c-pink),#f472b6); }
+    .ms-icon { width:42px; height:42px; border-radius:11px; display:grid; place-items:center; font-size:1.15rem; color:#fff; flex-shrink:0; }
+    .ms1 .ms-icon { background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); box-shadow:0 3px 10px rgba(79,70,229,.28); }
+    .ms2 .ms-icon { background:linear-gradient(135deg,var(--c-green),#34d399); box-shadow:0 3px 10px rgba(16,185,129,.28); }
+    .ms3 .ms-icon { background:linear-gradient(135deg,var(--c-accent),var(--c-orange)); box-shadow:0 3px 10px rgba(245,158,11,.28); }
+    .ms4 .ms-icon { background:linear-gradient(135deg,var(--c-pink),#f472b6); box-shadow:0 3px 10px rgba(236,72,153,.28); }
+    .ms-val { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); line-height:1; }
+    .ms-lbl { font-size:.75rem; color:var(--c-muted); font-weight:600; margin-top:2px; }
+
+    /* ═══ TOOLBAR ═══ */
+    .toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; animation:fadeUp .45s ease .1s both; }
+    .toolbar-search { flex:1; min-width:200px; max-width:300px; position:relative; }
+    .toolbar-search input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:#fff; color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .toolbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); }
+    .toolbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); pointer-events:none; }
+    .toolbar-select { padding:10px 14px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:#fff; color:var(--c-text-2); outline:none; cursor:pointer; transition:border-color var(--trans); }
+    .toolbar-select:focus { border-color:var(--c-primary); }
+    .toolbar-right { margin-left:auto; display:flex; gap:8px; align-items:center; }
+    .btn-toolbar { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border-radius:10px; font-size:.875rem; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer; border:none; transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-toolbar:hover { transform:translateY(-1px); }
+    .btn-add { background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.3); }
+    .btn-add:hover { box-shadow:0 6px 18px rgba(79,70,229,.45); }
+    .btn-outline-tb { background:#fff; color:var(--c-text-2); border:1.5px solid var(--c-border); }
+    .btn-outline-tb:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; }
+
+    /* View toggle */
+    .view-toggle { display:flex; gap:0; border:1.5px solid var(--c-border); border-radius:10px; overflow:hidden; background:#fff; }
+    .view-btn { width:38px; height:38px; border:none; background:transparent; cursor:pointer; display:grid; place-items:center; font-size:1rem; color:var(--c-muted); transition:background var(--trans),color var(--trans); }
+    .view-btn.active { background:var(--c-primary); color:#fff; }
+    .view-btn:hover:not(.active) { background:var(--c-surface2); color:var(--c-primary); }
+
+    /* ═══ CARD GRID ═══ */
+    .kat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; animation:fadeUp .45s ease .15s both; }
+
+    .kat-card {
+      background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md);
+      box-shadow:var(--shadow-sm); overflow:hidden;
+      transition:transform var(--trans),box-shadow var(--trans);
+      display:flex; flex-direction:column; position:relative;
+    }
+    .kat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+
+    /* Card top color bar */
+    .kat-card-bar { height:4px; }
+
+    /* Card body */
+    .kat-card-body { padding:20px 20px 16px; flex:1; }
+    .kat-icon-wrap {
+      width:60px; height:60px; border-radius:16px;
+      display:grid; place-items:center; font-size:1.6rem; color:#fff;
+      margin-bottom:14px;
+      box-shadow:0 4px 16px rgba(0,0,0,.15);
+      transition:transform var(--trans);
+      position:relative;
+    }
+    .kat-card:hover .kat-icon-wrap { transform:scale(1.08) rotate(-5deg); }
+    .kat-icon-wrap::after {
+      content:''; position:absolute; inset:-5px; border-radius:20px;
+      border:2px dashed rgba(255,255,255,.3);
+      animation:iconRingRotate 12s linear infinite;
+    }
+    @keyframes iconRingRotate { to{transform:rotate(360deg)} }
+    .kat-name { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.05rem; color:var(--c-text); margin-bottom:5px; }
+    .kat-desc { font-size:.78rem; color:var(--c-muted); line-height:1.6; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .kat-slug { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--c-muted); margin-top:8px; background:var(--c-surface2); padding:3px 8px; border-radius:5px; display:inline-block; }
+
+    /* Stats row in card */
+    .kat-stats { display:flex; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid var(--c-border); }
+    .kat-stat { display:flex; align-items:center; gap:5px; font-size:.75rem; color:var(--c-muted); font-weight:600; }
+    .kat-stat i { font-size:.8rem; }
+    .kat-stat span { font-weight:800; color:var(--c-text); }
+
+    /* Card footer */
+    .kat-card-footer { padding:12px 16px; border-top:1px solid var(--c-border); display:flex; align-items:center; justify-content:space-between; background:var(--c-surface2); }
+    .kat-status { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:99px; font-size:.7rem; font-weight:800; }
+    .kat-status-active   { background:#f0fdf4; color:var(--c-green); border:1px solid #bbf7d0; }
+    .kat-status-active::before   { content:''; width:6px; height:6px; border-radius:50%; background:var(--c-green); animation:dotPulse 2s ease infinite; }
+    .kat-status-inactive { background:#fef2f2; color:var(--c-red);   border:1px solid #fecaca; }
+    .kat-status-inactive::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--c-red); }
+    .kat-actions { display:flex; gap:5px; }
+    .kat-action-btn { width:30px; height:30px; border-radius:7px; border:1.5px solid var(--c-border); background:#fff; cursor:pointer; display:grid; place-items:center; font-size:.85rem; transition:all var(--trans); }
+    .kat-action-btn:hover { transform:scale(1.1); }
+    .kat-btn-edit   { color:var(--c-primary); }
+    .kat-btn-edit:hover   { background:var(--c-primary); color:#fff; border-color:var(--c-primary); }
+    .kat-btn-toggle { color:var(--c-accent); }
+    .kat-btn-toggle:hover { background:var(--c-accent); color:#fff; border-color:var(--c-accent); }
+    .kat-btn-delete { color:var(--c-red); }
+    .kat-btn-delete:hover { background:var(--c-red); color:#fff; border-color:var(--c-red); }
+
+    /* ═══ TABLE VIEW ═══ */
+    .table-card { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; animation:fadeUp .45s ease .15s both; }
+    .table-card-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--c-border); }
+    .table-card-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem; color:var(--c-text); display:flex; align-items:center; gap:8px; }
+    .table-card-title i { color:var(--c-primary); }
+    .table-meta { font-size:.78rem; color:var(--c-muted); }
+    .table-wrap { overflow-x:auto; }
+    table.kat-table { width:100%; border-collapse:collapse; }
+    .kat-table thead th { background:var(--c-surface2); padding:11px 16px; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--c-muted); border-bottom:1px solid var(--c-border); white-space:nowrap; cursor:pointer; user-select:none; transition:color var(--trans); }
+    .kat-table thead th:hover { color:var(--c-primary); }
+    .kat-table thead th .sort-icon { margin-left:4px; opacity:.4; font-size:.7rem; }
+    .kat-table thead th.sorted .sort-icon { opacity:1; color:var(--c-primary); }
+    .kat-table tbody tr { border-bottom:1px solid var(--c-border); transition:background var(--trans); }
+    .kat-table tbody tr:last-child { border-bottom:none; }
+    .kat-table tbody tr:hover { background:rgba(79,70,229,.03); }
+    .kat-table tbody td { padding:13px 16px; font-size:.875rem; color:var(--c-text-2); vertical-align:middle; }
+    .tbl-kat-cell { display:flex; align-items:center; gap:12px; }
+    .tbl-icon-sm { width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-size:1.1rem; color:#fff; flex-shrink:0; }
+    .tbl-kat-name { font-weight:700; color:var(--c-text); }
+    .tbl-kat-slug { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--c-muted); margin-top:2px; }
+    .tbl-actions { display:flex; gap:5px; justify-content:center; }
+    .tbl-btn { width:30px; height:30px; border-radius:8px; border:none; cursor:pointer; display:grid; place-items:center; font-size:.88rem; transition:all var(--trans); }
+    .tbl-btn:hover { transform:scale(1.1); }
+    .tbl-edit   { background:#eff6ff; color:var(--c-primary); }
+    .tbl-toggle { background:#fffbeb; color:var(--c-accent); }
+    .tbl-delete { background:#fef2f2; color:var(--c-red); }
+    .tbl-edit:hover   { background:var(--c-primary); color:#fff; }
+    .tbl-toggle:hover { background:var(--c-accent);  color:#fff; }
+    .tbl-delete:hover { background:var(--c-red);     color:#fff; }
+    .table-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid var(--c-border); flex-wrap:wrap; gap:10px; }
+    .page-info { font-size:.8rem; color:var(--c-muted); }
+    .pagination-wrap { display:flex; gap:4px; }
+    .page-btn { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--c-border); background:#fff; font-size:.82rem; font-weight:700; color:var(--c-text-2); cursor:pointer; display:grid; place-items:center; transition:all var(--trans); }
+    .page-btn:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; }
+    .page-btn.active { background:var(--c-primary); border-color:var(--c-primary); color:#fff; }
+    .page-btn:disabled { opacity:.4; cursor:default; }
+
+    /* Empty state */
+    .empty-state { padding:64px 24px; text-align:center; }
+    .empty-icon { font-size:3.5rem; color:var(--c-border); margin-bottom:16px; }
+    .empty-state h3 { font-family:'Nunito',sans-serif; font-weight:800; font-size:1.1rem; color:var(--c-muted); margin-bottom:6px; }
+    .empty-state p { font-size:.85rem; color:var(--c-muted); }
+
+    /* ═══ MODAL ADD/EDIT ═══ */
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); z-index:1000; display:grid; place-items:center; opacity:0; pointer-events:none; transition:opacity .25s; padding:16px; overflow-y:auto; }
+    .modal-overlay.show { opacity:1; pointer-events:all; }
+    .modal-box { background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); width:100%; max-width:580px; transform:translateY(24px) scale(.96); transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .modal-overlay.show .modal-box { transform:translateY(0) scale(1); }
+    .modal-head { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--c-border); position:sticky; top:0; background:#fff; z-index:1; border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
+    .modal-head::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:var(--radius-lg) var(--radius-lg) 0 0; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .modal-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.05rem; color:var(--c-text); display:flex; align-items:center; gap:10px; }
+    .modal-title .head-icon { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:1rem; color:#fff; transition:background var(--trans); }
+    .btn-close-modal { width:32px; height:32px; border-radius:8px; border:none; background:var(--c-surface2); cursor:pointer; display:grid; place-items:center; color:var(--c-muted); font-size:.95rem; transition:background var(--trans),color var(--trans); }
+    .btn-close-modal:hover { background:#fef2f2; color:var(--c-red); }
+    .modal-body { padding:24px; overflow-y:auto; max-height:calc(90vh - 130px); }
+    .modal-foot { padding:16px 24px; border-top:1px solid var(--c-border); display:flex; gap:10px; justify-content:flex-end; background:var(--c-surface2); border-radius:0 0 var(--radius-lg) var(--radius-lg); }
+
+    /* Form fields */
+    .fgroup { margin-bottom:18px; }
+    .fgroup:last-child { margin-bottom:0; }
+    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .flabel { font-size:.8rem; font-weight:700; color:var(--c-text); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+    .flabel .req { color:var(--c-pink); }
+    .fwrap { position:relative; }
+    .ficon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.9rem; pointer-events:none; transition:color var(--trans); }
+    .fwrap:focus-within .ficon { color:var(--c-primary); }
+    .fctrl { width:100%; padding:11px 13px 11px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans),background var(--trans); }
+    .fctrl:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .fctrl.no-icon { padding-left:13px; }
+    .fctrl.is-invalid { border-color:var(--c-red); box-shadow:0 0 0 3px rgba(239,68,68,.1); }
+    .finvalid { font-size:.72rem; color:var(--c-red); margin-top:4px; display:none; }
+    .fgroup.has-err .finvalid { display:block; }
+    .fgroup.has-err .fctrl { border-color:var(--c-red); }
+    .fhint { font-size:.72rem; color:var(--c-muted); margin-top:4px; }
+    textarea.fctrl { resize:vertical; padding-top:10px; min-height:80px; }
+    select.fctrl { cursor:pointer; }
+
+    /* ─── ICON PREVIEW ─── */
+    .icon-preview-wrap { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+    .icon-preview-box {
+      width:70px; height:70px; border-radius:16px;
+      display:grid; place-items:center; font-size:2rem; color:#fff;
+      flex-shrink:0; box-shadow:0 4px 16px rgba(79,70,229,.3);
+      transition:background var(--trans), transform var(--trans);
+      animation:previewPulse 3s ease-in-out infinite;
+    }
+    @keyframes previewPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    .icon-preview-info { font-size:.8rem; color:var(--c-muted); }
+    .icon-preview-info strong { color:var(--c-text); display:block; margin-bottom:2px; }
+
+    /* ─── ICON PICKER ─── */
+    .icon-picker-label { font-size:.8rem; font-weight:700; color:var(--c-text); margin-bottom:8px; }
+    .icon-search-wrap { position:relative; margin-bottom:10px; }
+    .icon-search { width:100%; padding:9px 13px 9px 36px; border:1.5px solid var(--c-border); border-radius:9px; font-size:.82rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans); }
+    .icon-search:focus { border-color:var(--c-primary); }
+    .icon-search-wrap i { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--c-muted); pointer-events:none; font-size:.9rem; }
+    .icon-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:5px; max-height:180px; overflow-y:auto; padding:4px; }
+    .icon-grid::-webkit-scrollbar { width:4px; }
+    .icon-grid::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .icon-btn { width:36px; height:36px; border-radius:8px; border:1.5px solid var(--c-border); background:#fff; cursor:pointer; display:grid; place-items:center; font-size:1rem; color:var(--c-text-2); transition:all var(--trans); }
+    .icon-btn:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; transform:scale(1.1); }
+    .icon-btn.selected { border-color:var(--c-primary); background:var(--c-primary); color:#fff; }
+
+    /* ─── COLOR PICKER ─── */
+    .color-picker-label { font-size:.8rem; font-weight:700; color:var(--c-text); margin-bottom:8px; }
+    .color-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .color-swatch { width:36px; height:36px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:transform var(--trans),box-shadow var(--trans); position:relative; }
+    .color-swatch:hover { transform:scale(1.15); }
+    .color-swatch.selected { border-color:#fff; box-shadow:0 0 0 3px var(--c-primary); }
+    .color-swatch.selected::after { content:'\F26A'; font-family:'bootstrap-icons'; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:.75rem; }
+
+    /* Btn modal */
+    .btn-primary-m { display:inline-flex; align-items:center; gap:7px; padding:11px 22px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; transition:transform var(--trans),box-shadow var(--trans); box-shadow:0 4px 12px rgba(79,70,229,.3); }
+    .btn-primary-m:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(79,70,229,.45); }
+    .btn-primary-m:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-secondary-m { display:inline-flex; align-items:center; gap:7px; padding:11px 18px; border-radius:10px; border:1.5px solid var(--c-border); background:#fff; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; transition:border-color var(--trans),color var(--trans); }
+    .btn-secondary-m:hover { border-color:var(--c-primary); color:var(--c-primary); }
+
+    /* FAB */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(79,70,229,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(79,70,229,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Footer */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* Responsive */
+    @media(max-width:1200px) { .mini-stats{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:992px)  { :root{--sidebar-w:240px} .frow2{grid-template-columns:1fr} }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;} .main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;} .user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+      .toolbar-right{margin-left:0;width:100%;}
+      .icon-grid{grid-template-columns:repeat(6,1fr);}
+    }
+    @media(max-width:576px) {
+      .mini-stats{grid-template-columns:1fr}
+      .page-header{flex-direction:column;align-items:flex-start}
+      .main-footer{flex-direction:column;align-items:flex-start}
+      .modal-foot{flex-direction:column}
+      .modal-foot .btn-primary-m,.modal-foot .btn-secondary-m{justify-content:center}
+      .kat-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item active" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="semua-kegiatan.html" class="nav-link-item" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="tambah-kegiatan.html" class="nav-link-item" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="pengaturan-sistem.html" class="nav-link-item" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1><i class="bi bi-tags-fill"></i> Manajemen Kategori</h1>
+      <p>Kelola kategori kegiatan — tambah, edit, dan atur status kategori.</p>
+    </div>
+    <nav class="breadcrumb-nav">
+      <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <a href="#">Master</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <span class="bc-current"><i class="bi bi-tags-fill"></i> Kategori</span>
+    </nav>
+  </div>
+
+  <!-- Mini Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat ms1">
+      <div class="ms-icon"><i class="bi bi-tags-fill"></i></div>
+      <div><div class="ms-val" id="sc1">0</div><div class="ms-lbl">Total Kategori</div></div>
+    </div>
+    <div class="mini-stat ms2">
+      <div class="ms-icon"><i class="bi bi-check-circle-fill"></i></div>
+      <div><div class="ms-val" id="sc2">0</div><div class="ms-lbl">Aktif</div></div>
+    </div>
+    <div class="mini-stat ms3">
+      <div class="ms-icon"><i class="bi bi-calendar3-fill"></i></div>
+      <div><div class="ms-val" id="sc3">0</div><div class="ms-lbl">Total Kegiatan</div></div>
+    </div>
+    <div class="mini-stat ms4">
+      <div class="ms-icon"><i class="bi bi-images"></i></div>
+      <div><div class="ms-val" id="sc4">0</div><div class="ms-lbl">Total Foto</div></div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" id="searchInput" placeholder="Cari nama kategori..." oninput="filterData()" />
+    </div>
+    <select class="toolbar-select" id="filterStatus" onchange="filterData()">
+      <option value="">Semua Status</option>
+      <option value="active">Aktif</option>
+      <option value="inactive">Nonaktif</option>
+    </select>
+    <div class="toolbar-right">
+      <div class="view-toggle">
+        <button class="view-btn active" id="btnCardView" onclick="setView('card')" title="Card View"><i class="bi bi-grid-3x2-gap-fill"></i></button>
+        <button class="view-btn" id="btnTableView" onclick="setView('table')" title="Table View"><i class="bi bi-table"></i></button>
+      </div>
+      <button class="btn-toolbar btn-add" onclick="openAddModal()">
+        <i class="bi bi-plus-lg"></i> Tambah Kategori
+      </button>
+    </div>
+  </div>
+
+  <!-- Card View -->
+  <div id="cardViewWrap">
+    <div class="kat-grid" id="katGrid"></div>
+    <div class="empty-state d-none" id="emptyCard">
+      <div class="empty-icon"><i class="bi bi-tags"></i></div>
+      <h3>Tidak ada kategori ditemukan</h3>
+      <p>Ubah filter atau tambahkan kategori baru.</p>
+    </div>
+  </div>
+
+  <!-- Table View -->
+  <div id="tableViewWrap" style="display:none;">
+    <div class="table-card">
+      <div class="table-card-head">
+        <div>
+          <div class="table-card-title"><i class="bi bi-table"></i> Daftar Kategori</div>
+          <div class="table-meta" id="tableMeta"></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="kat-table">
+          <thead>
+            <tr>
+              <th style="width:44px;">#</th>
+              <th onclick="sortTable(0)">Kategori <i class="bi bi-chevron-expand sort-icon"></i></th>
+              <th onclick="sortTable(1)">Slug <i class="bi bi-chevron-expand sort-icon"></i></th>
+              <th onclick="sortTable(2)">Kegiatan <i class="bi bi-chevron-expand sort-icon"></i></th>
+              <th onclick="sortTable(3)">Foto <i class="bi bi-chevron-expand sort-icon"></i></th>
+              <th onclick="sortTable(4)">Status <i class="bi bi-chevron-expand sort-icon"></i></th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="empty-state d-none" id="emptyTable">
+          <div class="empty-icon"><i class="bi bi-tags"></i></div>
+          <h3>Tidak ada kategori ditemukan</h3>
+          <p>Ubah filter atau tambahkan kategori baru.</p>
+        </div>
+      </div>
+      <div class="table-footer">
+        <div class="page-info" id="pageInfo"></div>
+        <div class="pagination-wrap" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Pagination -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px;" id="cardPagWrap">
+    <div class="page-info" id="cardPageInfo"></div>
+    <div class="pagination-wrap" id="cardPagination"></div>
+  </div>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan.</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<!-- ═══════════ MODAL ADD/EDIT ═══════════ -->
+<div class="modal-overlay" id="modalKat">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">
+        <div class="head-icon" id="modalHeadIcon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-purple));"><i class="bi bi-tags-fill" id="modalHeadIconI"></i></div>
+        <span id="modalTitleText">Tambah Kategori</span>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal('modalKat')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Preview -->
+      <div class="icon-preview-wrap">
+        <div class="icon-preview-box" id="previewBox" style="background:linear-gradient(135deg,var(--c-primary),var(--c-purple));">
+          <i class="bi bi-tags-fill" id="previewIcon"></i>
+        </div>
+        <div class="icon-preview-info">
+          <strong id="previewName">Nama Kategori</strong>
+          Preview tampilan ikon & warna<br/>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;" id="previewSlug">nama-kategori</span>
+        </div>
+      </div>
+
+      <!-- Nama & Slug -->
+      <div class="frow2">
+        <div class="fgroup" id="grp-nama">
+          <div class="flabel"><i class="bi bi-type" style="color:var(--c-muted);font-size:.85rem;"></i> Nama Kategori <span class="req">*</span></div>
+          <div class="fwrap">
+            <i class="bi bi-type ficon"></i>
+            <input type="text" class="fctrl" id="f-nama" placeholder="Contoh: Rapat Koordinasi"
+              oninput="onNamaInput(this.value);clearErr('grp-nama')" maxlength="50" />
+          </div>
+          <div class="finvalid">Nama kategori wajib diisi.</div>
+        </div>
+        <div class="fgroup" id="grp-slug">
+          <div class="flabel"><i class="bi bi-link-45deg" style="color:var(--c-muted);font-size:.85rem;"></i> Slug <span class="req">*</span></div>
+          <div class="fwrap">
+            <i class="bi bi-link-45deg ficon"></i>
+            <input type="text" class="fctrl" id="f-slug" placeholder="rapat-koordinasi"
+              oninput="clearErr('grp-slug');updatePreview()" />
+          </div>
+          <div class="finvalid">Slug wajib diisi (huruf kecil, tanpa spasi).</div>
+          <div class="fhint">Otomatis dari nama. Gunakan huruf kecil & strip (-).</div>
+        </div>
+      </div>
+
+      <!-- Deskripsi -->
+      <div class="fgroup">
+        <div class="flabel"><i class="bi bi-card-text" style="color:var(--c-muted);font-size:.85rem;"></i> Deskripsi <span style="color:var(--c-muted);font-weight:500;font-size:.72rem;">(opsional)</span></div>
+        <textarea class="fctrl no-icon" id="f-desc" rows="3" placeholder="Deskripsi singkat kategori ini..."></textarea>
+      </div>
+
+      <!-- Icon Picker -->
+      <div class="fgroup">
+        <div class="icon-picker-label"><i class="bi bi-emoji-smile" style="color:var(--c-primary);margin-right:4px;"></i> Pilih Ikon</div>
+        <div class="icon-search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="icon-search" id="iconSearch" placeholder="Cari ikon..." oninput="filterIcons(this.value)" />
+        </div>
+        <div class="icon-grid" id="iconGrid"></div>
+      </div>
+
+      <!-- Color Picker -->
+      <div class="fgroup" style="margin-bottom:0;">
+        <div class="color-picker-label"><i class="bi bi-palette-fill" style="color:var(--c-primary);margin-right:4px;"></i> Pilih Warna</div>
+        <div class="color-grid" id="colorGrid"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary-m" onclick="closeModal('modalKat')"><i class="bi bi-x-circle"></i> Batal</button>
+      <button class="btn-primary-m" id="btnSaveKat" onclick="saveKategori()"><i class="bi bi-check2-circle"></i> Simpan Kategori</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+<script>
+/* ════════════════════════════════════
+   DATA
+════════════════════════════════════ */
+let DATA = [
+  { id:1, nama:'Rapat / Koordinasi', slug:'rapat-koordinasi', desc:'Kegiatan rapat internal maupun koordinasi antar instansi pemerintah.',        icon:'bi-people-fill',              grad:'linear-gradient(135deg,#4f46e5,#7c3aed)', gradId:0,  kegiatan:72, foto:312, status:'active',   urutan:1 },
+  { id:2, nama:'Pelatihan / Workshop', slug:'pelatihan-workshop', desc:'Kegiatan pelatihan, bimbingan teknis, dan workshop pengembangan SDM.',    icon:'bi-book-fill',                grad:'linear-gradient(135deg,#10b981,#06b6d4)', gradId:1,  kegiatan:45, foto:198, status:'active',   urutan:2 },
+  { id:3, nama:'Kunjungan / Studi Banding', slug:'kunjungan-studi-banding', desc:'Kunjungan lapangan dan studi banding ke instansi lain.',         icon:'bi-geo-alt-fill',             grad:'linear-gradient(135deg,#f59e0b,#f97316)', gradId:2,  kegiatan:31, foto:145, status:'active',   urutan:3 },
+  { id:4, nama:'Sosialisasi / Diseminasi', slug:'sosialisasi-diseminasi', desc:'Sosialisasi program, kebijakan, dan informasi kepada masyarakat.', icon:'bi-megaphone-fill',           grad:'linear-gradient(135deg,#06b6d4,#3b82f6)', gradId:3,  kegiatan:28, foto:97,  status:'active',   urutan:4 },
+  { id:5, nama:'Upacara / Seremonial', slug:'upacara-seremonial', desc:'Upacara bendera, peringatan hari besar, dan kegiatan seremonial.',         icon:'bi-flag-fill',                grad:'linear-gradient(135deg,#ec4899,#f472b6)', gradId:4,  kegiatan:18, foto:124, status:'active',   urutan:5 },
+  { id:6, nama:'Pameran / Expo', slug:'pameran-expo', desc:'Kegiatan pameran produk, expo teknologi, dan gelar karya.',                            icon:'bi-shop-window',              grad:'linear-gradient(135deg,#8b5cf6,#a78bfa)', gradId:5,  kegiatan:9,  foto:67,  status:'active',   urutan:6 },
+  { id:7, nama:'Olahraga / Kesehatan', slug:'olahraga-kesehatan', desc:'Senam pagi, jalan sehat, dan kegiatan olahraga lainnya.',                 icon:'bi-heart-fill',               grad:'linear-gradient(135deg,#ef4444,#f87171)', gradId:6,  kegiatan:14, foto:78,  status:'active',   urutan:7 },
+  { id:8, nama:'Lainnya', slug:'lainnya', desc:'Kegiatan lain yang tidak masuk dalam kategori di atas.',                                           icon:'bi-three-dots-vertical',      grad:'linear-gradient(135deg,#64748b,#94a3b8)', gradId:7,  kegiatan:12, foto:48,  status:'inactive', urutan:8 },
+];
+
+/* ════════════════════════════════════
+   ICON & COLOR PALETTE
+════════════════════════════════════ */
+const ALL_ICONS = [
+  'bi-people-fill','bi-book-fill','bi-geo-alt-fill','bi-megaphone-fill','bi-flag-fill',
+  'bi-shop-window','bi-heart-fill','bi-three-dots-vertical','bi-calendar3-fill','bi-camera-fill',
+  'bi-briefcase-fill','bi-building-fill','bi-chat-dots-fill','bi-trophy-fill','bi-star-fill',
+  'bi-lightning-fill','bi-shield-fill','bi-house-fill','bi-globe-americas','bi-phone-fill',
+  'bi-laptop','bi-cpu-fill','bi-database-fill','bi-cloud-fill','bi-graph-up-arrow',
+  'bi-pie-chart-fill','bi-bar-chart-fill','bi-newspaper','bi-envelope-fill','bi-bell-fill',
+  'bi-person-fill','bi-person-workspace','bi-gear-fill','bi-tools','bi-wrench-adjustable',
+  'bi-clipboard-fill','bi-file-earmark-text-fill','bi-journals','bi-bookmark-fill','bi-pin-fill',
+  'bi-music-note-beamed','bi-camera-video-fill','bi-image-fill','bi-palette-fill','bi-brush-fill',
+  'bi-headphones','bi-mic-fill','bi-broadcast-pin','bi-wifi','bi-usb-symbol',
+  'bi-flower1','bi-tree-fill','bi-sun-fill','bi-moon-fill','bi-cloud-rain-fill',
+  'bi-airplane-fill','bi-bus-front-fill','bi-bicycle','bi-bag-fill','bi-box-seam-fill',
+];
+
+const COLORS = [
+  { id:0,  grad:'linear-gradient(135deg,#4f46e5,#7c3aed)',  hex:'#4f46e5' },
+  { id:1,  grad:'linear-gradient(135deg,#10b981,#06b6d4)',  hex:'#10b981' },
+  { id:2,  grad:'linear-gradient(135deg,#f59e0b,#f97316)',  hex:'#f59e0b' },
+  { id:3,  grad:'linear-gradient(135deg,#06b6d4,#3b82f6)',  hex:'#06b6d4' },
+  { id:4,  grad:'linear-gradient(135deg,#ec4899,#f472b6)',  hex:'#ec4899' },
+  { id:5,  grad:'linear-gradient(135deg,#8b5cf6,#a78bfa)',  hex:'#8b5cf6' },
+  { id:6,  grad:'linear-gradient(135deg,#ef4444,#f87171)',  hex:'#ef4444' },
+  { id:7,  grad:'linear-gradient(135deg,#64748b,#94a3b8)',  hex:'#64748b' },
+  { id:8,  grad:'linear-gradient(135deg,#059669,#34d399)',  hex:'#059669' },
+  { id:9,  grad:'linear-gradient(135deg,#d97706,#fbbf24)',  hex:'#d97706' },
+  { id:10, grad:'linear-gradient(135deg,#0891b2,#22d3ee)',  hex:'#0891b2' },
+  { id:11, grad:'linear-gradient(135deg,#7c3aed,#ec4899)',  hex:'#7c3aed' },
+  { id:12, grad:'linear-gradient(135deg,#1d4ed8,#38bdf8)',  hex:'#1d4ed8' },
+  { id:13, grad:'linear-gradient(135deg,#be185d,#f9a8d4)',  hex:'#be185d' },
+  { id:14, grad:'linear-gradient(135deg,#15803d,#4ade80)',  hex:'#15803d' },
+  { id:15, grad:'linear-gradient(135deg,#b45309,#fde68a)',  hex:'#b45309' },
+];
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+let filteredData = [...DATA];
+let currentView  = 'card';
+let currentPage  = 1;
+const perPage    = 12;
+let editingId    = null;
+let selIcon      = 'bi-tags-fill';
+let selColor     = 0;
+let sortCol      = -1, sortAsc = true;
+
+/* ════════════════════════════════════
+   STATS
+════════════════════════════════════ */
+function updateStats() {
+  const animC = (id, t) => {
+    const el=document.getElementById(id); let c=0,i=t/50;
+    const tm=setInterval(()=>{c+=i;if(c>=t){c=t;clearInterval(tm);}el.textContent=Math.floor(c).toLocaleString('id-ID');},16);
+  };
+  animC('sc1', DATA.length);
+  animC('sc2', DATA.filter(d=>d.status==='active').length);
+  animC('sc3', DATA.reduce((s,d)=>s+d.kegiatan,0));
+  animC('sc4', DATA.reduce((s,d)=>s+d.foto,0));
+}
+updateStats();
+
+/* ════════════════════════════════════
+   FILTER
+════════════════════════════════════ */
+function filterData() {
+  const q  = document.getElementById('searchInput').value.toLowerCase();
+  const st = document.getElementById('filterStatus').value;
+  filteredData = DATA.filter(d =>
+    (!q  || d.nama.toLowerCase().includes(q) || d.slug.includes(q) || d.desc.toLowerCase().includes(q)) &&
+    (!st || d.status === st)
+  );
+  currentPage = 1;
+  render();
+}
+
+/* ════════════════════════════════════
+   RENDER
+════════════════════════════════════ */
+function render() {
+  if (currentView==='card') renderCards(); else renderTable();
+}
+
+function renderCards() {
+  const grid  = document.getElementById('katGrid');
+  const empty = document.getElementById('emptyCard');
+  const slice = filteredData.slice((currentPage-1)*perPage, currentPage*perPage);
+  if (!filteredData.length) { grid.innerHTML=''; empty.classList.remove('d-none'); renderCardPag(); return; }
+  empty.classList.add('d-none');
+
+  grid.innerHTML = slice.map(d => `
+    <div class="kat-card" data-id="${d.id}" style="animation:fadeUp .4s ease ${(slice.indexOf(d)*.04)}s both;">
+      <div class="kat-card-bar" style="background:${d.grad};"></div>
+      <div class="kat-card-body">
+        <div class="kat-icon-wrap" style="background:${d.grad};">
+          <i class="bi ${d.icon}"></i>
+        </div>
+        <div class="kat-name">${d.nama}</div>
+        <div class="kat-desc">${d.desc || '<span style="color:var(--c-border);font-style:italic;">Belum ada deskripsi</span>'}</div>
+        <code class="kat-slug">${d.slug}</code>
+        <div class="kat-stats">
+          <div class="kat-stat"><i class="bi bi-calendar3-fill" style="color:var(--c-primary);"></i> <span>${d.kegiatan}</span> kegiatan</div>
+          <div class="kat-stat"><i class="bi bi-images" style="color:var(--c-green);"></i> <span>${d.foto}</span> foto</div>
+        </div>
+      </div>
+      <div class="kat-card-footer">
+        <span class="kat-status ${d.status==='active'?'kat-status-active':'kat-status-inactive'}">
+          ${d.status==='active'?'Aktif':'Nonaktif'}
+        </span>
+        <div class="kat-actions">
+          <button class="kat-action-btn kat-btn-edit"   onclick="openEditModal(${d.id})" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+          <button class="kat-action-btn kat-btn-toggle" onclick="toggleStatus(${d.id})"  title="${d.status==='active'?'Nonaktifkan':'Aktifkan'}">
+            <i class="bi ${d.status==='active'?'bi-toggle-on':'bi-toggle-off'}"></i>
+          </button>
+          <button class="kat-action-btn kat-btn-delete" onclick="deleteKategori(${d.id})" title="Hapus"><i class="bi bi-trash3-fill"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+  renderCardPag();
+}
+
+function renderCardPag() {
+  const total = Math.ceil(filteredData.length/perPage);
+  const s=(currentPage-1)*perPage+1, e=Math.min(currentPage*perPage,filteredData.length);
+  document.getElementById('cardPageInfo').textContent = filteredData.length ? `Menampilkan ${s}–${e} dari ${filteredData.length} kategori` : '';
+  const pg=document.getElementById('cardPagination');
+  if(total<=1){pg.innerHTML='';return;}
+  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="bi bi-chevron-left"></i></button>`;
+  for(let i=1;i<=total;i++) html+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}><i class="bi bi-chevron-right"></i></button>`;
+  pg.innerHTML=html;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyTable');
+  const slice = filteredData.slice((currentPage-1)*perPage, currentPage*perPage);
+  if (!filteredData.length) { tbody.innerHTML=''; empty.classList.remove('d-none'); renderTablePag(); return; }
+  empty.classList.add('d-none');
+  tbody.innerHTML = slice.map((d,i) => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--c-muted);font-size:.78rem;">${(currentPage-1)*perPage+i+1}</td>
+      <td>
+        <div class="tbl-kat-cell">
+          <div class="tbl-icon-sm" style="background:${d.grad};"><i class="bi ${d.icon}"></i></div>
+          <div>
+            <div class="tbl-kat-name">${d.nama}</div>
+            <div class="tbl-kat-slug">${d.desc||''}</div>
+          </div>
+        </div>
+      </td>
+      <td><code style="font-family:'DM Mono',monospace;font-size:.75rem;background:var(--c-surface2);padding:3px 8px;border-radius:5px;">${d.slug}</code></td>
+      <td style="font-weight:700;text-align:center;">${d.kegiatan}</td>
+      <td style="font-weight:700;text-align:center;">${d.foto}</td>
+      <td>
+        <span class="kat-status ${d.status==='active'?'kat-status-active':'kat-status-inactive'}">
+          ${d.status==='active'?'Aktif':'Nonaktif'}
+        </span>
+      </td>
+      <td>
+        <div class="tbl-actions">
+          <button class="tbl-btn tbl-edit"   onclick="openEditModal(${d.id})" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+          <button class="tbl-btn tbl-toggle" onclick="toggleStatus(${d.id})"  title="Toggle Status"><i class="bi ${d.status==='active'?'bi-toggle-on':'bi-toggle-off'}"></i></button>
+          <button class="tbl-btn tbl-delete" onclick="deleteKategori(${d.id})" title="Hapus"><i class="bi bi-trash3-fill"></i></button>
+        </div>
+      </td>
+    </tr>`).join('');
+  const s=(currentPage-1)*perPage+1, e=Math.min(currentPage*perPage,filteredData.length);
+  document.getElementById('tableMeta').textContent=`${filteredData.length} kategori`;
+  document.getElementById('pageInfo').textContent=filteredData.length?`Menampilkan ${s}–${e} dari ${filteredData.length}`:'';
+  renderTablePag();
+}
+
+function renderTablePag() {
+  const total=Math.ceil(filteredData.length/perPage);
+  const pg=document.getElementById('pagination');
+  if(total<=1){pg.innerHTML='';return;}
+  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="bi bi-chevron-left"></i></button>`;
+  for(let i=1;i<=total;i++) html+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}><i class="bi bi-chevron-right"></i></button>`;
+  pg.innerHTML=html;
+}
+
+function goPage(p) {
+  const total=Math.ceil(filteredData.length/perPage);
+  if(p<1||p>total) return;
+  currentPage=p; render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ════════════════════════════════════
+   SORT TABLE
+════════════════════════════════════ */
+function sortTable(col) {
+  if(sortCol===col) sortAsc=!sortAsc; else{sortCol=col;sortAsc=true;}
+  const keys=['nama','slug','kegiatan','foto','status'];
+  filteredData.sort((a,b)=>{
+    const av=String(a[keys[col]]), bv=String(b[keys[col]]);
+    return sortAsc?av.localeCompare(bv,undefined,{numeric:true}):bv.localeCompare(av,undefined,{numeric:true});
+  });
+  currentPage=1; renderTable();
+  document.querySelectorAll('.kat-table thead th .sort-icon').forEach((ic,i)=>{
+    ic.className='sort-icon bi '+(i===col?(sortAsc?'bi-sort-down-alt':'bi-sort-up'):'bi-chevron-expand');
+    ic.closest('th').classList.toggle('sorted',i===col);
+  });
+}
+
+/* ════════════════════════════════════
+   VIEW TOGGLE
+════════════════════════════════════ */
+function setView(v) {
+  currentView=v; currentPage=1;
+  document.getElementById('btnCardView').classList.toggle('active',v==='card');
+  document.getElementById('btnTableView').classList.toggle('active',v==='table');
+  document.getElementById('cardViewWrap').style.display  = v==='card'  ? '':'none';
+  document.getElementById('tableViewWrap').style.display = v==='table' ? '':'none';
+  document.getElementById('cardPagWrap').style.display   = v==='card'  ? '':'none';
+  render();
+}
+
+/* ════════════════════════════════════
+   BUILD ICON & COLOR GRIDS
+════════════════════════════════════ */
+function buildIconGrid(filter='') {
+  const grid = document.getElementById('iconGrid');
+  const icons = filter ? ALL_ICONS.filter(i => i.includes(filter.toLowerCase())) : ALL_ICONS;
+  grid.innerHTML = icons.map(ic => `
+    <button type="button" class="icon-btn ${ic===selIcon?'selected':''}" onclick="selectIcon('${ic}')" title="${ic}">
+      <i class="bi ${ic}"></i>
+    </button>`).join('');
+}
+function filterIcons(q) { buildIconGrid(q); }
+function selectIcon(ic) {
+  selIcon = ic;
+  buildIconGrid(document.getElementById('iconSearch').value);
+  document.getElementById('previewIcon').className = `bi ${ic}`;
+  document.getElementById('modalHeadIconI').className = `bi ${ic}`;
+}
+
+function buildColorGrid() {
+  document.getElementById('colorGrid').innerHTML = COLORS.map(c => `
+    <div class="color-swatch ${c.id===selColor?'selected':''}"
+      style="background:${c.grad};"
+      onclick="selectColor(${c.id})" title="${c.hex}"></div>`).join('');
+}
+function selectColor(id) {
+  selColor = id;
+  buildColorGrid();
+  const grad = COLORS[id].grad;
+  document.getElementById('previewBox').style.background = grad;
+  document.getElementById('modalHeadIcon').style.background = grad;
+}
+
+/* ════════════════════════════════════
+   MODAL OPEN/CLOSE
+════════════════════════════════════ */
+function openAddModal() {
+  editingId = null;
+  selIcon  = 'bi-tags-fill';
+  selColor = 0;
+  document.getElementById('modalTitleText').textContent   = 'Tambah Kategori';
+  document.getElementById('modalHeadIconI').className     = 'bi bi-tags-fill';
+  document.getElementById('modalHeadIcon').style.background = COLORS[0].grad;
+  document.getElementById('btnSaveKat').innerHTML         = '<i class="bi bi-check2-circle"></i> Simpan Kategori';
+  document.getElementById('previewIcon').className        = 'bi bi-tags-fill';
+  document.getElementById('previewBox').style.background  = COLORS[0].grad;
+  document.getElementById('previewName').textContent      = 'Nama Kategori';
+  document.getElementById('previewSlug').textContent      = 'nama-kategori';
+  ['f-nama','f-slug','f-desc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('.fgroup').forEach(g=>g.classList.remove('has-err'));
+  buildIconGrid(); buildColorGrid();
+  openModal('modalKat');
+}
+
+function openEditModal(id) {
+  const d = DATA.find(x=>x.id===id); if(!d) return;
+  editingId = id;
+  selIcon   = d.icon;
+  selColor  = d.gradId;
+  document.getElementById('modalTitleText').textContent   = 'Edit Kategori';
+  document.getElementById('modalHeadIconI').className     = `bi ${d.icon}`;
+  document.getElementById('modalHeadIcon').style.background = d.grad;
+  document.getElementById('btnSaveKat').innerHTML         = '<i class="bi bi-check2-circle"></i> Perbarui Kategori';
+  document.getElementById('previewIcon').className        = `bi ${d.icon}`;
+  document.getElementById('previewBox').style.background  = d.grad;
+  document.getElementById('previewName').textContent      = d.nama;
+  document.getElementById('previewSlug').textContent      = d.slug;
+  document.getElementById('f-nama').value = d.nama;
+  document.getElementById('f-slug').value = d.slug;
+  document.getElementById('f-desc').value = d.desc||'';
+  document.querySelectorAll('.fgroup').forEach(g=>g.classList.remove('has-err'));
+  buildIconGrid(); buildColorGrid();
+  openModal('modalKat');
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')&&(document.body.style.overflow='');}));
+
+/* ════════════════════════════════════
+   NAMA → SLUG AUTO
+════════════════════════════════════ */
+function onNamaInput(val) {
+  const slug = val.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim();
+  document.getElementById('f-slug').value = slug;
+  document.getElementById('previewName').textContent = val || 'Nama Kategori';
+  document.getElementById('previewSlug').textContent = slug || 'nama-kategori';
+}
+function updatePreview() {
+  document.getElementById('previewSlug').textContent = document.getElementById('f-slug').value || 'nama-kategori';
+}
+
+/* ════════════════════════════════════
+   VALIDATE & SAVE
+════════════════════════════════════ */
+function clearErr(id) { document.getElementById(id)?.classList.remove('has-err'); }
+function setErr(id)   { document.getElementById(id)?.classList.add('has-err'); }
+
+function saveKategori() {
+  const nama = document.getElementById('f-nama').value.trim();
+  const slug = document.getElementById('f-slug').value.trim();
+  let ok = true;
+  if(!nama) { setErr('grp-nama'); ok=false; } else clearErr('grp-nama');
+  if(!slug) { setErr('grp-slug'); ok=false; } else clearErr('grp-slug');
+  if(!ok) { DKA.toast({type:'danger',title:'Form belum lengkap',message:'Harap isi semua field wajib.',position:'top-right'}); return; }
+
+  const btn=document.getElementById('btnSaveKat');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+
+  setTimeout(()=>{
+    btn.disabled=false;
+    const grad = COLORS[selColor].grad;
+    if(editingId) {
+      const d=DATA.find(x=>x.id===editingId);
+      d.nama=nama; d.slug=slug; d.desc=document.getElementById('f-desc').value.trim();
+      d.icon=selIcon; d.grad=grad; d.gradId=selColor;
+      btn.innerHTML='<i class="bi bi-check2-circle"></i> Perbarui Kategori';
+      DKA.toast({type:'success',title:'Kategori Diperbarui!',message:`"${nama}" berhasil diperbarui.`,position:'top-right',duration:4000});
+    } else {
+      DATA.push({ id:Date.now(), nama, slug, desc:document.getElementById('f-desc').value.trim(), icon:selIcon, grad, gradId:selColor, kegiatan:0, foto:0, status:'active', urutan:DATA.length+1 });
+      btn.innerHTML='<i class="bi bi-check2-circle"></i> Simpan Kategori';
+      DKA.toast({type:'success',title:'Kategori Ditambahkan!',message:`"${nama}" berhasil ditambahkan.`,position:'top-right',duration:4000});
+    }
+    updateStats(); filterData(); closeModal('modalKat');
+  },1100);
+}
+
+/* ════════════════════════════════════
+   TOGGLE STATUS
+════════════════════════════════════ */
+function toggleStatus(id) {
+  const d=DATA.find(x=>x.id===id); if(!d) return;
+  const action = d.status==='active' ? 'nonaktifkan' : 'aktifkan';
+  DKA.dialog({
+    type   : d.status==='active'?'warning':'success',
+    title  : d.status==='active'?'Nonaktifkan Kategori?':'Aktifkan Kategori?',
+    message: `Kategori "<strong>${d.nama}</strong>" akan di${action}. Kegiatan yang sudah menggunakan kategori ini tidak terpengaruh.`,
+    confirm: `Ya, ${action.charAt(0).toUpperCase()+action.slice(1)}`,
+  }).then(result=>{
+    if(!result) return;
+    d.status = d.status==='active'?'inactive':'active';
+    updateStats(); filterData();
+    DKA.toast({type:d.status==='active'?'success':'info',title:`Kategori ${d.status==='active'?'Diaktifkan':'Dinonaktifkan'}`,message:`"${d.nama}" berhasil di${action}kan.`,position:'top-right'});
+  });
+}
+
+/* ════════════════════════════════════
+   DELETE
+════════════════════════════════════ */
+function deleteKategori(id) {
+  const d=DATA.find(x=>x.id===id); if(!d) return;
+  DKA.deleteConfirm({
+    title   : 'Hapus Kategori?',
+    message : d.kegiatan>0
+      ? `Kategori ini digunakan oleh <strong>${d.kegiatan} kegiatan</strong>. Hapus kategori ini tidak akan menghapus kegiatannya, namun kategori akan dihapus dari sana.`
+      : 'Kategori ini belum memiliki kegiatan. Aman untuk dihapus.',
+    itemName: `${d.icon.replace('bi-','')} ${d.nama}`,
+    confirm : 'Ya, Hapus Kategori',
+  }).then(result=>{
+    if(!result) return;
+    const loader=DKA.loading({title:'Menghapus kategori...',message:'Membersihkan data terkait.',style:'dots'});
+    setTimeout(()=>{
+      DATA=DATA.filter(x=>x.id!==id);
+      filteredData=filteredData.filter(x=>x.id!==id);
+      loader.close(); updateStats(); filterData();
+      DKA.toast({type:'success',title:'Kategori Dihapus',message:`"${d.nama}" berhasil dihapus.`,position:'top-right'});
+    },1200);
+  });
+}
+
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile=()=>window.innerWidth<=768;
+function toggleSidebar(){isMobile()?document.body.classList.toggle('mobile-open'):document.body.classList.toggle('collapsed');}
+function closeMobileSidebar(){document.body.classList.remove('mobile-open');}
+const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+function toggleUserDropdown(){const o=userDropdown.classList.toggle('show');userTrigger.classList.toggle('open',o);}
+document.addEventListener('click',e=>{if(!document.querySelector('.user-dropdown-wrap').contains(e.target)){userDropdown.classList.remove('show');userTrigger.classList.remove('open');}});
+
+window.addEventListener('scroll',()=>document.getElementById('fabBtn').classList.toggle('visible',window.scrollY>300),{passive:true});
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
+
+/* Init */
+filterData();
+</script>
+</body>
+</html>

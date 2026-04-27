@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Tambah Kegiatan</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    /* ═══════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:background var(--trans); flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1){width:18px;}.hline:nth-child(2){width:14px;}.hline:nth-child(3){width:18px;}
+    body.collapsed .hline:nth-child(1){transform:translateY(7px) rotate(45deg);width:18px;}
+    body.collapsed .hline:nth-child(2){opacity:0;width:0;}
+    body.collapsed .hline:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:18px;}
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══ MAIN ═══ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    /* ═══ PAGE HEADER ═══ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:20px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .ph-left h1 { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); margin-bottom:2px; display:flex; align-items:center; gap:10px; }
+    .ph-left h1 i { font-size:1.3rem; color:var(--c-primary); animation:iconWiggle 3s ease infinite; }
+    @keyframes iconWiggle { 0%,80%,100%{transform:rotate(0)} 85%{transform:rotate(-8deg)} 90%{transform:rotate(8deg)} 95%{transform:rotate(-4deg)} }
+    .ph-left p { font-size:.82rem; color:var(--c-muted); }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ═══════════════════════════════════
+       FORM LAYOUT
+    ═══════════════════════════════════ */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ─── CARD ─── */
+    .form-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      animation: fadeUp .45s ease .05s both;
+    }
+    .form-card + .form-card { margin-top: 20px; }
+    .fc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px; border-bottom: 1px solid var(--c-border);
+      position: relative;
+    }
+    .fc-head::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 3px 3px 0 0;
+    }
+    .fc-head.indigo::before { background: linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .fc-head.green::before  { background: linear-gradient(90deg,var(--c-green),var(--c-secondary)); }
+    .fc-head.amber::before  { background: linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .fc-head.pink::before   { background: linear-gradient(90deg,var(--c-pink),var(--c-purple)); }
+    .fc-title {
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .95rem; color: var(--c-text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .fc-title i { font-size: 1rem; color: var(--c-primary); }
+    .fc-desc { font-size: .75rem; color: var(--c-muted); margin-top: 2px; }
+    .fc-body { padding: 22px; }
+
+    /* ─── FORM FIELDS ─── */
+    .fgroup { margin-bottom: 18px; }
+    .fgroup:last-child { margin-bottom: 0; }
+    .frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .frow3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+    .flabel {
+      font-size: .8rem; font-weight: 700; color: var(--c-text);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+    }
+    .flabel .req { color: var(--c-pink); }
+    .flabel .opt { color: var(--c-muted); font-weight: 500; font-size: .72rem; }
+
+    .fwrap { position: relative; }
+    .ficon {
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      color: var(--c-muted); font-size: .9rem; pointer-events: none; transition: color var(--trans);
+    }
+    .fwrap:focus-within .ficon { color: var(--c-primary); }
+
+    .fctrl {
+      width: 100%; padding: 11px 13px 11px 38px;
+      border: 1.5px solid var(--c-border); border-radius: 10px;
+      font-size: .875rem; font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--c-surface2); color: var(--c-text);
+      outline: none; transition: border-color var(--trans), box-shadow var(--trans), background var(--trans);
+    }
+    .fctrl:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); background: #fff; }
+    .fctrl.no-icon { padding-left: 13px; }
+    .fctrl.is-invalid { border-color: var(--c-red); box-shadow: 0 0 0 3px rgba(239,68,68,.1); }
+    .fctrl.is-valid   { border-color: var(--c-green); }
+    .finvalid { font-size: .72rem; color: var(--c-red); margin-top: 4px; display: none; }
+    .fgroup.has-err .finvalid { display: block; }
+    .fgroup.has-err .fctrl    { border-color: var(--c-red); }
+    .fhint { font-size: .72rem; color: var(--c-muted); margin-top: 4px; line-height: 1.5; }
+
+    select.fctrl { cursor: pointer; }
+
+    /* ─── CHARACTER COUNTER ─── */
+    .char-counter {
+      font-size: .7rem; color: var(--c-muted); text-align: right; margin-top: 4px;
+      font-family: 'DM Mono', monospace;
+    }
+    .char-counter.warn { color: var(--c-accent); }
+    .char-counter.over { color: var(--c-red); }
+
+    /* ─── TAGS INPUT ─── */
+    .tags-wrap {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      padding: 8px 10px; border: 1.5px solid var(--c-border); border-radius: 10px;
+      background: var(--c-surface2); min-height: 44px;
+      cursor: text; transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    .tags-wrap:focus-within { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); background: #fff; }
+    .tag-item {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(79,70,229,.1); border: 1px solid rgba(79,70,229,.2);
+      color: var(--c-primary); border-radius: 99px;
+      padding: 3px 10px 3px 10px; font-size: .75rem; font-weight: 700;
+      animation: tagPop .25s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes tagPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+    .tag-remove { background: none; border: none; cursor: pointer; color: var(--c-primary); font-size: .65rem; padding: 0 1px; line-height: 1; opacity: .7; transition: opacity .15s; }
+    .tag-remove:hover { opacity: 1; }
+    .tags-input { border: none; outline: none; background: transparent; font-size: .82rem; font-family: 'Plus Jakarta Sans',sans-serif; color: var(--c-text); min-width: 100px; flex: 1; }
+
+    /* ─── CKEDITOR WRAPPER ─── */
+    .ck-editor-wrap {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid var(--c-border);
+      transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    .ck-editor-wrap:focus-within {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    }
+    .ck-editor-wrap.is-invalid { border-color: var(--c-red); }
+
+    /* Restyle CKEditor toolbar to match theme */
+    .ck.ck-toolbar {
+      background: var(--c-surface2) !important;
+      border: none !important;
+      border-bottom: 1px solid var(--c-border) !important;
+      border-radius: 0 !important;
+      padding: 6px 8px !important;
+    }
+    .ck.ck-editor__editable {
+      border: none !important;
+      border-radius: 0 !important;
+      min-height: 220px;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: .9rem !important;
+      color: var(--c-text) !important;
+      padding: 14px 16px !important;
+      line-height: 1.75 !important;
+    }
+    .ck.ck-editor__editable:focus { box-shadow: none !important; }
+    .ck.ck-toolbar__separator { background: var(--c-border) !important; }
+    .ck.ck-button { border-radius: 7px !important; transition: background .15s !important; }
+    .ck.ck-button:hover { background: rgba(79,70,229,.08) !important; }
+    .ck.ck-button.ck-on { background: rgba(79,70,229,.12) !important; color: var(--c-primary) !important; }
+    .ck-word-count { font-size: .72rem !important; color: var(--c-muted) !important; padding: 6px 12px !important; background: var(--c-surface2) !important; border-top: 1px solid var(--c-border) !important; }
+
+    /* ─── PHOTO UPLOAD ZONE ─── */
+    .photo-upload-zone {
+      border: 2px dashed var(--c-border);
+      border-radius: 14px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--trans), background var(--trans), transform .2s;
+      background: var(--c-surface2);
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-upload-zone:hover { border-color: var(--c-primary); background: rgba(79,70,229,.03); }
+    .photo-upload-zone.drag-over {
+      border-color: var(--c-primary);
+      background: rgba(79,70,229,.06);
+      transform: scale(1.01);
+      box-shadow: 0 0 0 4px rgba(79,70,229,.1);
+    }
+    .photo-upload-zone.is-invalid { border-color: var(--c-red); }
+    .photo-upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-icon-wrap {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+      display: grid; place-items: center; margin: 0 auto 14px;
+      font-size: 1.6rem; color: #fff;
+      box-shadow: 0 6px 20px rgba(79,70,229,.3);
+      animation: uploadIconBounce 2.5s ease-in-out infinite;
+    }
+    @keyframes uploadIconBounce {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-6px) scale(1.05); }
+    }
+    .upload-title { font-size: .9rem; font-weight: 700; color: var(--c-text); margin-bottom: 4px; }
+    .upload-sub   { font-size: .78rem; color: var(--c-muted); margin-bottom: 12px; }
+    .upload-or    { display: flex; align-items: center; gap: 10px; margin: 12px 0; color: var(--c-muted); font-size: .75rem; }
+    .upload-or::before, .upload-or::after { content:''; flex:1; height:1px; background:var(--c-border); }
+    .btn-browse {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 20px; border-radius: 99px;
+      background: linear-gradient(135deg,var(--c-primary),var(--c-secondary));
+      color: #fff; font-size: .82rem; font-weight: 700;
+      font-family: 'Plus Jakarta Sans',sans-serif;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(79,70,229,.3);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-browse:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(79,70,229,.4); }
+    .upload-formats { font-size: .7rem; color: var(--c-muted); margin-top: 10px; }
+
+    /* ─── PHOTO PREVIEW GRID ─── */
+    .photo-preview-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .photo-item {
+      position: relative; border-radius: 10px; overflow: hidden;
+      aspect-ratio: 1; background: var(--c-surface2);
+      border: 1.5px solid var(--c-border);
+      animation: photoIn .4s cubic-bezier(.34,1.56,.64,1) both;
+      group: photo;
+    }
+    @keyframes photoIn {
+      from { transform: scale(0) rotate(-5deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0);     opacity: 1; }
+    }
+    .photo-item img { width:100%; height:100%; object-fit:cover; display:block; }
+    .photo-item-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background .2s;
+    }
+    .photo-item:hover .photo-item-overlay { background: rgba(0,0,0,.45); }
+    .photo-item-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+      display: grid; place-items: center; font-size: .85rem; color: #fff;
+      opacity: 0; transform: scale(.7); transition: opacity .2s, transform .2s;
+    }
+    .photo-item:hover .photo-item-btn { opacity: 1; transform: scale(1); }
+    .photo-btn-view   { background: rgba(255,255,255,.2); }
+    .photo-btn-delete { background: rgba(239,68,68,.85); }
+    .photo-item-num {
+      position: absolute; top: 5px; left: 5px;
+      background: rgba(0,0,0,.55); color: #fff;
+      font-size: .62rem; font-weight: 800;
+      padding: 2px 6px; border-radius: 99px;
+    }
+    .photo-main-badge {
+      position: absolute; bottom: 5px; left: 0; right: 0; text-align: center;
+      background: linear-gradient(135deg,var(--c-primary),var(--c-secondary));
+      color: #fff; font-size: .6rem; font-weight: 800;
+      padding: 3px 0; letter-spacing: .3px;
+    }
+
+    /* Photo counter */
+    .photo-counter {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; padding: 10px 14px;
+      background: rgba(79,70,229,.05); border: 1px solid rgba(79,70,229,.12);
+      border-radius: 10px;
+    }
+    .photo-counter-info { font-size: .8rem; font-weight: 700; color: var(--c-text); display: flex; align-items: center; gap: 6px; }
+    .photo-counter-info i { color: var(--c-primary); }
+    .photo-counter-bar-wrap { flex: 1; max-width: 160px; margin: 0 12px; }
+    .photo-counter-bar { height: 6px; background: var(--c-border); border-radius: 99px; overflow: hidden; }
+    .photo-counter-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,var(--c-primary),var(--c-secondary)); transition: width .3s; }
+    .photo-counter-num { font-family: 'DM Mono',monospace; font-size: .78rem; font-weight: 500; color: var(--c-primary); }
+    .btn-clear-photos {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 8px; border: 1.5px solid rgba(239,68,68,.25);
+      background: #fef2f2; color: var(--c-red); font-size: .72rem; font-weight: 700;
+      font-family: 'Plus Jakarta Sans',sans-serif; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-clear-photos:hover { background: #fee2e2; }
+
+    /* ─── STATUS TOGGLE ─── */
+    .status-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status-opt { position: relative; }
+    .status-opt input { display: none; }
+    .status-opt label {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 10px;
+      border: 1.5px solid var(--c-border); background: #fff;
+      cursor: pointer; font-size: .82rem; font-weight: 700;
+      color: var(--c-text-2); transition: all var(--trans);
+    }
+    .status-opt label i { font-size: .85rem; }
+    .status-opt input:checked ~ label {
+      border-color: var(--c-primary);
+      background: linear-gradient(90deg,rgba(79,70,229,.08),rgba(79,70,229,.04));
+      color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    }
+    .status-opt label.selesai  i { color: var(--c-green); }
+    .status-opt label.berjalan i { color: var(--c-primary); }
+    .status-opt label.draft    i { color: var(--c-accent); }
+    .status-opt input:checked ~ label.selesai  { border-color:var(--c-green); background:rgba(16,185,129,.06); color:var(--c-green); box-shadow:0 0 0 3px rgba(16,185,129,.1); }
+    .status-opt input:checked ~ label.berjalan { border-color:var(--c-primary); background:rgba(79,70,229,.06); color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); }
+    .status-opt input:checked ~ label.draft    { border-color:var(--c-accent); background:rgba(245,158,11,.06); color:#d97706; box-shadow:0 0 0 3px rgba(245,158,11,.1); }
+
+    /* ─── SIDEBAR RIGHT CARDS ─── */
+    .side-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 16px;
+      animation: fadeUp .45s ease .1s both;
+    }
+    .side-card:last-child { margin-bottom: 0; }
+    .sc-head { padding: 14px 18px; border-bottom: 1px solid var(--c-border); }
+    .sc-title {
+      font-family: 'Nunito',sans-serif; font-weight: 800; font-size: .9rem; color: var(--c-text);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .sc-title i { color: var(--c-primary); }
+    .sc-body { padding: 16px 18px; }
+
+    /* ─── PETUGAS AVATAR PICKER ─── */
+    .petugas-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+    .petugas-list::-webkit-scrollbar { width:3px; }
+    .petugas-list::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .petugas-opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; cursor: pointer; transition: background var(--trans); }
+    .petugas-opt:hover { background: rgba(79,70,229,.05); }
+    .petugas-opt input { display: none; }
+    .petugas-opt label { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; }
+    .p-avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: .75rem; font-weight: 800; flex-shrink: 0; }
+    .p-name { font-size: .82rem; font-weight: 700; color: var(--c-text); }
+    .p-role { font-size: .7rem; color: var(--c-muted); }
+    .p-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--c-border); display: grid; place-items: center; margin-left: auto; flex-shrink: 0; transition: background var(--trans); }
+    .petugas-opt input:checked ~ label .p-check { background: var(--c-green); border-color: var(--c-green); }
+    .petugas-opt input:checked ~ label .p-check::after { content: '\F26A'; font-family: 'bootstrap-icons'; color: #fff; font-size: .65rem; }
+    .petugas-opt input:checked ~ label .p-name { color: var(--c-primary); }
+
+    /* ─── TIPS CARD ─── */
+    .tip-item { display: flex; gap: 10px; margin-bottom: 10px; }
+    .tip-item:last-child { margin-bottom: 0; }
+    .tip-icon { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; font-size: .8rem; color: #fff; flex-shrink: 0; }
+    .tip-text { font-size: .78rem; color: var(--c-text-2); line-height: 1.55; }
+    .tip-text strong { color: var(--c-text); }
+
+    /* ─── FORM ACTIONS ─── */
+    .form-actions-bar {
+      background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius-md);
+      padding: 16px 22px; margin-top: 20px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+      animation: fadeUp .45s ease .2s both;
+    }
+    .btn-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 11px; border: none;
+      background: linear-gradient(135deg,var(--c-primary),var(--c-purple));
+      color: #fff; font-weight: 800; font-size: .9rem;
+      font-family: 'Plus Jakarta Sans',sans-serif;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(79,70,229,.35);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,.5); }
+    .btn-submit:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-draft {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 11px; border: none;
+      background: linear-gradient(135deg,var(--c-accent),var(--c-orange));
+      color: #fff; font-weight: 800; font-size: .9rem;
+      font-family: 'Plus Jakarta Sans',sans-serif;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(245,158,11,.32);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-draft:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,.45); }
+    .btn-cancel-form {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 20px; border-radius: 11px;
+      border: 1.5px solid var(--c-border); background: #fff;
+      color: var(--c-text-2); font-weight: 700; font-size: .9rem;
+      font-family: 'Plus Jakarta Sans',sans-serif; cursor: pointer;
+      transition: border-color var(--trans), color var(--trans);
+    }
+    .btn-cancel-form:hover { border-color: var(--c-red); color: var(--c-red); }
+
+    /* PREVIEW MODAL */
+    .preview-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:2000; display:grid; place-items:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .preview-modal-overlay.show { opacity:1; pointer-events:all; }
+    .preview-modal-img { max-width:90vw; max-height:86vh; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.5); object-fit:contain; transform:scale(.88); transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .preview-modal-overlay.show .preview-modal-img { transform:scale(1); }
+    .preview-close { position:fixed; top:20px; right:24px; background:rgba(255,255,255,.15); border:none; border-radius:50%; width:40px; height:40px; display:grid; place-items:center; color:#fff; font-size:1.1rem; cursor:pointer; transition:background .2s; }
+    .preview-close:hover { background:rgba(239,68,68,.7); }
+
+    /* FAB */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(79,70,229,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(79,70,229,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Footer */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* Responsive */
+    @media(max-width:1100px) { .form-grid { grid-template-columns: 1fr; } }
+    @media(max-width:992px)  { :root{ --sidebar-w:240px; } .frow2,.frow3 { grid-template-columns:1fr; } }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;}.main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;}.user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+    }
+    @media(max-width:576px) {
+      .page-header{flex-direction:column;align-items:flex-start;}
+      .main-footer{flex-direction:column;align-items:flex-start;}
+      .form-actions-bar{flex-direction:column;align-items:stretch;}
+      .form-actions-bar .btn-submit,.form-actions-bar .btn-draft,.form-actions-bar .btn-cancel-form{justify-content:center;}
+      .photo-preview-wrap{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="semua-kegiatan.html" class="nav-link-item" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item active" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="pengaturan-sistem.html" class="nav-link-item" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1><i class="bi bi-plus-circle-fill"></i> Tambah Kegiatan</h1>
+      <p>Isi formulir berikut untuk mendokumentasikan kegiatan baru beserta foto-fotonya.</p>
+    </div>
+    <nav class="breadcrumb-nav">
+      <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <a href="semua-kegiatan.html">Semua Kegiatan</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <span class="bc-current"><i class="bi bi-plus-circle-fill"></i> Tambah</span>
+    </nav>
+  </div>
+
+  <form id="mainForm" novalidate>
+  <div class="form-grid">
+
+    <!-- ═══ LEFT COLUMN ═══ -->
+    <div>
+
+      <!-- 1. Informasi Utama -->
+      <div class="form-card">
+        <div class="fc-head indigo">
+          <div>
+            <div class="fc-title"><i class="bi bi-info-circle-fill"></i> Informasi Utama</div>
+            <div class="fc-desc">Isi data dasar dokumentasi kegiatan</div>
+          </div>
+        </div>
+        <div class="fc-body">
+
+          <!-- Judul -->
+          <div class="fgroup" id="grp-judul">
+            <div class="flabel"><i class="bi bi-type" style="color:var(--c-muted);font-size:.85rem;"></i> Judul Kegiatan <span class="req">*</span></div>
+            <div class="fwrap">
+              <i class="bi bi-type ficon"></i>
+              <input type="text" class="fctrl" id="f-judul" placeholder="Contoh: Rapat Koordinasi Dinas Kominfo 2025"
+                oninput="charCount(this,'cc-judul',120);clearErr('grp-judul')" maxlength="120" />
+            </div>
+            <div class="char-counter" id="cc-judul">0 / 120</div>
+            <div class="finvalid">Judul kegiatan wajib diisi.</div>
+          </div>
+
+          <!-- Tanggal & Waktu -->
+          <div class="frow2">
+            <div class="fgroup" id="grp-tanggal">
+              <div class="flabel"><i class="bi bi-calendar3" style="color:var(--c-muted);font-size:.85rem;"></i> Tanggal Kegiatan <span class="req">*</span></div>
+              <div class="fwrap">
+                <i class="bi bi-calendar3 ficon"></i>
+                <input type="date" class="fctrl" id="f-tanggal" onchange="clearErr('grp-tanggal')" />
+              </div>
+              <div class="finvalid">Tanggal kegiatan wajib diisi.</div>
+            </div>
+            <div class="fgroup" id="grp-waktu">
+              <div class="flabel"><i class="bi bi-clock" style="color:var(--c-muted);font-size:.85rem;"></i> Waktu Mulai <span class="opt">(opsional)</span></div>
+              <div class="fwrap">
+                <i class="bi bi-clock ficon"></i>
+                <input type="time" class="fctrl" id="f-waktu" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Lokasi -->
+          <div class="fgroup">
+            <div class="flabel"><i class="bi bi-geo-alt-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Lokasi Kegiatan <span class="opt">(opsional)</span></div>
+            <div class="fwrap">
+              <i class="bi bi-geo-alt-fill ficon"></i>
+              <input type="text" class="fctrl" id="f-lokasi" placeholder="Contoh: Ruang Rapat Lantai 3, Gedung A" />
+            </div>
+          </div>
+
+          <!-- Kategori & Sub-kategori -->
+          <div class="frow2">
+            <div class="fgroup" id="grp-kategori">
+              <div class="flabel"><i class="bi bi-tags-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Kategori <span class="req">*</span></div>
+              <div class="fwrap">
+                <i class="bi bi-tags-fill ficon"></i>
+                <select class="fctrl" id="f-kategori" onchange="clearErr('grp-kategori')">
+                  <option value="">-- Pilih Kategori --</option>
+                  <option value="Rapat">Rapat / Koordinasi</option>
+                  <option value="Pelatihan">Pelatihan / Workshop</option>
+                  <option value="Kunjungan">Kunjungan / Studi Banding</option>
+                  <option value="Sosialisasi">Sosialisasi / Diseminasi</option>
+                  <option value="Upacara">Upacara / Seremonial</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="finvalid">Kategori wajib dipilih.</div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-building-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Unit Kerja <span class="opt">(opsional)</span></div>
+              <div class="fwrap">
+                <i class="bi bi-building-fill ficon"></i>
+                <select class="fctrl" id="f-unit">
+                  <option value="">-- Pilih Unit --</option>
+                  <option>Dinas Kominfo</option>
+                  <option>Dinas Pendidikan</option>
+                  <option>Dinas Kesehatan</option>
+                  <option>Dinas Sosial</option>
+                  <option>Dinas PUPR</option>
+                  <option>Bagian Humas</option>
+                  <option>Sekretariat Daerah</option>
+                  <option>Bappeda</option>
+                  <option>Inspektorat</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="fgroup">
+            <div class="flabel"><i class="bi bi-hash" style="color:var(--c-muted);font-size:.85rem;"></i> Tag <span class="opt">(opsional, tekan Enter)</span></div>
+            <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+              <input type="text" class="tags-input" id="tagInput" placeholder="Ketik tag lalu Enter..." />
+            </div>
+            <div class="fhint"><i class="bi bi-lightbulb"></i> Contoh: smart-city, 2025, koordinasi</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 2. Uraian Kegiatan (CKEditor) -->
+      <div class="form-card" style="margin-top:20px;">
+        <div class="fc-head green">
+          <div>
+            <div class="fc-title"><i class="bi bi-file-text-fill"></i> Uraian Kegiatan</div>
+            <div class="fc-desc">Deskripsi lengkap jalannya kegiatan dengan rich text editor</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button type="button" class="btn-browse" style="padding:6px 14px;font-size:.72rem;" onclick="insertTemplate('singkat')">
+              <i class="bi bi-magic"></i> Template Singkat
+            </button>
+            <button type="button" class="btn-browse" style="padding:6px 14px;font-size:.72rem;background:linear-gradient(135deg,var(--c-green),var(--c-secondary));" onclick="insertTemplate('lengkap')">
+              <i class="bi bi-layout-text-window"></i> Template Lengkap
+            </button>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="fgroup" id="grp-uraian">
+            <div class="flabel"><i class="bi bi-pen-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Uraian Kegiatan <span class="req">*</span></div>
+            <div class="ck-editor-wrap" id="ck-wrap">
+              <textarea id="editor-uraian" name="uraian"></textarea>
+            </div>
+            <div class="finvalid" id="err-uraian">Uraian kegiatan wajib diisi (minimal 30 karakter).</div>
+            <div class="fhint" style="margin-top:6px;"><i class="bi bi-info-circle"></i> Gunakan toolbar di atas untuk format teks, sisipkan tabel, atau tambahkan list.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Upload Foto -->
+      <div class="form-card" style="margin-top:20px;">
+        <div class="fc-head amber">
+          <div>
+            <div class="fc-title"><i class="bi bi-images"></i> Upload Foto Dokumentasi</div>
+            <div class="fc-desc">Upload minimal 1 foto, maksimal 20 foto per kegiatan</div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--c-muted);" id="photoCountLabel">0 / 20</div>
+        </div>
+        <div class="fc-body">
+
+          <!-- Drop zone -->
+          <div class="photo-upload-zone" id="dropZone"
+            ondragover="onDragOver(event)"
+            ondragleave="onDragLeave(event)"
+            ondrop="onDrop(event)">
+            <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple onchange="handleFiles(this.files)" />
+            <div class="upload-icon-wrap"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+            <div class="upload-title">Drag &amp; drop foto di sini</div>
+            <div class="upload-sub">atau klik tombol di bawah untuk memilih dari perangkat</div>
+            <div class="upload-or">atau</div>
+            <button type="button" class="btn-browse" onclick="document.getElementById('photoInput').click()">
+              <i class="bi bi-folder2-open"></i> Pilih Foto
+            </button>
+            <div class="upload-formats">Format: JPG, PNG, WEBP, GIF &nbsp;·&nbsp; Maks. 10 MB / foto &nbsp;·&nbsp; Maks. 20 foto</div>
+          </div>
+
+          <!-- Preview grid -->
+          <div class="photo-preview-wrap" id="photoPreview"></div>
+
+          <!-- Counter bar -->
+          <div class="photo-counter" id="photoCounter" style="display:none;">
+            <div class="photo-counter-info"><i class="bi bi-images"></i> <span id="photoCountText">0 foto dipilih</span></div>
+            <div class="photo-counter-bar-wrap">
+              <div class="photo-counter-bar">
+                <div class="photo-counter-fill" id="photoCountBar" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="photo-counter-num" id="photoCountNum">0/20</div>
+            <button type="button" class="btn-clear-photos" onclick="clearAllPhotos()">
+              <i class="bi bi-trash3-fill"></i> Hapus Semua
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT COLUMN ═══ -->
+    <div>
+
+      <!-- Status -->
+      <div class="side-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="bi bi-toggles"></i> Status Kegiatan</div>
+        </div>
+        <div class="sc-body">
+          <div class="status-options">
+            <div class="status-opt">
+              <input type="radio" name="status" id="s-selesai" value="selesai" checked />
+              <label for="s-selesai" class="selesai">
+                <i class="bi bi-check-circle-fill"></i> Selesai
+              </label>
+            </div>
+            <div class="status-opt">
+              <input type="radio" name="status" id="s-berjalan" value="berjalan" />
+              <label for="s-berjalan" class="berjalan">
+                <i class="bi bi-play-circle-fill"></i> Sedang Berjalan
+              </label>
+            </div>
+            <div class="status-opt">
+              <input type="radio" name="status" id="s-draft" value="draft" />
+              <label for="s-draft" class="draft">
+                <i class="bi bi-pencil-square"></i> Draft
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jumlah Peserta -->
+      <div class="side-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="bi bi-people-fill"></i> Detail Peserta</div>
+        </div>
+        <div class="sc-body">
+          <div class="fgroup">
+            <div class="flabel">Jumlah Peserta <span class="opt">(opsional)</span></div>
+            <div class="fwrap">
+              <i class="bi bi-people-fill ficon"></i>
+              <input type="number" class="fctrl" id="f-peserta" placeholder="0" min="0" />
+            </div>
+          </div>
+          <div class="fgroup" style="margin-bottom:0;">
+            <div class="flabel">Narasumber / Pemateri <span class="opt">(opsional)</span></div>
+            <div class="fwrap">
+              <i class="bi bi-person-video3 ficon"></i>
+              <input type="text" class="fctrl" id="f-narasumber" placeholder="Nama narasumber" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Petugas Dokumentasi -->
+      <div class="side-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="bi bi-person-badge-fill"></i> Petugas Dokumentasi</div>
+        </div>
+        <div class="sc-body">
+          <div class="fhint" style="margin-bottom:10px;"><i class="bi bi-info-circle"></i> Pilih satu atau lebih petugas</div>
+          <div class="petugas-list" id="petugasList"></div>
+        </div>
+      </div>
+
+      <!-- Lampiran Dokumen -->
+      <div class="side-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="bi bi-paperclip"></i> Lampiran Dokumen</div>
+        </div>
+        <div class="sc-body">
+          <div class="photo-upload-zone" style="padding:18px 14px;">
+            <input type="file" id="docInput" accept=".pdf,.docx,.xlsx,.pptx" multiple />
+            <i class="bi bi-file-earmark-arrow-up-fill" style="font-size:1.6rem;color:var(--c-muted);display:block;margin-bottom:7px;"></i>
+            <div style="font-size:.8rem;font-weight:700;color:var(--c-text);margin-bottom:3px;">Upload Dokumen</div>
+            <div style="font-size:.72rem;color:var(--c-muted);">PDF, DOCX, XLSX, PPTX · Maks. 10 MB</div>
+          </div>
+          <div id="docPreview" style="margin-top:8px;display:flex;flex-direction:column;gap:5px;"></div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="side-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="bi bi-lightbulb-fill" style="color:var(--c-accent);"></i> Tips Dokumentasi</div>
+        </div>
+        <div class="sc-body">
+          <div class="tip-item">
+            <div class="tip-icon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));"><i class="bi bi-camera-fill"></i></div>
+            <div class="tip-text"><strong>Foto berkualitas tinggi</strong> — Gunakan resolusi minimal 1MP untuk hasil terbaik.</div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon" style="background:linear-gradient(135deg,var(--c-green),#34d399);"><i class="bi bi-sort-num-up"></i></div>
+            <div class="tip-text"><strong>Urutan foto</strong> — Foto pertama akan menjadi foto utama yang ditampilkan.</div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon" style="background:linear-gradient(135deg,var(--c-accent),var(--c-orange));"><i class="bi bi-pen-fill"></i></div>
+            <div class="tip-text"><strong>Uraian lengkap</strong> — Sertakan latar belakang, tujuan, dan hasil kegiatan.</div>
+          </div>
+          <div class="tip-item" style="margin-bottom:0;">
+            <div class="tip-icon" style="background:linear-gradient(135deg,var(--c-pink),#f472b6);"><i class="bi bi-tags-fill"></i></div>
+            <div class="tip-text"><strong>Gunakan tag</strong> — Memudahkan pencarian dan pengelompokan kegiatan.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Form Actions -->
+  <div class="form-actions-bar">
+    <button type="submit" class="btn-submit" id="btnSubmit">
+      <i class="bi bi-check2-circle"></i> Simpan Kegiatan
+    </button>
+    <button type="button" class="btn-draft" onclick="saveDraft()">
+      <i class="bi bi-save-fill"></i> Simpan sebagai Draft
+    </button>
+    <button type="button" class="btn-cancel-form" onclick="cancelForm()">
+      <i class="bi bi-x-circle"></i> Batal
+    </button>
+    <div style="margin-left:auto;font-size:.78rem;color:var(--c-muted);">
+      <i class="bi bi-info-circle"></i> Field bertanda <span style="color:var(--c-pink);font-weight:700;">*</span> wajib diisi
+    </div>
+  </div>
+
+  </form>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan.</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<!-- Photo Preview Modal -->
+<div class="preview-modal-overlay" id="previewModal" onclick="closePreview()">
+  <button class="preview-close" onclick="closePreview()"><i class="bi bi-x-lg"></i></button>
+  <img src="" id="previewModalImg" class="preview-modal-img" alt="Preview" onclick="event.stopPropagation()" />
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
+<script>
+/* ════════════════════════════════════
+   CKEDITOR 5 INIT
+════════════════════════════════════ */
+let editorInstance = null;
+
+ClassicEditor.create(document.querySelector('#editor-uraian'), {
+  toolbar: {
+    items: [
+      'heading', '|',
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'fontColor', 'fontBackgroundColor', '|',
+      'bulletedList', 'numberedList', '|',
+      'outdent', 'indent', '|',
+      'blockQuote', 'insertTable', '|',
+      'link', '|',
+      'alignment', '|',
+      'undo', 'redo'
+    ],
+    shouldNotGroupWhenFull: false
+  },
+  placeholder: 'Tuliskan uraian kegiatan secara lengkap...\n\nContoh: Kegiatan ini dilaksanakan dalam rangka...',
+  heading: {
+    options: [
+      { model:'paragraph', title:'Paragraf', class:'ck-heading_paragraph' },
+      { model:'heading2',  view:'h2', title:'Judul 2', class:'ck-heading_heading2' },
+      { model:'heading3',  view:'h3', title:'Judul 3', class:'ck-heading_heading3' },
+      { model:'heading4',  view:'h4', title:'Judul 4', class:'ck-heading_heading4' },
+    ]
+  },
+  table: {
+    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableCellProperties', 'tableProperties']
+  },
+  language: 'en',
+}).then(editor => {
+  editorInstance = editor;
+
+  /* Clear invalid state on input */
+  editor.model.document.on('change:data', () => {
+    const wrap = document.getElementById('ck-wrap');
+    const err  = document.getElementById('err-uraian');
+    if (editor.getData().length > 0) {
+      wrap.classList.remove('is-invalid');
+      err.style.display = 'none';
+      document.getElementById('grp-uraian').classList.remove('has-err');
+    }
+  });
+
+}).catch(err => { console.error('CKEditor Error:', err); });
+
+/* ════════════════════════════════════
+   TEMPLATE INSERTER
+════════════════════════════════════ */
+function insertTemplate(type) {
+  if (!editorInstance) return;
+  const tpl = {
+    singkat: `<p>Kegiatan ini dilaksanakan pada <strong>[tanggal]</strong> bertempat di <strong>[lokasi]</strong>.</p>
+<p>Kegiatan dihadiri oleh <strong>[jumlah]</strong> peserta dari berbagai unsur terkait.</p>
+<p>Adapun hasil dari kegiatan ini adalah sebagai berikut:</p>
+<ul>
+<li>Poin hasil 1</li>
+<li>Poin hasil 2</li>
+</ul>`,
+    lengkap: `<h2>Latar Belakang</h2>
+<p>Tuliskan latar belakang dan dasar hukum pelaksanaan kegiatan ini...</p>
+
+<h2>Tujuan Kegiatan</h2>
+<ul>
+<li>Tujuan pertama kegiatan</li>
+<li>Tujuan kedua kegiatan</li>
+</ul>
+
+<h2>Pelaksanaan</h2>
+<p>Kegiatan dilaksanakan pada <strong>[tanggal]</strong>, pukul <strong>[waktu]</strong>, bertempat di <strong>[lokasi]</strong>. Kegiatan ini dihadiri oleh <strong>[jumlah]</strong> peserta.</p>
+
+<h2>Hasil &amp; Kesimpulan</h2>
+<p>Tuliskan hasil kegiatan dan kesimpulan yang dicapai...</p>
+
+<h2>Tindak Lanjut</h2>
+<p>Tuliskan rencana tindak lanjut dari kegiatan ini...</p>`,
+  };
+  editorInstance.setData(tpl[type] || '');
+  DKA.toast({ type:'success', title:'Template dimuat!', message:'Edit sesuai kebutuhan.', position:'top-right', duration:2500 });
+}
+
+/* ════════════════════════════════════
+   TAGS INPUT
+════════════════════════════════════ */
+const tags = [];
+const tagInput = document.getElementById('tagInput');
+const tagsWrap = document.getElementById('tagsWrap');
+
+tagInput.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ',') && tagInput.value.trim()) {
+    e.preventDefault();
+    addTag(tagInput.value.trim().replace(/,/g,''));
+    tagInput.value = '';
+  }
+  if (e.key === 'Backspace' && !tagInput.value && tags.length) {
+    removeTag(tags.length - 1);
+  }
+});
+
+function addTag(val) {
+  val = val.toLowerCase().replace(/\s+/g,'-').slice(0,30);
+  if (!val || tags.includes(val) || tags.length >= 10) return;
+  tags.push(val);
+  const el = document.createElement('span');
+  el.className = 'tag-item';
+  el.innerHTML = `${val} <button class="tag-remove" onclick="removeTag(${tags.length-1})" type="button">✕</button>`;
+  tagsWrap.insertBefore(el, tagInput);
+}
+
+function removeTag(idx) {
+  tags.splice(idx, 1);
+  const items = tagsWrap.querySelectorAll('.tag-item');
+  items.forEach(i => i.remove());
+  tags.forEach(t => {
+    const el = document.createElement('span');
+    el.className = 'tag-item';
+    el.innerHTML = `${t} <button class="tag-remove" type="button">✕</button>`;
+    el.querySelector('.tag-remove').addEventListener('click',()=>removeTag(tags.indexOf(t)));
+    tagsWrap.insertBefore(el, tagInput);
+  });
+}
+
+/* ════════════════════════════════════
+   PHOTO UPLOAD
+════════════════════════════════════ */
+let photos = [];
+const MAX_PHOTOS = 20;
+const MAX_SIZE   = 10 * 1024 * 1024; // 10 MB
+
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function onDragLeave(e){ document.getElementById('dropZone').classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(fileList) {
+  const files   = Array.from(fileList);
+  const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+  let added = 0, skippedSize = 0, skippedType = 0;
+
+  files.forEach(f => {
+    if (!allowed.includes(f.type)) { skippedType++; return; }
+    if (f.size > MAX_SIZE)          { skippedSize++; return; }
+    if (photos.length >= MAX_PHOTOS){ return; }
+
+    const url = URL.createObjectURL(f);
+    photos.push({ file: f, url, name: f.name, size: f.size });
+    added++;
+  });
+
+  renderPhotos();
+
+  if (skippedType) DKA.toast({ type:'warning', title:'Format tidak didukung', message:`${skippedType} file dilewati karena format tidak valid.`, position:'top-right', duration:4000 });
+  if (skippedSize) DKA.toast({ type:'warning', title:'File terlalu besar', message:`${skippedSize} file dilewati karena melebihi 10 MB.`, position:'top-right', duration:4000 });
+  if (added)       DKA.toast({ type:'success', title:`${added} foto ditambahkan`, message:`Total: ${photos.length} foto.`, position:'top-right', duration:2500 });
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photoPreview');
+  const counter = document.getElementById('photoCounter');
+  const countLabel = document.getElementById('photoCountLabel');
+
+  countLabel.textContent = `${photos.length} / ${MAX_PHOTOS}`;
+  document.getElementById('photoCountText').textContent = `${photos.length} foto dipilih`;
+  document.getElementById('photoCountNum').textContent  = `${photos.length}/${MAX_PHOTOS}`;
+  document.getElementById('photoCountBar').style.width  = `${(photos.length/MAX_PHOTOS)*100}%`;
+  counter.style.display = photos.length ? 'flex' : 'none';
+
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="photo-item" style="animation-delay:${i*.04}s;">
+      <img src="${p.url}" alt="${p.name}" />
+      <div class="photo-item-overlay">
+        <button type="button" class="photo-item-btn photo-btn-view" onclick="previewPhoto('${p.url}')" title="Lihat"><i class="bi bi-eye-fill"></i></button>
+        <button type="button" class="photo-item-btn photo-btn-delete" onclick="removePhoto(${i})" title="Hapus"><i class="bi bi-trash3-fill"></i></button>
+      </div>
+      <div class="photo-item-num">${i+1}</div>
+      ${i===0?'<div class="photo-main-badge">Foto Utama</div>':''}
+    </div>`).join('');
+}
+
+function removePhoto(idx) {
+  URL.revokeObjectURL(photos[idx].url);
+  photos.splice(idx, 1);
+  renderPhotos();
+}
+
+function clearAllPhotos() {
+  DKA.deleteConfirm({
+    title   : 'Hapus Semua Foto?',
+    message : 'Semua foto yang telah dipilih akan dihapus dari daftar.',
+    itemName: `${photos.length} foto`,
+    confirm : 'Ya, Hapus Semua',
+  }).then(result => {
+    if (!result) return;
+    photos.forEach(p => URL.revokeObjectURL(p.url));
+    photos = [];
+    renderPhotos();
+    DKA.toast({ type:'info', title:'Foto dihapus', message:'Semua foto berhasil dihapus dari daftar.', position:'top-right' });
+  });
+}
+
+function previewPhoto(url) {
+  document.getElementById('previewModalImg').src = url;
+  document.getElementById('previewModal').classList.add('show');
+}
+function closePreview() { document.getElementById('previewModal').classList.remove('show'); }
+
+/* ════════════════════════════════════
+   PETUGAS LIST
+════════════════════════════════════ */
+const PETUGAS = [
+  { id:'p1', name:'Ahmad Fauzi',    role:'Administrator',   grad:'linear-gradient(135deg,#4f46e5,#7c3aed)' },
+  { id:'p2', name:'Siti Rahayu',    role:'Operator',        grad:'linear-gradient(135deg,#10b981,#06b6d4)' },
+  { id:'p3', name:'Budi Santoso',   role:'Fotografer',      grad:'linear-gradient(135deg,#f59e0b,#f97316)' },
+  { id:'p4', name:'Dewi Kusuma',    role:'Dokumentator',    grad:'linear-gradient(135deg,#ec4899,#f472b6)' },
+  { id:'p5', name:'Wahyu Nugroho',  role:'Kabid Humas',     grad:'linear-gradient(135deg,#8b5cf6,#a78bfa)' },
+  { id:'p6', name:'Rina Marlina',   role:'Admin Sistem',    grad:'linear-gradient(135deg,#ef4444,#f87171)' },
+];
+
+const petugasList = document.getElementById('petugasList');
+petugasList.innerHTML = PETUGAS.map(p => {
+  const initials = p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  return `
+    <div class="petugas-opt">
+      <input type="checkbox" id="${p.id}" name="petugas[]" value="${p.name}" />
+      <label for="${p.id}">
+        <div class="p-avatar" style="background:${p.grad};">${initials}</div>
+        <div>
+          <div class="p-name">${p.name}</div>
+          <div class="p-role">${p.role}</div>
+        </div>
+        <div class="p-check"></div>
+      </label>
+    </div>`;
+}).join('');
+
+/* ════════════════════════════════════
+   DOCUMENT ATTACHMENT
+════════════════════════════════════ */
+document.getElementById('docInput').addEventListener('change', function() {
+  const preview = document.getElementById('docPreview');
+  preview.innerHTML = '';
+  Array.from(this.files).forEach(f => {
+    const el = document.createElement('div');
+    el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--c-surface2);border:1px solid var(--c-border);border-radius:8px;font-size:.78rem;';
+    const icon = f.name.endsWith('.pdf') ? 'bi-file-earmark-pdf-fill' : f.name.endsWith('.docx') ? 'bi-file-earmark-word-fill' : 'bi-file-earmark-fill';
+    const color = f.name.endsWith('.pdf') ? '#ef4444' : f.name.endsWith('.docx') ? '#2563eb' : '#64748b';
+    el.innerHTML = `
+      <i class="bi ${icon}" style="color:${color};font-size:1.1rem;flex-shrink:0;"></i>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name}</div>
+        <div style="color:var(--c-muted);">${(f.size/1024/1024).toFixed(2)} MB</div>
+      </div>
+      <button type="button" style="background:none;border:none;cursor:pointer;color:var(--c-muted);font-size:.85rem;" onclick="this.parentElement.remove()">
+        <i class="bi bi-x-lg"></i>
+      </button>`;
+    preview.appendChild(el);
+  });
+});
+
+/* ════════════════════════════════════
+   CHAR COUNTER
+════════════════════════════════════ */
+function charCount(el, countId, max) {
+  const len = el.value.length;
+  const el2 = document.getElementById(countId);
+  el2.textContent = `${len} / ${max}`;
+  el2.className = 'char-counter' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
+}
+
+/* ════════════════════════════════════
+   VALIDATION
+════════════════════════════════════ */
+function setErr(grpId)   { document.getElementById(grpId)?.classList.add('has-err'); }
+function clearErr(grpId) { document.getElementById(grpId)?.classList.remove('has-err'); }
+
+function validate() {
+  let ok = true;
+
+  if (!document.getElementById('f-judul').value.trim()) {
+    setErr('grp-judul'); ok = false;
+  } else clearErr('grp-judul');
+
+  if (!document.getElementById('f-tanggal').value) {
+    setErr('grp-tanggal'); ok = false;
+  } else clearErr('grp-tanggal');
+
+  if (!document.getElementById('f-kategori').value) {
+    setErr('grp-kategori'); ok = false;
+  } else clearErr('grp-kategori');
+
+  const uraianText = editorInstance ? editorInstance.getData().replace(/<[^>]*>/g,'').trim() : '';
+  const ckWrap = document.getElementById('ck-wrap');
+  const ckErr  = document.getElementById('err-uraian');
+  if (!uraianText || uraianText.length < 30) {
+    ckWrap.classList.add('is-invalid');
+    ckErr.style.display = 'block';
+    ok = false;
+  } else {
+    ckWrap.classList.remove('is-invalid');
+    ckErr.style.display = 'none';
+  }
+
+  return ok;
+}
+
+/* ════════════════════════════════════
+   SUBMIT
+════════════════════════════════════ */
+document.getElementById('mainForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!validate()) {
+    DKA.toast({ type:'danger', title:'Form belum lengkap', message:'Harap lengkapi semua field yang wajib diisi.', position:'top-right', duration:4000 });
+    const firstErr = document.querySelector('.has-err, .ck-editor-wrap.is-invalid');
+    if (firstErr) firstErr.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+
+  DKA.dialog({
+    type   : 'success',
+    title  : 'Simpan Kegiatan?',
+    message: `Kegiatan "<strong>${document.getElementById('f-judul').value.trim().slice(0,50)}...</strong>" akan disimpan dengan ${photos.length} foto.`,
+    confirm: 'Ya, Simpan Sekarang',
+  }).then(result => {
+    if (!result) return;
+    const loader = DKA.loading({ title:'Menyimpan kegiatan...', message:'Mengupload foto dokumentasi.', style:'ring' });
+    const steps  = ['Memvalidasi data...','Mengupload foto...','Menyimpan ke database...'];
+    steps.forEach((s,i) => setTimeout(()=>loader.update(s),(i+1)*900));
+    setTimeout(()=>{
+      loader.close();
+      DKA.notify({
+        type   : 'success',
+        title  : 'Kegiatan Berhasil Disimpan!',
+        message: `Kegiatan "${document.getElementById('f-judul').value.trim().slice(0,40)}..." telah berhasil ditambahkan ke sistem dengan ${photos.length} foto.`,
+        duration: 7000,
+      });
+      setTimeout(()=>{ window.location.href = 'semua-kegiatan.html'; }, 2000);
+    }, (steps.length+1)*900);
+  });
+});
+
+function saveDraft() {
+  if (!document.getElementById('f-judul').value.trim()) {
+    DKA.toast({ type:'warning', title:'Judul diperlukan', message:'Isi judul kegiatan terlebih dahulu untuk menyimpan draft.', position:'top-right' });
+    document.getElementById('f-judul').focus();
+    return;
+  }
+  document.getElementById('s-draft').checked = true;
+  const loader = DKA.loading({ title:'Menyimpan draft...', message:'Mohon tunggu.', style:'dots' });
+  setTimeout(()=>{
+    loader.close();
+    DKA.toast({ type:'info', title:'Draft Tersimpan', message:'Kegiatan disimpan sebagai draft. Anda bisa melanjutkan nanti.', position:'top-right', duration:4500 });
+  }, 1200);
+}
+
+function cancelForm() {
+  DKA.dialog({
+    type   : 'warning',
+    title  : 'Batalkan Input?',
+    message: 'Semua data yang telah Anda isi akan hilang. Apakah Anda yakin ingin meninggalkan halaman ini?',
+    confirm: 'Ya, Batalkan',
+  }).then(result => {
+    if (result) window.location.href = 'semua-kegiatan.html';
+  });
+}
+
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile = () => window.innerWidth <= 768;
+function toggleSidebar() { isMobile()?document.body.classList.toggle('mobile-open'):document.body.classList.toggle('collapsed'); }
+function closeMobileSidebar() { document.body.classList.remove('mobile-open'); }
+const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+function toggleUserDropdown() { const o=userDropdown.classList.toggle('show'); userTrigger.classList.toggle('open',o); }
+document.addEventListener('click',e=>{ if(!document.querySelector('.user-dropdown-wrap').contains(e.target)){userDropdown.classList.remove('show');userTrigger.classList.remove('open');} });
+
+/* FAB */
+window.addEventListener('scroll',()=>document.getElementById('fabBtn').classList.toggle('visible',window.scrollY>300),{passive:true});
+function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* Default tanggal hari ini */
+document.getElementById('f-tanggal').valueAsDate = new Date();
+</script>
+</body>
+</html>
