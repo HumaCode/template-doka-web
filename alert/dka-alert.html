@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DKA Alert — Demo & Dokumentasi</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- DKA Alert Library -->
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    :root {
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0f0e2e 0%, #1e1b4b 35%, #2d1b69 65%, #1a0a3d 100%);
+      padding: 60px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .hero-inner  { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(79,70,229,.25); border: 1px solid rgba(129,140,248,.3);
+      border-radius: 99px; padding: 5px 14px;
+      font-size: .72rem; font-weight: 700; color: #a5b4fc;
+      letter-spacing: .5px; margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: #fff; line-height: 1.15; margin-bottom: 14px;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, #818cf8, #a78bfa, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: clamp(.9rem,2vw,1rem); color: rgba(255,255,255,.6); max-width: 540px; margin: 0 auto 30px; line-height: 1.7; }
+    .hero-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 99px; padding: 6px 14px;
+      font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.7);
+    }
+    .hero-pill i { font-size: .85rem; }
+
+    /* ── CONTAINER ── */
+    .demo-container { max-width: 1080px; margin: 0 auto; padding: 40px 20px 60px; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 1.35rem; color: var(--c-text);
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-title i { color: var(--c-primary); font-size: 1.2rem; }
+    .sec-sub  { font-size: .85rem; color: var(--c-muted); margin-bottom: 20px; }
+    .sec-divider { height: 1px; background: var(--c-border); margin: 36px 0; }
+
+    /* ── DEMO CARD ── */
+    .demo-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .demo-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--c-border);
+      background: var(--c-bg);
+    }
+    .demo-card-title {
+      font-family: 'Nunito', sans-serif; font-weight: 800;
+      font-size: .95rem; color: var(--c-text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .demo-card-title i { color: var(--c-primary); }
+    .demo-card-desc { font-size: .75rem; color: var(--c-muted); margin-top: 2px; }
+    .demo-card-body { padding: 22px; }
+
+    /* ── BUTTON GRID ── */
+    .btn-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    /* ── DEMO BUTTONS ── */
+    .demo-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 11px; border: none; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .85rem; font-weight: 700;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .demo-btn:hover { transform: translateY(-2px); }
+    .demo-btn i { font-size: .95rem; }
+
+    .db-indigo  { background: linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; box-shadow:0 4px 14px rgba(79,70,229,.35); }
+    .db-cyan    { background: linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; box-shadow:0 4px 14px rgba(6,182,212,.35); }
+    .db-green   { background: linear-gradient(135deg,#10b981,#34d399); color:#fff; box-shadow:0 4px 14px rgba(16,185,129,.35); }
+    .db-amber   { background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow:0 4px 14px rgba(245,158,11,.35); }
+    .db-red     { background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 4px 14px rgba(239,68,68,.35); }
+    .db-purple  { background: linear-gradient(135deg,#7c3aed,#ec4899); color:#fff; box-shadow:0 4px 14px rgba(124,58,237,.35); }
+    .db-pink    { background: linear-gradient(135deg,#ec4899,#f97316); color:#fff; box-shadow:0 4px 14px rgba(236,72,153,.35); }
+    .db-slate   { background: linear-gradient(135deg,#475569,#64748b); color:#fff; box-shadow:0 4px 14px rgba(71,85,105,.25); }
+    .db-outline { background:#fff; color:var(--c-text-2); border:1.5px solid var(--c-border); }
+    .db-outline:hover { border-color:var(--c-primary); color:var(--c-primary); }
+
+    /* ── CODE SNIPPET ── */
+    .code-block {
+      background: #0f172a;
+      border-radius: 12px; padding: 16px 18px;
+      font-family: 'DM Mono', monospace;
+      font-size: .78rem; line-height: 1.7;
+      color: #94a3b8; overflow-x: auto;
+      margin-top: 14px;
+      position: relative;
+    }
+    .code-block .kw  { color: #818cf8; }
+    .code-block .fn  { color: #38bdf8; }
+    .code-block .str { color: #86efac; }
+    .code-block .cmt { color: #475569; font-style: italic; }
+    .code-block .num { color: #fbbf24; }
+    .code-block .op  { color: #f472b6; }
+    .copy-btn {
+      position: absolute; top: 10px; right: 12px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 7px; padding: 4px 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .7rem; font-weight: 700; color: rgba(255,255,255,.5);
+      cursor: pointer; transition: background .2s, color .2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+    /* ── INLINE ALERT DEMO AREA ── */
+    #inline-demo-area { min-height: 60px; }
+
+    /* ── POSITION GRID ── */
+    .pos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; max-width: 400px; }
+    .pos-btn {
+      padding: 8px; border-radius: 9px; border: 1.5px solid var(--c-border);
+      background: #fff; cursor: pointer; font-size: .72rem; font-weight: 700;
+      color: var(--c-text-2); font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color .2s, color .2s, background .2s;
+      text-align: center;
+    }
+    .pos-btn:hover { border-color: var(--c-primary); color: var(--c-primary); background: #eef2ff; }
+    .pos-btn.active { border-color: var(--c-primary); background: var(--c-primary); color: #fff; }
+
+    /* ── RESULT CONSOLE ── */
+    .result-console {
+      background: #0f172a; border-radius: 12px;
+      padding: 14px 16px; font-family: 'DM Mono', monospace;
+      font-size: .78rem; color: #64748b; min-height: 56px;
+      margin-top: 14px; border: 1px solid #1e293b;
+    }
+    .result-console .log-line { margin-bottom: 3px; }
+    .result-console .log-ok   { color: #4ade80; }
+    .result-console .log-no   { color: #f87171; }
+    .result-console .log-info { color: #38bdf8; }
+    .result-console .log-dim  { color: #334155; }
+
+    /* ── API TABLE ── */
+    .api-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .api-table th { background: var(--c-bg); padding: 10px 14px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--c-muted); border-bottom: 1px solid var(--c-border); text-align: left; }
+    .api-table td { padding: 12px 14px; border-bottom: 1px solid var(--c-border); vertical-align: top; line-height: 1.55; }
+    .api-table tr:last-child td { border-bottom: none; }
+    .api-table tr:hover td { background: rgba(79,70,229,.02); }
+    .api-badge { font-family: 'DM Mono', monospace; font-size: .7rem; background: #eef2ff; color: var(--c-primary); padding: 2px 7px; border-radius: 5px; }
+    .type-badge { font-family: 'DM Mono', monospace; font-size: .68rem; background: #f0fdf4; color: #059669; padding: 2px 7px; border-radius: 5px; }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      text-align: center; padding: 28px;
+      border-top: 1px solid var(--c-border);
+      font-size: .8rem; color: var(--c-muted);
+      background: var(--c-surface);
+    }
+    .page-footer strong { color: var(--c-primary); font-weight: 700; }
+
+    /* ── FAB ── */
+    .fab { position: fixed; bottom: 24px; right: 24px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color: #fff; font-size: 1.2rem; border: none; cursor: pointer; display: grid; place-items: center; box-shadow: 0 6px 20px rgba(79,70,229,.45); z-index: 400; transition: transform .2s, box-shadow .2s, opacity .2s; opacity: 0; transform: scale(0); }
+    .fab.visible { opacity: 1; transform: scale(1); }
+    .fab:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 28px rgba(79,70,229,.6); }
+
+    /* responsive */
+    @media(max-width:600px) {
+      .btn-grid { flex-direction: column; }
+      .demo-btn { justify-content: center; }
+      .pos-grid { grid-template-columns: repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-badge"><i class="bi bi-bell-fill"></i> DKA Alert Library v1.0.0</div>
+    <h1>DokaKegiatan<br/><span>Alert System</span></h1>
+    <p>Library alert & notifikasi custom yang modern, interaktif, dan sepenuhnya terintegrasi dengan tema warna DokaKegiatan.</p>
+    <div class="hero-pills">
+      <div class="hero-pill"><i class="bi bi-check2-circle"></i> Toast</div>
+      <div class="hero-pill"><i class="bi bi-dialog"></i> Dialog</div>
+      <div class="hero-pill"><i class="bi bi-key-fill"></i> Password</div>
+      <div class="hero-pill"><i class="bi bi-person-check-fill"></i> Approve User</div>
+      <div class="hero-pill"><i class="bi bi-trash3-fill"></i> Delete Confirm</div>
+      <div class="hero-pill"><i class="bi bi-arrow-repeat"></i> Loading</div>
+      <div class="hero-pill"><i class="bi bi-bell-fill"></i> Notify</div>
+      <div class="hero-pill"><i class="bi bi-exclamation-circle-fill"></i> Inline Alert</div>
+    </div>
+  </div>
+</div>
+
+<div class="demo-container">
+
+  <!-- ════ 1. TOAST ════ -->
+  <div class="sec-title"><i class="bi bi-chat-square-fill"></i> 1. Toast Notification</div>
+  <div class="sec-sub">Notifikasi kecil muncul di sudut layar dengan progress bar countdown. Hover untuk pause.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-check-circle-fill"></i> Tipe Toast</div>
+        <div class="demo-card-desc">4 tipe dasar — success, danger, warning, info</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-green" onclick="DKA.toast({type:'success',title:'Berhasil!',message:'Data berhasil disimpan ke sistem.',duration:4000})">
+          <i class="bi bi-check-circle-fill"></i> Success Toast
+        </button>
+        <button class="demo-btn db-red" onclick="DKA.toast({type:'danger',title:'Gagal!',message:'Terjadi kesalahan saat memproses data.',duration:4000})">
+          <i class="bi bi-x-circle-fill"></i> Danger Toast
+        </button>
+        <button class="demo-btn db-amber" onclick="DKA.toast({type:'warning',title:'Peringatan',message:'Storage hampir penuh. Segera bersihkan file lama.',duration:4000})">
+          <i class="bi bi-exclamation-triangle-fill"></i> Warning Toast
+        </button>
+        <button class="demo-btn db-indigo" onclick="DKA.toast({type:'info',title:'Informasi',message:'Sistem akan diperbarui pada pukul 02.00 WIB.',duration:4000})">
+          <i class="bi bi-info-circle-fill"></i> Info Toast
+        </button>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div style="font-size:.82rem;font-weight:700;color:var(--c-text);margin-bottom:10px;">Pilih Posisi:</div>
+        <div class="pos-grid" id="posGrid">
+          <button class="pos-btn" data-pos="top-left"      onclick="setPosActive(this)">↖ Kiri Atas</button>
+          <button class="pos-btn active" data-pos="top-center"   onclick="setPosActive(this)">↑ Tengah Atas</button>
+          <button class="pos-btn" data-pos="top-right"     onclick="setPosActive(this)">↗ Kanan Atas</button>
+          <button class="pos-btn" data-pos="bottom-left"   onclick="setPosActive(this)">↙ Kiri Bawah</button>
+          <button class="pos-btn" data-pos="bottom-center" onclick="setPosActive(this)">↓ Tengah Bawah</button>
+          <button class="pos-btn" data-pos="bottom-right"  onclick="setPosActive(this)">↘ Kanan Bawah</button>
+        </div>
+        <button class="demo-btn db-indigo" style="margin-top:12px;" onclick="toastAtPos()">
+          <i class="bi bi-send-fill"></i> Tampilkan di Posisi Ini
+        </button>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="cmt">// Toast sederhana</span>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">toast</span>({
+  <span class="str">type</span>     : <span class="str">'success'</span>,     <span class="cmt">// success | danger | warning | info</span>
+  <span class="str">title</span>    : <span class="str">'Berhasil!'</span>,
+  <span class="str">message</span>  : <span class="str">'Data berhasil disimpan.'</span>,
+  <span class="str">duration</span> : <span class="num">4000</span>,            <span class="cmt">// ms</span>
+  <span class="str">position</span> : <span class="str">'top-right'</span>,    <span class="cmt">// top-right|top-left|top-center|bottom-*</span>
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 2. DIALOG ════ -->
+  <div class="sec-title"><i class="bi bi-window-fullscreen"></i> 2. Dialog Konfirmasi</div>
+  <div class="sec-sub">Dialog modal dengan Promise — tunggu jawaban user sebelum lanjut eksekusi.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-question-circle-fill"></i> Standard Dialog</div>
+        <div class="demo-card-desc">Semua tipe dialog — hasilnya tampil di console bawah</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-green" onclick="runDialog('success')">
+          <i class="bi bi-check-circle-fill"></i> Success Dialog
+        </button>
+        <button class="demo-btn db-red" onclick="runDialog('danger')">
+          <i class="bi bi-x-circle-fill"></i> Danger Dialog
+        </button>
+        <button class="demo-btn db-amber" onclick="runDialog('warning')">
+          <i class="bi bi-exclamation-triangle-fill"></i> Warning Dialog
+        </button>
+        <button class="demo-btn db-indigo" onclick="runDialog('info')">
+          <i class="bi bi-info-circle-fill"></i> Info Dialog
+        </button>
+        <button class="demo-btn db-purple" onclick="runDialog('question')">
+          <i class="bi bi-question-circle-fill"></i> Question Dialog
+        </button>
+      </div>
+      <div class="result-console" id="dialogConsole">
+        <div class="log-dim">// Hasil dialog akan tampil di sini...</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">dialog</span>({
+  <span class="str">type</span>   : <span class="str">'danger'</span>,
+  <span class="str">title</span>  : <span class="str">'Konfirmasi Aksi'</span>,
+  <span class="str">message</span>: <span class="str">'Apakah Anda yakin ingin melanjutkan?'</span>,
+  <span class="str">confirm</span>: <span class="str">'Ya, Lanjutkan'</span>,
+  <span class="str">cancel</span> : <span class="str">'Batal'</span>,
+}).<span class="fn">then</span>(<span class="kw">result</span> <span class="op">=></span> {
+  <span class="kw">if</span> (result) {
+    <span class="cmt">// user klik konfirm</span>
+  }
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 3. DELETE CONFIRM ════ -->
+  <div class="sec-title"><i class="bi bi-trash3-fill"></i> 3. Delete Confirm</div>
+  <div class="sec-sub">Dialog hapus khusus dengan chip nama item yang akan dihapus — lebih informatif dan aman.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-trash3-fill"></i> Alert Delete</div>
+        <div class="demo-card-desc">Konfirmasi penghapusan dengan nama item yang ditampilkan</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-red" onclick="runDelete('Ahmad Fauzi — Administrator')">
+          <i class="bi bi-person-dash-fill"></i> Hapus Pengguna
+        </button>
+        <button class="demo-btn db-red" onclick="runDelete('Kegiatan Rapat Koordinasi 24 Apr 2025')">
+          <i class="bi bi-calendar-x-fill"></i> Hapus Kegiatan
+        </button>
+        <button class="demo-btn db-red" onclick="runDelete('foto_rapat_2025-04-24_001.jpg')">
+          <i class="bi bi-image-fill"></i> Hapus Foto
+        </button>
+        <button class="demo-btn db-red" onclick="runDelete('backup_2025-04-22_02-00.sql.gz')">
+          <i class="bi bi-archive-fill"></i> Hapus Backup
+        </button>
+      </div>
+      <div class="result-console" id="deleteConsole">
+        <div class="log-dim">// Hasil delete confirm akan tampil di sini...</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">deleteConfirm</span>({
+  <span class="str">title</span>   : <span class="str">'Hapus Pengguna?'</span>,
+  <span class="str">message</span> : <span class="str">'Tindakan ini tidak dapat dibatalkan.'</span>,
+  <span class="str">itemName</span>: <span class="str">'Ahmad Fauzi — Administrator'</span>,
+  <span class="str">confirm</span> : <span class="str">'Ya, Hapus Sekarang'</span>,
+  <span class="str">cancel</span>  : <span class="str">'Batal'</span>,
+}).<span class="fn">then</span>(<span class="kw">result</span> <span class="op">=></span> {
+  <span class="kw">if</span> (result) {
+    <span class="cmt">// lanjutkan proses hapus</span>
+  }
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 4. APPROVE USER ════ -->
+  <div class="sec-title"><i class="bi bi-person-check-fill"></i> 4. Approve User</div>
+  <div class="sec-sub">Dialog persetujuan akun pengguna baru — menampilkan card info user lengkap sebelum dikonfirmasi.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-person-check-fill"></i> Popup Approve Pengguna</div>
+        <div class="demo-card-desc">Tampil kartu info pengguna sebelum disetujui</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-green" onclick="runApprove({name:'Budi Santoso',role:'Operator',email:'budi@pekalongan.go.id',instansi:'Dinas Sosial',avatarGrad:'linear-gradient(135deg,#10b981,#06b6d4)'})">
+          <i class="bi bi-person-plus-fill"></i> Approve — Budi Santoso
+        </button>
+        <button class="demo-btn db-green" onclick="runApprove({name:'Dewi Kusuma',role:'Pengguna',email:'dewi@pekalongan.go.id',instansi:'Bagian Humas',avatarGrad:'linear-gradient(135deg,#ec4899,#f472b6)'})">
+          <i class="bi bi-person-plus-fill"></i> Approve — Dewi Kusuma
+        </button>
+        <button class="demo-btn db-green" onclick="runApprove({name:'Rizal Pratama',role:'Administrator',email:'rizal@pekalongan.go.id',instansi:'Dinas Kominfo',avatarGrad:'linear-gradient(135deg,#4f46e5,#7c3aed)'})">
+          <i class="bi bi-person-plus-fill"></i> Approve — Rizal Pratama
+        </button>
+      </div>
+      <div class="result-console" id="approveConsole">
+        <div class="log-dim">// Hasil approve akan tampil di sini...</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">approveUser</span>({
+  <span class="str">title</span>  : <span class="str">'Setujui Pengguna?'</span>,
+  <span class="str">message</span>: <span class="str">'Pengguna akan mendapat akses ke sistem.'</span>,
+  <span class="str">user</span>: {
+    <span class="str">name</span>      : <span class="str">'Budi Santoso'</span>,
+    <span class="str">role</span>      : <span class="str">'Operator'</span>,
+    <span class="str">email</span>     : <span class="str">'budi@pekalongan.go.id'</span>,
+    <span class="str">instansi</span>  : <span class="str">'Dinas Sosial'</span>,
+    <span class="str">avatarGrad</span>: <span class="str">'linear-gradient(135deg,#10b981,#06b6d4)'</span>,
+  },
+  <span class="str">confirm</span>: <span class="str">'Ya, Setujui Akun'</span>,
+}).<span class="fn">then</span>(<span class="kw">result</span> <span class="op">=></span> {
+  <span class="kw">if</span> (result) {
+    <span class="cmt">// akun disetujui → update status</span>
+  }
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 5. UBAH PASSWORD ════ -->
+  <div class="sec-title"><i class="bi bi-key-fill"></i> 5. Popup Ubah Password</div>
+  <div class="sec-sub">Dialog ganti password lengkap — validasi real-time, strength meter, rules checklist, toggle show/hide.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-key-fill"></i> Password Dialog</div>
+        <div class="demo-card-desc">Versi dengan password saat ini, dan versi tanpa (set password baru)</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-indigo" onclick="runPassword(true)">
+          <i class="bi bi-key-fill"></i> Ubah Password (dengan verifikasi)
+        </button>
+        <button class="demo-btn db-cyan" onclick="runPassword(false)">
+          <i class="bi bi-lock-fill"></i> Set Password Baru (tanpa verifikasi)
+        </button>
+      </div>
+      <div class="result-console" id="passwordConsole">
+        <div class="log-dim">// Hasil password dialog akan tampil di sini...</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">password</span>({
+  <span class="str">title</span>          : <span class="str">'Ubah Password'</span>,
+  <span class="str">confirm</span>        : <span class="str">'Simpan Password Baru'</span>,
+  <span class="str">cancel</span>         : <span class="str">'Batal'</span>,
+  <span class="str">requireCurrent</span>: <span class="kw">true</span>,   <span class="cmt">// false = tanpa password lama</span>
+}).<span class="fn">then</span>(<span class="kw">result</span> <span class="op">=></span> {
+  <span class="kw">if</span> (result.confirmed) {
+    <span class="cmt">// result.password berisi password baru</span>
+    <span class="fn">console</span>.<span class="fn">log</span>(result.password);
+  }
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 6. LOADING ════ -->
+  <div class="sec-title"><i class="bi bi-arrow-repeat"></i> 6. Loading Overlay</div>
+  <div class="sec-sub">Overlay loading dengan 3 gaya animasi berbeda — ring, dots, wave. Update pesan secara dinamis.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-arrow-repeat"></i> Loading Overlay</div>
+        <div class="demo-card-desc">3 style: ring spinner, dots pulse, wave bars</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-indigo" onclick="runLoading('ring')">
+          <i class="bi bi-arrow-repeat"></i> Ring Spinner
+        </button>
+        <button class="demo-btn db-cyan" onclick="runLoading('dots')">
+          <i class="bi bi-three-dots"></i> Dots Pulse
+        </button>
+        <button class="demo-btn db-purple" onclick="runLoading('wave')">
+          <i class="bi bi-activity"></i> Wave Bars
+        </button>
+        <button class="demo-btn db-green" onclick="runLoadingWithUpdate()">
+          <i class="bi bi-chat-square-text-fill"></i> Loading + Update Pesan
+        </button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="kw">const</span> loader <span class="op">=</span> <span class="fn">DKA</span><span class="op">.</span><span class="fn">loading</span>({
+  <span class="str">title</span>  : <span class="str">'Menyimpan data...'</span>,
+  <span class="str">message</span>: <span class="str">'Mohon tunggu sebentar.'</span>,
+  <span class="str">style</span>  : <span class="str">'ring'</span>,   <span class="cmt">// 'ring' | 'dots' | 'wave'</span>
+});
+
+<span class="cmt">// Update pesan saat loading berlangsung</span>
+<span class="fn">setTimeout</span>(() <span class="op">=></span> loader.<span class="fn">update</span>(<span class="str">'Memvalidasi data...'</span>), <span class="num">1500</span>);
+<span class="fn">setTimeout</span>(() <span class="op">=></span> loader.<span class="fn">close</span>(),                    <span class="num">3000</span>);
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 7. NOTIFY ════ -->
+  <div class="sec-title"><i class="bi bi-bell-fill"></i> 7. Notify Panel</div>
+  <div class="sec-sub">Panel notifikasi besar yang muncul dari sisi kanan layar — cocok untuk informasi penting.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-bell-fill"></i> Notify (Side Panel)</div>
+        <div class="demo-card-desc">Notifikasi besar dengan timestamp dan progress bar</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-green" onclick="DKA.notify({type:'success',title:'Upload Berhasil',message:'8 foto kegiatan Rapat Koordinasi berhasil diupload ke sistem DokaKegiatan.',duration:6000})">
+          <i class="bi bi-check-circle-fill"></i> Notify Success
+        </button>
+        <button class="demo-btn db-red" onclick="DKA.notify({type:'danger',title:'Koneksi Terputus',message:'Koneksi ke server terputus. Beberapa fitur mungkin tidak tersedia. Coba refresh halaman.',duration:6000})">
+          <i class="bi bi-x-circle-fill"></i> Notify Danger
+        </button>
+        <button class="demo-btn db-amber" onclick="DKA.notify({type:'warning',title:'Storage Hampir Penuh',message:'Kapasitas penyimpanan sudah mencapai 90%. Segera hapus file yang tidak diperlukan.',duration:6000})">
+          <i class="bi bi-exclamation-triangle-fill"></i> Notify Warning
+        </button>
+        <button class="demo-btn db-indigo" onclick="DKA.notify({type:'info',title:'Pembaruan Sistem',message:'Sistem DokaKegiatan akan diperbarui ke versi 1.3.0 pada Senin, 28 April 2025 pukul 02.00 WIB.',duration:6000})">
+          <i class="bi bi-info-circle-fill"></i> Notify Info
+        </button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">notify</span>({
+  <span class="str">type</span>    : <span class="str">'success'</span>,
+  <span class="str">title</span>   : <span class="str">'Upload Berhasil'</span>,
+  <span class="str">message</span> : <span class="str">'8 foto kegiatan berhasil diupload.'</span>,
+  <span class="str">duration</span>: <span class="num">6000</span>,
+});
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 8. INLINE ALERT ════ -->
+  <div class="sec-title"><i class="bi bi-exclamation-circle-fill"></i> 8. Inline Alert</div>
+  <div class="sec-sub">Alert yang diinjeksi langsung ke dalam elemen target di halaman — tidak muncul sebagai overlay.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-exclamation-circle-fill"></i> Inline Alert</div>
+        <div class="demo-card-desc">Alert muncul di dalam area konten di bawah ini</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <!-- Target area -->
+      <div id="inline-demo-area" style="min-height:60px;padding:2px;margin-bottom:14px;border:1.5px dashed var(--c-border);border-radius:12px;padding:8px;background:var(--c-bg);">
+        <div style="text-align:center;color:var(--c-muted);font-size:.78rem;padding:16px 0;">
+          <i class="bi bi-arrow-down-circle" style="font-size:1.2rem;display:block;margin-bottom:4px;"></i>
+          Alert akan muncul di sini
+        </div>
+      </div>
+      <div class="btn-grid">
+        <button class="demo-btn db-green" onclick="DKA.alert({type:'success',title:'Berhasil Disimpan',message:'Data profil pengguna berhasil diperbarui.'}, '#inline-demo-area')">
+          <i class="bi bi-check-circle-fill"></i> Success Alert
+        </button>
+        <button class="demo-btn db-red" onclick="DKA.alert({type:'danger',title:'Gagal Upload',message:'Ukuran file melebihi batas maksimal 10MB. Gunakan file yang lebih kecil.'}, '#inline-demo-area')">
+          <i class="bi bi-x-circle-fill"></i> Danger Alert
+        </button>
+        <button class="demo-btn db-amber" onclick="DKA.alert({type:'warning',title:'Perhatian',message:'Pengaturan ini akan mempengaruhi semua pengguna aktif.'}, '#inline-demo-area')">
+          <i class="bi bi-exclamation-triangle-fill"></i> Warning Alert
+        </button>
+        <button class="demo-btn db-indigo" onclick="DKA.alert({type:'info',title:'Informasi',message:'Backup otomatis terakhir berjalan 2 jam yang lalu.'}, '#inline-demo-area')">
+          <i class="bi bi-info-circle-fill"></i> Info Alert
+        </button>
+        <button class="demo-btn db-slate" onclick="DKA.alert({type:'info',title:'Non-closable',message:'Alert ini tidak memiliki tombol tutup.',closable:false}, '#inline-demo-area')">
+          <i class="bi bi-lock-fill"></i> Non-Closable
+        </button>
+        <button class="demo-btn db-outline" onclick="document.getElementById('inline-demo-area').innerHTML='<div style=\'text-align:center;color:var(--c-muted);font-size:.78rem;padding:16px 0;\'><i class=\'bi bi-arrow-down-circle\' style=\'font-size:1.2rem;display:block;margin-bottom:4px;\'></i>Alert akan muncul di sini</div>'">
+          <i class="bi bi-trash3"></i> Clear Area
+        </button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">alert</span>({
+  <span class="str">type</span>    : <span class="str">'success'</span>,
+  <span class="str">title</span>   : <span class="str">'Berhasil Disimpan'</span>,
+  <span class="str">message</span> : <span class="str">'Data berhasil diperbarui.'</span>,
+  <span class="str">closable</span>: <span class="kw">true</span>,
+}, <span class="str">'#target-element'</span>);   <span class="cmt">// CSS selector atau element</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 9. KOMBINASI USE CASE ════ -->
+  <div class="sec-title"><i class="bi bi-lightning-fill"></i> 9. Use Case Nyata</div>
+  <div class="sec-sub">Contoh kombinasi DKA Alert dalam skenario aplikasi nyata DokaKegiatan.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-layers-fill"></i> Skenario Lengkap</div>
+        <div class="demo-card-desc">Kombinasi loading → dialog → toast seperti di aplikasi sesungguhnya</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-indigo" onclick="scenarioSaveActivity()">
+          <i class="bi bi-calendar-plus-fill"></i> Simpan Kegiatan
+        </button>
+        <button class="demo-btn db-red" onclick="scenarioDeleteUser()">
+          <i class="bi bi-person-dash-fill"></i> Hapus Pengguna
+        </button>
+        <button class="demo-btn db-green" onclick="scenarioApproveAndNotify()">
+          <i class="bi bi-person-check-fill"></i> Approve & Notify
+        </button>
+        <button class="demo-btn db-amber" onclick="scenarioChangePw()">
+          <i class="bi bi-key-fill"></i> Alur Ubah Password
+        </button>
+        <button class="demo-btn db-slate" onclick="scenarioExportPDF()">
+          <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
+        </button>
+        <button class="demo-btn db-purple" onclick="scenarioClearCache()">
+          <i class="bi bi-lightning-fill"></i> Clear Cache
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ 10. TUTUP SEMUA ════ -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-card-title"><i class="bi bi-x-circle-fill"></i> Kontrol Global</div>
+        <div class="demo-card-desc">Tutup semua elemen DKA yang sedang aktif</div>
+      </div>
+    </div>
+    <div class="demo-card-body">
+      <div class="btn-grid">
+        <button class="demo-btn db-slate" onclick="DKA.close()">
+          <i class="bi bi-x-lg"></i> DKA.close() — Tutup Backdrop
+        </button>
+        <button class="demo-btn db-red" onclick="DKA.closeAll()">
+          <i class="bi bi-x-circle-fill"></i> DKA.closeAll() — Tutup Semua
+        </button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">close</span>();    <span class="cmt">// tutup dialog/loading aktif</span>
+<span class="fn">DKA</span><span class="op">.</span><span class="fn">closeAll</span>(); <span class="cmt">// tutup semua: backdrop + toast + notify</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ════ API TABLE ════ -->
+  <div class="sec-title"><i class="bi bi-code-slash"></i> API Reference</div>
+  <div class="sec-sub">Dokumentasi lengkap semua method yang tersedia di DKA library.</div>
+
+  <div class="demo-card">
+    <div class="demo-card-body" style="padding:0;overflow-x:auto;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Parameter Utama</th>
+            <th>Return</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="api-badge">DKA.toast()</code></td>
+            <td><code>type, title, message, duration, position</code></td>
+            <td><span class="type-badge">{ dismiss }</span></td>
+            <td>Toast notifikasi kecil di sudut layar</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.dialog()</code></td>
+            <td><code>type, title, message, confirm, cancel</code></td>
+            <td><span class="type-badge">Promise&lt;boolean&gt;</span></td>
+            <td>Dialog konfirmasi standar dengan 5 tipe</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.deleteConfirm()</code></td>
+            <td><code>title, message, itemName, confirm, cancel</code></td>
+            <td><span class="type-badge">Promise&lt;boolean&gt;</span></td>
+            <td>Dialog hapus khusus dengan chip nama item</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.approveUser()</code></td>
+            <td><code>title, message, user{name,role,email,instansi,avatarGrad}</code></td>
+            <td><span class="type-badge">Promise&lt;boolean&gt;</span></td>
+            <td>Dialog approve pengguna dengan kartu info</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.password()</code></td>
+            <td><code>title, confirm, cancel, requireCurrent</code></td>
+            <td><span class="type-badge">Promise&lt;{confirmed,password}&gt;</span></td>
+            <td>Dialog ubah password dengan strength meter & validasi</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.loading()</code></td>
+            <td><code>title, message, style ('ring'|'dots'|'wave')</code></td>
+            <td><span class="type-badge">{ close(), update(msg) }</span></td>
+            <td>Overlay loading, update pesan secara dinamis</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.notify()</code></td>
+            <td><code>type, title, message, duration</code></td>
+            <td><span class="type-badge">{ dismiss }</span></td>
+            <td>Panel notifikasi besar dari sisi kanan</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.alert()</code></td>
+            <td><code>type, title, message, closable</code> + <code>targetEl</code></td>
+            <td><span class="type-badge">{ el, dismiss() }</span></td>
+            <td>Alert inline diinjeksi ke elemen target</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.close()</code></td>
+            <td>—</td>
+            <td><span class="type-badge">void</span></td>
+            <td>Tutup backdrop aktif (dialog/loading)</td>
+          </tr>
+          <tr>
+            <td><code class="api-badge">DKA.closeAll()</code></td>
+            <td>—</td>
+            <td><span class="type-badge">void</span></td>
+            <td>Tutup semua elemen DKA yang aktif</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <strong>DKA Alert</strong> v1.0.0 &nbsp;·&nbsp; DokaKegiatan Alert Library &nbsp;·&nbsp;
+  Terintegrasi dengan tema <strong>#4f46e5</strong> Indigo DokaKegiatan
+</footer>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+
+<script>
+/* ════════════════════════════════════
+   HERO CANVAS PARTICLES
+════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+  const EMOJIS = ['🔔','💬','✅','❌','⚠️','ℹ️','🔑','🗑️','👤','✨','⭐','💫'];
+  const COLORS = ['#818cf8','#a78bfa','#34d399','#f87171','#fbbf24','#38bdf8'];
+
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  function rnd(a,b) { return a + Math.random()*(b-a); }
+  function make() {
+    const e = Math.random() > .45;
+    return {
+      x:rnd(0,W), y:rnd(0,H), vx:rnd(-.3,.3), vy:rnd(-.55,-.1),
+      size:rnd(e?13:3,e?22:8), alpha:rnd(.08,.28),
+      color:COLORS[Math.floor(Math.random()*COLORS.length)],
+      emoji:e?EMOJIS[Math.floor(Math.random()*EMOJIS.length)]:null,
+      rotate:rnd(0,Math.PI*2), rotV:rnd(-.014,.014),
+      pulse:rnd(0,Math.PI*2), pulseV:rnd(.01,.04),
+    };
+  }
+  function init() { resize(); particles = Array.from({length:Math.min(36,Math.floor(W/28))},make); }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha + .04*Math.sin(p.pulse);
+      ctx.translate(p.x,p.y); ctx.rotate(p.rotate);
+      if (p.emoji) {
+        ctx.font = `${p.size}px serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(p.emoji,0,0);
+      } else {
+        ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2);
+        ctx.fillStyle=p.color; ctx.fill();
+      }
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.rotate+=p.rotV; p.pulse+=p.pulseV;
+      if(p.y<-40) p.y=H+40;
+      if(p.x<-40) p.x=W+40;
+      if(p.x>W+40) p.x=-40;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', () => { resize(); });
+  init(); draw();
+})();
+
+/* ════════════════════════════════════
+   FAB
+════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+  document.getElementById('fabBtn').classList.toggle('visible', window.scrollY > 300);
+}, {passive:true});
+
+/* ════════════════════════════════════
+   TOAST POSITION
+════════════════════════════════════ */
+let selectedPos = 'top-center';
+function setPosActive(btn) {
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedPos = btn.dataset.pos;
+}
+function toastAtPos() {
+  DKA.toast({
+    type: 'info',
+    title: 'Posisi: ' + selectedPos,
+    message: 'Toast muncul di posisi ' + selectedPos,
+    position: selectedPos,
+    duration: 3500,
+  });
+}
+
+/* ════════════════════════════════════
+   DIALOG DEMOS
+════════════════════════════════════ */
+const DIALOG_DATA = {
+  success: { title:'Konfirmasi Publikasi', message:'Kegiatan ini akan dipublikasikan dan dapat dilihat oleh semua pengguna.' },
+  danger:  { title:'Hapus Data Permanen',  message:'Data yang dihapus tidak dapat dipulihkan. Pastikan Anda sudah membuat backup.' },
+  warning: { title:'Perubahan Penting',    message:'Mengubah pengaturan ini akan mempengaruhi seluruh pengguna yang sedang aktif.' },
+  info:    { title:'Informasi Sistem',     message:'Sistem akan melakukan backup otomatis dalam 10 menit. Proses ini mungkin memakan waktu.' },
+  question:{ title:'Yakin Ingin Keluar?', message:'Sesi Anda akan diakhiri dan Anda perlu login kembali untuk mengakses sistem.' },
+};
+function runDialog(type) {
+  const d = DIALOG_DATA[type] || DIALOG_DATA.info;
+  DKA.dialog({ type, title: d.title, message: d.message })
+    .then(result => {
+      const con = document.getElementById('dialogConsole');
+      const ts  = new Date().toLocaleTimeString('id-ID');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = result
+        ? `<span class="log-info">[${ts}]</span> dialog(<span class="log-ok">'${type}'</span>) → <span class="log-ok">true</span> <span class="log-dim">// user klik Konfirm</span>`
+        : `<span class="log-info">[${ts}]</span> dialog(<span class="log-ok">'${type}'</span>) → <span class="log-no">false</span> <span class="log-dim">// user klik Batal / Escape</span>`;
+      con.innerHTML = '';
+      con.appendChild(line);
+      if (result) {
+        DKA.toast({ type:'success', title:'Dikonfirmasi!', message:'Aksi berhasil dilanjutkan.', position:'bottom-right' });
+      }
+    });
+}
+
+/* ════════════════════════════════════
+   DELETE DEMOS
+════════════════════════════════════ */
+function runDelete(itemName) {
+  DKA.deleteConfirm({
+    title   : 'Hapus Data?',
+    message : 'Tindakan ini tidak dapat dibatalkan. Data yang dihapus tidak bisa dipulihkan.',
+    itemName: itemName,
+    confirm : 'Ya, Hapus Sekarang',
+  }).then(result => {
+    const con  = document.getElementById('deleteConsole');
+    const ts   = new Date().toLocaleTimeString('id-ID');
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML = result
+      ? `<span class="log-info">[${ts}]</span> deleteConfirm() → <span class="log-ok">true</span> <span class="log-dim">// "${itemName}" dihapus</span>`
+      : `<span class="log-info">[${ts}]</span> deleteConfirm() → <span class="log-no">false</span> <span class="log-dim">// user membatalkan</span>`;
+    con.innerHTML = '';
+    con.appendChild(line);
+    if (result) {
+      DKA.toast({ type:'success', title:'Berhasil Dihapus', message:`"${itemName}" telah dihapus dari sistem.`, position:'bottom-right', duration:4000 });
+    }
+  });
+}
+
+/* ════════════════════════════════════
+   APPROVE DEMOS
+════════════════════════════════════ */
+function runApprove(user) {
+  DKA.approveUser({ user, confirm:'Ya, Setujui Akun' })
+    .then(result => {
+      const con  = document.getElementById('approveConsole');
+      const ts   = new Date().toLocaleTimeString('id-ID');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = result
+        ? `<span class="log-info">[${ts}]</span> approveUser() → <span class="log-ok">true</span> <span class="log-dim">// ${user.name} disetujui</span>`
+        : `<span class="log-info">[${ts}]</span> approveUser() → <span class="log-no">false</span> <span class="log-dim">// dibatalkan</span>`;
+      con.innerHTML = '';
+      con.appendChild(line);
+      if (result) {
+        DKA.toast({ type:'success', title:'Akun Disetujui!', message:`${user.name} telah mendapat akses ke sistem.`, position:'bottom-right', duration:4500 });
+      }
+    });
+}
+
+/* ════════════════════════════════════
+   PASSWORD DEMO
+════════════════════════════════════ */
+function runPassword(requireCurrent) {
+  DKA.password({ requireCurrent })
+    .then(result => {
+      const con  = document.getElementById('passwordConsole');
+      const ts   = new Date().toLocaleTimeString('id-ID');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = result.confirmed
+        ? `<span class="log-info">[${ts}]</span> password() → confirmed: <span class="log-ok">true</span>, password: <span class="log-ok">'${'*'.repeat(result.password.length)}'</span> <span class="log-dim">(${result.password.length} chars)</span>`
+        : `<span class="log-info">[${ts}]</span> password() → confirmed: <span class="log-no">false</span> <span class="log-dim">// user membatalkan</span>`;
+      con.innerHTML = '';
+      con.appendChild(line);
+      if (result.confirmed) {
+        DKA.toast({ type:'success', title:'Password Diperbarui!', message:'Password baru berhasil disimpan.', position:'bottom-right' });
+      }
+    });
+}
+
+/* ════════════════════════════════════
+   LOADING DEMOS
+════════════════════════════════════ */
+function runLoading(style) {
+  const msgs = {
+    ring: { title:'Menyimpan data...', message:'Mohon tunggu sebentar.' },
+    dots: { title:'Memproses...', message:'Sistem sedang bekerja.' },
+    wave: { title:'Mengupload foto...', message:'Harap tidak menutup halaman.' },
+  };
+  const m = msgs[style];
+  const loader = DKA.loading({ ...m, style });
+  setTimeout(() => {
+    loader.close();
+    DKA.toast({ type:'success', title:'Selesai!', message:'Proses berhasil diselesaikan.', position:'bottom-right' });
+  }, 2500);
+}
+
+function runLoadingWithUpdate() {
+  const steps = [
+    'Memvalidasi data...',
+    'Mengupload ke server...',
+    'Menyimpan ke database...',
+    'Selesai!',
+  ];
+  const loader = DKA.loading({
+    title  : 'Menyimpan Kegiatan',
+    message: 'Memulai proses...',
+    style  : 'ring',
+  });
+  steps.forEach((msg, i) => {
+    setTimeout(() => loader.update(msg), (i + 1) * 900);
+  });
+  setTimeout(() => {
+    loader.close();
+    DKA.notify({
+      type   : 'success',
+      title  : 'Kegiatan Disimpan!',
+      message: 'Kegiatan baru berhasil ditambahkan ke sistem DokaKegiatan dan sudah bisa diakses.',
+      duration: 6000,
+    });
+  }, (steps.length + 1) * 900);
+}
+
+/* ════════════════════════════════════
+   SCENARIO USE CASES
+════════════════════════════════════ */
+function scenarioSaveActivity() {
+  const loader = DKA.loading({ title:'Menyimpan Kegiatan', message:'Mengupload foto ke server...', style:'wave' });
+  setTimeout(() => loader.update('Menyimpan ke database...'), 1200);
+  setTimeout(() => {
+    loader.close();
+    DKA.toast({ type:'success', title:'Kegiatan Disimpan!', message:'Rapat Koordinasi Dinkes berhasil ditambahkan.', position:'top-right', duration:4500 });
+  }, 2500);
+}
+
+function scenarioDeleteUser() {
+  DKA.deleteConfirm({
+    title   : 'Hapus Akun Pengguna?',
+    message : 'Pengguna ini akan dihapus dari sistem beserta seluruh data kegiatannya.',
+    itemName: 'Budi Santoso — Operator',
+  }).then(result => {
+    if (!result) return;
+    const l = DKA.loading({ title:'Menghapus data...', message:'Membersihkan data terkait.', style:'dots' });
+    setTimeout(() => {
+      l.close();
+      DKA.toast({ type:'success', title:'Pengguna Dihapus', message:'Akun Budi Santoso berhasil dihapus dari sistem.', position:'top-right' });
+    }, 1800);
+  });
+}
+
+function scenarioApproveAndNotify() {
+  DKA.approveUser({
+    user: { name:'Nurul Hidayah', role:'Operator', email:'nurul@pekalongan.go.id', instansi:'Inspektorat', avatarGrad:'linear-gradient(135deg,#8b5cf6,#ec4899)' },
+  }).then(result => {
+    if (!result) return;
+    const l = DKA.loading({ title:'Memproses persetujuan...', message:'Mengaktifkan akun pengguna.', style:'ring' });
+    setTimeout(() => {
+      l.close();
+      DKA.notify({
+        type   : 'success',
+        title  : 'Akun Berhasil Disetujui',
+        message: 'Nurul Hidayah dari Inspektorat telah mendapat akses ke sistem DokaKegiatan. Email notifikasi telah dikirim.',
+        duration: 7000,
+      });
+    }, 1600);
+  });
+}
+
+function scenarioChangePw() {
+  DKA.password({ requireCurrent: true })
+    .then(result => {
+      if (!result.confirmed) return;
+      const l = DKA.loading({ title:'Menyimpan password baru...', message:'Memperbarui kredensial.', style:'ring' });
+      setTimeout(() => {
+        l.close();
+        DKA.notify({
+          type   : 'success',
+          title  : 'Password Berhasil Diubah',
+          message: 'Password akun Anda berhasil diperbarui. Gunakan password baru untuk login berikutnya.',
+          duration: 6000,
+        });
+      }, 1500);
+    });
+}
+
+function scenarioExportPDF() {
+  DKA.dialog({
+    type   : 'info',
+    title  : 'Export Laporan PDF',
+    message: 'Laporan bulanan April 2025 akan diekspor. Proses ini mungkin memakan waktu beberapa detik.',
+    confirm: 'Ya, Export Sekarang',
+  }).then(result => {
+    if (!result) return;
+    const l = DKA.loading({ title:'Membuat laporan PDF...', message:'Mengumpulkan data kegiatan.', style:'wave' });
+    setTimeout(() => l.update('Menyusun halaman PDF...'), 1000);
+    setTimeout(() => l.update('Finalisasi dokumen...'), 2200);
+    setTimeout(() => {
+      l.close();
+      DKA.toast({ type:'success', title:'PDF Siap Diunduh', message:'Laporan April 2025 berhasil dibuat (2.4 MB).', position:'top-right', duration:5000 });
+    }, 3200);
+  });
+}
+
+function scenarioClearCache() {
+  DKA.dialog({
+    type   : 'warning',
+    title  : 'Clear Application Cache',
+    message: 'Semua cache akan dibersihkan. Pengguna yang sedang aktif mungkin perlu refresh halaman.',
+    confirm: 'Clear Cache Sekarang',
+  }).then(result => {
+    if (!result) return;
+    const l = DKA.loading({ title:'Membersihkan cache...', message:'Menghapus file sementara.', style:'dots' });
+    setTimeout(() => {
+      l.close();
+      DKA.toast({ type:'success', title:'Cache Dibersihkan!', message:'Semua cache berhasil dihapus. Performa sistem meningkat.', position:'top-right', duration:4500 });
+    }, 2000);
+  });
+}
+
+/* ════════════════════════════════════
+   COPY CODE
+════════════════════════════════════ */
+function copyCode(btn) {
+  const block = btn.parentElement;
+  const text  = block.innerText.replace('Copy', '').replace('Copied!', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.color = '#4ade80';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
