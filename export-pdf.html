@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Export PDF</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    /* ═══════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1){width:18px;} .hline:nth-child(2){width:14px;} .hline:nth-child(3){width:18px;}
+    body.collapsed .hline:nth-child(1){transform:translateY(7px) rotate(45deg);width:18px;}
+    body.collapsed .hline:nth-child(2){opacity:0;width:0;}
+    body.collapsed .hline:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:18px;}
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══ MAIN ═══ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes iconWiggle { 0%,80%,100%{transform:rotate(0)} 85%{transform:rotate(-8deg)} 90%{transform:rotate(8deg)} 95%{transform:rotate(-4deg)} }
+
+    /* ═══ PAGE HEADER ═══ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:20px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-red),var(--c-orange),var(--c-accent)); }
+    .ph-left h1 { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); margin-bottom:2px; display:flex; align-items:center; gap:10px; }
+    .ph-left h1 i { font-size:1.3rem; color:var(--c-red); animation:iconWiggle 3s ease infinite; }
+    .ph-left p { font-size:.82rem; color:var(--c-muted); }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+
+    /* ═══ STAT CARDS ═══ */
+    .mini-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; animation:fadeUp .45s ease .05s both; }
+    .mini-stat { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); padding:16px 18px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-sm); transition:transform var(--trans),box-shadow var(--trans); cursor:default; position:relative; overflow:hidden; }
+    .mini-stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .mini-stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
+    .ms1::after { background:linear-gradient(90deg,var(--c-red),var(--c-orange)); }
+    .ms2::after { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .ms3::after { background:linear-gradient(90deg,var(--c-green),#34d399); }
+    .ms4::after { background:linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .ms-icon { width:42px; height:42px; border-radius:11px; display:grid; place-items:center; font-size:1.15rem; color:#fff; flex-shrink:0; }
+    .ms1 .ms-icon { background:linear-gradient(135deg,var(--c-red),var(--c-orange)); box-shadow:0 3px 10px rgba(239,68,68,.28); }
+    .ms2 .ms-icon { background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); box-shadow:0 3px 10px rgba(79,70,229,.28); }
+    .ms3 .ms-icon { background:linear-gradient(135deg,var(--c-green),#34d399); box-shadow:0 3px 10px rgba(16,185,129,.28); }
+    .ms4 .ms-icon { background:linear-gradient(135deg,var(--c-accent),var(--c-orange)); box-shadow:0 3px 10px rgba(245,158,11,.28); }
+    .ms-val { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); line-height:1; }
+    .ms-lbl { font-size:.75rem; color:var(--c-muted); font-weight:600; margin-top:2px; }
+
+    /* ═══ MAIN GRID ═══ */
+    .export-grid { display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start; }
+
+    /* ═══ DOCUMENT TYPE CARDS ═══ */
+    .doc-type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px; animation:fadeUp .45s ease .1s both; }
+
+    .doc-type-card {
+      background:#fff; border:2px solid var(--c-border); border-radius:var(--radius-md);
+      padding:18px 14px; text-align:center; cursor:pointer;
+      transition:all var(--trans); position:relative; overflow:hidden;
+    }
+    .doc-type-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; opacity:0; transition:opacity var(--trans); }
+    .doc-type-card:hover { border-color:var(--c-primary); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .doc-type-card:hover::before { opacity:1; }
+    .doc-type-card.selected { border-color:var(--c-primary); background:linear-gradient(135deg,rgba(79,70,229,.06),rgba(6,182,212,.03)); }
+    .doc-type-card.selected::before { opacity:1; }
+    .doc-type-card.selected::after { content:'\F26A'; font-family:'bootstrap-icons'; position:absolute; top:-1px; right:8px; font-size:.8rem; color:var(--c-primary); }
+    .dtc-indigo::before { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .dtc-green::before  { background:linear-gradient(90deg,var(--c-green),var(--c-secondary)); }
+    .dtc-red::before    { background:linear-gradient(90deg,var(--c-red),var(--c-orange)); }
+    .dtc-amber::before  { background:linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .dtc-purple::before { background:linear-gradient(90deg,var(--c-purple),var(--c-pink)); }
+    .dtc-slate::before  { background:linear-gradient(90deg,#64748b,#94a3b8); }
+
+    .dtc-icon { width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:1.4rem; color:#fff; margin:0 auto 10px; box-shadow:0 4px 12px rgba(0,0,0,.12); transition:transform var(--trans); }
+    .doc-type-card:hover .dtc-icon,
+    .doc-type-card.selected .dtc-icon { transform:scale(1.08) rotate(-5deg); }
+    .dtc-name { font-family:'Nunito',sans-serif; font-weight:900; font-size:.88rem; color:var(--c-text); margin-bottom:3px; }
+    .dtc-desc { font-size:.7rem; color:var(--c-muted); line-height:1.4; }
+    .dtc-badge { display:inline-flex; margin-top:8px; padding:2px 8px; border-radius:99px; font-size:.62rem; font-weight:800; background:rgba(79,70,229,.08); color:var(--c-primary); }
+
+    /* ═══ FORM CARD ═══ */
+    .form-card { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:20px; animation:fadeUp .45s ease .15s both; }
+    .fc-head { display:flex; align-items:center; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--c-border); position:relative; }
+    .fc-head::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
+    .fch-red::before    { background:linear-gradient(90deg,var(--c-red),var(--c-orange)); }
+    .fch-indigo::before { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .fch-green::before  { background:linear-gradient(90deg,var(--c-green),var(--c-secondary)); }
+    .fc-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem; color:var(--c-text); display:flex; align-items:center; gap:8px; }
+    .fc-title i { color:var(--c-red); }
+    .fc-body { padding:22px; }
+
+    /* Form fields */
+    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .fgroup { margin-bottom:16px; }
+    .fgroup:last-child { margin-bottom:0; }
+    .flabel { font-size:.8rem; font-weight:700; color:var(--c-text); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+    .flabel .req { color:var(--c-pink); }
+    .flabel .opt { color:var(--c-muted); font-weight:500; font-size:.72rem; }
+    .fwrap { position:relative; }
+    .f-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.9rem; pointer-events:none; transition:color var(--trans); }
+    .fwrap:focus-within .f-icon { color:var(--c-primary); }
+    .fctrl { width:100%; padding:11px 13px 11px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans),background var(--trans); }
+    .fctrl:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .fctrl.no-icon { padding-left:13px; }
+    select.fctrl { cursor:pointer; }
+    .fhint { font-size:.72rem; color:var(--c-muted); margin-top:4px; }
+
+    /* Toggle switch */
+    .ts-row { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--c-border); }
+    .ts-row:last-child { border-bottom:none; padding-bottom:0; }
+    .ts-row:first-child { padding-top:0; }
+    .ts-info { flex:1; min-width:0; }
+    .ts-label { font-size:.875rem; font-weight:700; color:var(--c-text); }
+    .ts-desc  { font-size:.72rem; color:var(--c-muted); margin-top:2px; }
+    .ts-wrap { position:relative; width:44px; height:24px; cursor:pointer; flex-shrink:0; }
+    .ts-wrap input { display:none; }
+    .ts-track { position:absolute; inset:0; border-radius:99px; background:var(--c-border); transition:background var(--trans); }
+    .ts-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.2); transition:transform var(--trans); }
+    .ts-wrap input:checked ~ .ts-track { background:var(--c-green); }
+    .ts-wrap input:checked ~ .ts-track .ts-thumb { transform:translateX(20px); }
+    .ts-wrap input:checked[data-c="red"]    ~ .ts-track { background:var(--c-red); }
+    .ts-wrap input:checked[data-c="primary"]~ .ts-track { background:var(--c-primary); }
+
+    /* ═══ PREVIEW PANEL (right) ═══ */
+    .preview-card { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:16px; animation:fadeUp .45s ease .1s both; }
+    .preview-card:last-child { margin-bottom:0; }
+    .pc-head { padding:14px 18px; border-bottom:1px solid var(--c-border); }
+    .pc-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem; color:var(--c-text); display:flex; align-items:center; gap:7px; }
+    .pc-title i { color:var(--c-primary); }
+    .pc-body { padding:18px; }
+
+    /* PDF Page Preview */
+    .pdf-preview {
+      background:#fff; border:1px solid var(--c-border); border-radius:8px;
+      box-shadow:0 4px 20px rgba(0,0,0,.08);
+      overflow:hidden; margin-bottom:14px;
+      aspect-ratio:210/297; /* A4 ratio */
+      display:flex; flex-direction:column;
+      position:relative;
+    }
+    .pdf-preview-header {
+      padding:12px 14px 10px;
+      border-bottom:2px solid var(--c-primary);
+      background:linear-gradient(135deg,rgba(79,70,229,.06),rgba(6,182,212,.03));
+    }
+    .pdf-logo-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .pdf-logo-box { width:28px; height:28px; border-radius:6px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; color:#fff; font-size:.7rem; flex-shrink:0; }
+    .pdf-org-name { font-size:.65rem; font-weight:800; color:var(--c-text); }
+    .pdf-org-sub  { font-size:.52rem; color:var(--c-muted); }
+    .pdf-doc-title { font-size:.75rem; font-weight:800; color:var(--c-text); text-align:center; padding:6px 0 2px; }
+    .pdf-doc-sub   { font-size:.55rem; color:var(--c-muted); text-align:center; }
+    .pdf-divider   { height:1px; background:var(--c-border); margin:6px 0; }
+    .pdf-content   { flex:1; padding:10px 14px; overflow:hidden; }
+    .pdf-stat-row  { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:8px; }
+    .pdf-stat-box  { background:var(--c-surface2); border-radius:5px; padding:5px; text-align:center; }
+    .pdf-stat-val  { font-size:.65rem; font-weight:900; color:var(--c-text); font-family:'Nunito',sans-serif; }
+    .pdf-stat-lbl  { font-size:.45rem; color:var(--c-muted); font-weight:600; }
+    .pdf-table-mock { width:100%; }
+    .pdf-tr { display:flex; align-items:center; gap:4px; padding:2px 0; border-bottom:1px solid rgba(226,232,240,.5); }
+    .pdf-tr:last-child { border-bottom:none; }
+    .pdf-td-no { width:14px; height:5px; background:#e2e8f0; border-radius:2px; flex-shrink:0; }
+    .pdf-td-name { flex:1; height:5px; background:#e2e8f0; border-radius:2px; }
+    .pdf-td-kat  { width:28px; height:5px; border-radius:2px; }
+    .pdf-td-status{ width:22px; height:5px; border-radius:2px; }
+    .pdf-footer-band { padding:6px 14px; background:linear-gradient(90deg,rgba(79,70,229,.06),rgba(6,182,212,.03)); border-top:1px solid var(--c-border); display:flex; align-items:center; justify-content:space-between; }
+    .pdf-footer-text { font-size:.45rem; color:var(--c-muted); }
+    .pdf-page-num { font-family:'DM Mono',monospace; font-size:.45rem; color:var(--c-muted); }
+
+    /* Watermark on preview */
+    .pdf-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-30deg); font-family:'Nunito',sans-serif; font-weight:900; font-size:2rem; color:rgba(79,70,229,.07); pointer-events:none; white-space:nowrap; letter-spacing:4px; }
+
+    /* ═══ PROGRESS SIMULATION ═══ */
+    .export-progress-wrap { display:none; }
+    .export-progress-wrap.show { display:block; }
+    .ep-steps { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .ep-step { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; background:var(--c-surface2); border:1px solid var(--c-border); transition:all var(--trans); }
+    .ep-step.active { background:rgba(79,70,229,.06); border-color:rgba(79,70,229,.2); }
+    .ep-step.done   { background:#f0fdf4; border-color:#bbf7d0; }
+    .ep-step-icon   { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:.82rem; flex-shrink:0; }
+    .ep-step.pending .ep-step-icon { background:var(--c-border); color:var(--c-muted); }
+    .ep-step.active  .ep-step-icon { background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; animation:stepPulse 1.2s ease-in-out infinite; }
+    .ep-step.done    .ep-step-icon { background:linear-gradient(135deg,var(--c-green),#34d399); color:#fff; }
+    @keyframes stepPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    .ep-step-label  { font-size:.82rem; font-weight:700; color:var(--c-text-2); }
+    .ep-step.active .ep-step-label  { color:var(--c-primary); }
+    .ep-step.done   .ep-step-label  { color:var(--c-green); }
+    .ep-bar-wrap { height:8px; background:var(--c-border); border-radius:99px; overflow:hidden; margin-bottom:8px; }
+    .ep-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); transition:width .4s; }
+    .ep-pct { font-family:'DM Mono',monospace; font-size:.75rem; font-weight:600; color:var(--c-primary); text-align:right; }
+
+    /* ═══ EXPORT HISTORY TABLE ═══ */
+    .history-table { width:100%; border-collapse:collapse; }
+    .history-table thead th { background:var(--c-surface2); padding:10px 14px; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--c-muted); border-bottom:1px solid var(--c-border); text-align:left; white-space:nowrap; }
+    .history-table tbody tr { border-bottom:1px solid var(--c-border); transition:background var(--trans); }
+    .history-table tbody tr:last-child { border-bottom:none; }
+    .history-table tbody tr:hover { background:rgba(79,70,229,.025); }
+    .history-table tbody td { padding:12px 14px; font-size:.85rem; color:var(--c-text-2); vertical-align:middle; }
+    .ht-file { display:flex; align-items:center; gap:10px; }
+    .ht-file-icon { width:36px; height:36px; border-radius:9px; display:grid; place-items:center; font-size:1rem; color:#fff; flex-shrink:0; }
+    .ht-file-name { font-weight:700; color:var(--c-text); font-size:.85rem; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ht-file-size { font-size:.7rem; color:var(--c-muted); margin-top:2px; font-family:'DM Mono',monospace; }
+    .ht-type-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:99px; font-size:.7rem; font-weight:800; }
+    .htp-bulanan  { background:rgba(79,70,229,.08); color:var(--c-primary); border:1px solid rgba(79,70,229,.2); }
+    .htp-kegiatan { background:rgba(16,185,129,.08); color:var(--c-green);  border:1px solid rgba(16,185,129,.2); }
+    .htp-galeri   { background:rgba(236,72,153,.08); color:var(--c-pink);   border:1px solid rgba(236,72,153,.2); }
+    .htp-rekap    { background:rgba(245,158,11,.08); color:#d97706;          border:1px solid rgba(245,158,11,.2); }
+    .htp-kustom   { background:rgba(100,116,139,.08);color:#64748b;          border:1px solid rgba(100,116,139,.2); }
+    .ht-actions { display:flex; gap:4px; }
+    .ht-btn { width:28px; height:28px; border-radius:7px; border:none; cursor:pointer; display:grid; place-items:center; font-size:.82rem; transition:all var(--trans); }
+    .ht-btn:hover { transform:scale(1.1); }
+    .htb-dl  { background:#f0fdf4; color:var(--c-green); }
+    .htb-del { background:#fef2f2; color:var(--c-red); }
+    .htb-dl:hover  { background:var(--c-green); color:#fff; }
+    .htb-del:hover { background:var(--c-red);   color:#fff; }
+
+    /* Export button */
+    .btn-export-now {
+      width:100%; padding:14px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,var(--c-red),var(--c-orange));
+      color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
+      font-size:1rem; cursor:pointer;
+      box-shadow:0 6px 20px rgba(239,68,68,.35);
+      transition:transform var(--trans),box-shadow var(--trans);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      margin-bottom:10px;
+    }
+    .btn-export-now:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(239,68,68,.5); }
+    .btn-export-now:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-preview {
+      width:100%; padding:11px; border-radius:12px;
+      border:1.5px solid var(--c-border); background:#fff;
+      color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif;
+      font-weight:700; font-size:.875rem; cursor:pointer;
+      transition:all var(--trans);
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-preview:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; }
+
+    /* Quick info rows */
+    .qi-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--c-border); font-size:.82rem; }
+    .qi-row:last-child { border-bottom:none; padding-bottom:0; }
+    .qi-row:first-child { padding-top:0; }
+    .qi-icon { color:var(--c-primary); font-size:.85rem; flex-shrink:0; width:18px; text-align:center; }
+    .qi-label { color:var(--c-muted); font-weight:600; flex:0 0 110px; }
+    .qi-val   { color:var(--c-text); font-weight:700; flex:1; }
+
+    /* FAB */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-red),var(--c-orange)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(239,68,68,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(239,68,68,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Footer */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* Responsive */
+    @media(max-width:1200px) { .mini-stats{grid-template-columns:repeat(2,1fr)} .export-grid{grid-template-columns:1fr} }
+    @media(max-width:992px)  { :root{--sidebar-w:240px;} .doc-type-grid{grid-template-columns:repeat(2,1fr)} .frow2{grid-template-columns:1fr} }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;} .main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;} .user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+    }
+    @media(max-width:576px) {
+      .mini-stats{grid-template-columns:1fr;}
+      .doc-type-grid{grid-template-columns:1fr;}
+      .page-header{flex-direction:column;align-items:flex-start;}
+      .main-footer{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="kategori.html" class="nav-link-item" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="unit-kerja.html" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="semua-kegiatan.html" class="nav-link-item" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="tambah-kegiatan.html" class="nav-link-item" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="galeri-foto.html" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="laporan-bulanan.html" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item active" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="akses-role.html" class="nav-link-item" data-label="Akses & Role"><i class="bi bi-shield-lock-fill nav-icon"></i><span class="nav-label">Akses & Role</span></a></div>
+    <div class="nav-item-wrap"><a href="pengaturan-sistem.html" class="nav-link-item" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari dokumen export..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</h1>
+      <p>Ekspor data kegiatan, laporan bulanan, galeri foto, dan rekap statistik ke format PDF.</p>
+    </div>
+    <nav class="breadcrumb-nav">
+      <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <a href="#">Laporan</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <span class="bc-current"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</span>
+    </nav>
+  </div>
+
+  <!-- Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat ms1"><div class="ms-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div><div><div class="ms-val" id="sc1">0</div><div class="ms-lbl">Total Export</div></div></div>
+    <div class="mini-stat ms2"><div class="ms-icon"><i class="bi bi-cloud-arrow-down-fill"></i></div><div><div class="ms-val" id="sc2">0</div><div class="ms-lbl">Bulan Ini</div></div></div>
+    <div class="mini-stat ms3"><div class="ms-icon"><i class="bi bi-hdd-fill"></i></div><div><div class="ms-val" id="sc3">0</div><div class="ms-lbl">Total Ukuran (MB)</div></div></div>
+    <div class="mini-stat ms4"><div class="ms-icon"><i class="bi bi-calendar-check-fill"></i></div><div><div class="ms-val" id="sc4">0</div><div class="ms-lbl">Export Hari Ini</div></div></div>
+  </div>
+
+  <!-- Export Grid -->
+  <div class="export-grid">
+
+    <!-- ═══ LEFT: Config ═══ -->
+    <div>
+
+      <!-- 1. Pilih Jenis Dokumen -->
+      <div class="form-card">
+        <div class="fc-head fch-red">
+          <div class="fc-title"><i class="bi bi-file-earmark-pdf-fill"></i> Pilih Jenis Dokumen</div>
+        </div>
+        <div class="fc-body">
+          <div class="doc-type-grid" id="docTypeGrid">
+            <div class="doc-type-card dtc-indigo selected" data-type="laporan-bulanan" onclick="selectDocType(this,'laporan-bulanan')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);"><i class="bi bi-bar-chart-fill"></i></div>
+              <div class="dtc-name">Laporan Bulanan</div>
+              <div class="dtc-desc">Rekap lengkap kegiatan beserta statistik</div>
+              <span class="dtc-badge">Populer</span>
+            </div>
+            <div class="doc-type-card dtc-green" data-type="daftar-kegiatan" onclick="selectDocType(this,'daftar-kegiatan')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#10b981,#06b6d4);"><i class="bi bi-calendar3-fill"></i></div>
+              <div class="dtc-name">Daftar Kegiatan</div>
+              <div class="dtc-desc">Tabel lengkap semua kegiatan</div>
+              <span class="dtc-badge">Standar</span>
+            </div>
+            <div class="doc-type-card dtc-red" data-type="galeri-foto" onclick="selectDocType(this,'galeri-foto')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6);"><i class="bi bi-images"></i></div>
+              <div class="dtc-name">Galeri Foto</div>
+              <div class="dtc-desc">Album foto kegiatan dengan keterangan</div>
+              <span class="dtc-badge">Foto</span>
+            </div>
+            <div class="doc-type-card dtc-amber" data-type="rekap-unit" onclick="selectDocType(this,'rekap-unit')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#f59e0b,#f97316);"><i class="bi bi-building-fill"></i></div>
+              <div class="dtc-name">Rekap Per Unit</div>
+              <div class="dtc-desc">Kinerja dokumentasi tiap unit kerja</div>
+              <span class="dtc-badge">Unit</span>
+            </div>
+            <div class="doc-type-card dtc-purple" data-type="detail-kegiatan" onclick="selectDocType(this,'detail-kegiatan')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);"><i class="bi bi-file-text-fill"></i></div>
+              <div class="dtc-name">Detail Kegiatan</div>
+              <div class="dtc-desc">Laporan detail satu kegiatan spesifik</div>
+              <span class="dtc-badge">Detail</span>
+            </div>
+            <div class="doc-type-card dtc-slate" data-type="kustom" onclick="selectDocType(this,'kustom')">
+              <div class="dtc-icon" style="background:linear-gradient(135deg,#64748b,#94a3b8);"><i class="bi bi-sliders2"></i></div>
+              <div class="dtc-name">Kustom</div>
+              <div class="dtc-desc">Pilih konten sesuai kebutuhan</div>
+              <span class="dtc-badge">Fleksibel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Konfigurasi Filter -->
+      <div class="form-card">
+        <div class="fc-head fch-indigo">
+          <div class="fc-title" style="color:var(--c-text);"><i class="bi bi-funnel-fill" style="color:var(--c-primary);"></i> Filter & Rentang Data</div>
+        </div>
+        <div class="fc-body">
+          <div class="frow2">
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-calendar3" style="color:var(--c-muted);font-size:.85rem;"></i> Bulan Mulai</div>
+              <div class="fwrap">
+                <i class="bi bi-calendar3 f-icon"></i>
+                <select class="fctrl" id="fBulanMulai" onchange="updatePreviewInfo()">
+                  <option value="1">Januari</option><option value="2">Februari</option>
+                  <option value="3">Maret</option><option value="4" selected>April</option>
+                  <option value="5">Mei</option><option value="6">Juni</option>
+                </select>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-calendar3" style="color:var(--c-muted);font-size:.85rem;"></i> Bulan Akhir</div>
+              <div class="fwrap">
+                <i class="bi bi-calendar3 f-icon"></i>
+                <select class="fctrl" id="fBulanAkhir" onchange="updatePreviewInfo()">
+                  <option value="1">Januari</option><option value="2">Februari</option>
+                  <option value="3">Maret</option><option value="4" selected>April</option>
+                  <option value="5">Mei</option><option value="6">Juni</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="frow2">
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-calendar-year" style="color:var(--c-muted);font-size:.85rem;"></i> Tahun</div>
+              <div class="fwrap">
+                <i class="bi bi-calendar-year f-icon"></i>
+                <select class="fctrl" id="fTahun">
+                  <option value="2025" selected>2025</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                </select>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-building-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Unit Kerja <span class="opt">(opsional)</span></div>
+              <div class="fwrap">
+                <i class="bi bi-building-fill f-icon"></i>
+                <select class="fctrl" id="fUnit" onchange="updatePreviewInfo()">
+                  <option value="">Semua Unit Kerja</option>
+                  <option value="Diskominfo">Dinas Kominfo</option>
+                  <option value="Disdik">Dinas Pendidikan</option>
+                  <option value="Dinkes">Dinas Kesehatan</option>
+                  <option value="Humas">Bagian Humas</option>
+                  <option value="Setda">Sekretariat Daerah</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="frow2">
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-tags-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Kategori <span class="opt">(opsional)</span></div>
+              <div class="fwrap">
+                <i class="bi bi-tags-fill f-icon"></i>
+                <select class="fctrl" id="fKategori">
+                  <option value="">Semua Kategori</option>
+                  <option value="Rapat">Rapat</option>
+                  <option value="Pelatihan">Pelatihan</option>
+                  <option value="Kunjungan">Kunjungan</option>
+                  <option value="Sosialisasi">Sosialisasi</option>
+                  <option value="Upacara">Upacara</option>
+                </select>
+              </div>
+            </div>
+            <div class="fgroup">
+              <div class="flabel"><i class="bi bi-circle-fill" style="color:var(--c-muted);font-size:.85rem;"></i> Status <span class="opt">(opsional)</span></div>
+              <div class="fwrap">
+                <i class="bi bi-circle-fill f-icon"></i>
+                <select class="fctrl" id="fStatus">
+                  <option value="">Semua Status</option>
+                  <option value="selesai">Selesai</option>
+                  <option value="berjalan">Sedang Berjalan</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Opsi Tampilan PDF -->
+      <div class="form-card">
+        <div class="fc-head fch-green">
+          <div class="fc-title" style="color:var(--c-text);"><i class="bi bi-layout-text-window" style="color:var(--c-green);"></i> Opsi Tampilan PDF</div>
+        </div>
+        <div class="fc-body">
+          <div class="frow2" style="margin-bottom:16px;">
+            <div class="fgroup" style="margin-bottom:0;">
+              <div class="flabel"><i class="bi bi-file-break" style="color:var(--c-muted);font-size:.85rem;"></i> Ukuran Kertas</div>
+              <div class="fwrap">
+                <i class="bi bi-file-break f-icon"></i>
+                <select class="fctrl" id="fKertas">
+                  <option value="A4" selected>A4 (210×297 mm)</option>
+                  <option value="A3">A3 (297×420 mm)</option>
+                  <option value="Letter">Letter (216×279 mm)</option>
+                </select>
+              </div>
+            </div>
+            <div class="fgroup" style="margin-bottom:0;">
+              <div class="flabel"><i class="bi bi-phone-landscape" style="color:var(--c-muted);font-size:.85rem;"></i> Orientasi</div>
+              <div class="fwrap">
+                <i class="bi bi-phone-landscape f-icon"></i>
+                <select class="fctrl" id="fOrientasi">
+                  <option value="portrait" selected>Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Sertakan Foto Kegiatan</div><div class="ts-desc">Lampirkan thumbnail foto dalam laporan</div></div>
+            <label class="ts-wrap"><input type="checkbox" checked data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Tampilkan Grafik & Chart</div><div class="ts-desc">Tambahkan visualisasi data statistik</div></div>
+            <label class="ts-wrap"><input type="checkbox" checked data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Tampilkan Nomor Halaman</div><div class="ts-desc">Tambahkan footer nomor halaman</div></div>
+            <label class="ts-wrap"><input type="checkbox" checked data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Watermark Resmi</div><div class="ts-desc">Tambahkan watermark "DokaKegiatan" pada halaman</div></div>
+            <label class="ts-wrap"><input type="checkbox" data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Kompresi Gambar</div><div class="ts-desc">Kompres gambar untuk file lebih kecil</div></div>
+            <label class="ts-wrap"><input type="checkbox" checked data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+          <div class="ts-row">
+            <div class="ts-info"><div class="ts-label">Sertakan Halaman Cover</div><div class="ts-desc">Tambahkan cover page di awal dokumen</div></div>
+            <label class="ts-wrap"><input type="checkbox" checked data-c="primary" /><div class="ts-track"><div class="ts-thumb"></div></div></label>
+          </div>
+
+          <!-- Judul Dokumen -->
+          <div class="fgroup" style="margin-top:16px;margin-bottom:0;">
+            <div class="flabel"><i class="bi bi-type" style="color:var(--c-muted);font-size:.85rem;"></i> Judul Dokumen <span class="opt">(opsional)</span></div>
+            <div class="fwrap">
+              <i class="bi bi-type f-icon"></i>
+              <input type="text" class="fctrl" id="fJudul" placeholder="Otomatis dari jenis laporan" oninput="updatePreviewInfo()" />
+            </div>
+            <div class="fhint"><i class="bi bi-info-circle"></i> Kosongkan untuk menggunakan judul default.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Riwayat Export -->
+      <div class="form-card">
+        <div class="fc-head" style="position:relative;">
+          <div class="fc-title" style="color:var(--c-text);"><i class="bi bi-clock-history" style="color:var(--c-primary);"></i> Riwayat Export</div>
+          <span style="font-size:.75rem;color:var(--c-muted);" id="historyCount">— dokumen</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Nama File</th>
+                <th>Jenis</th>
+                <th>Periode</th>
+                <th>Ukuran</th>
+                <th>Dibuat</th>
+                <th style="text-align:center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT: Preview & Action ═══ -->
+    <div>
+
+      <!-- Preview PDF -->
+      <div class="preview-card">
+        <div class="pc-head"><div class="pc-title"><i class="bi bi-eye-fill"></i> Preview Dokumen</div></div>
+        <div class="pc-body">
+
+          <!-- PDF Preview Box -->
+          <div class="pdf-preview" id="pdfPreview">
+            <div class="pdf-watermark">PREVIEW</div>
+            <div class="pdf-preview-header">
+              <div class="pdf-logo-row">
+                <div class="pdf-logo-box"><i class="bi bi-camera-reels-fill" style="font-size:.7rem;"></i></div>
+                <div>
+                  <div class="pdf-org-name">PEMERINTAH KOTA PEKALONGAN</div>
+                  <div class="pdf-org-sub">Dinas Komunikasi dan Informatika</div>
+                </div>
+              </div>
+              <div class="pdf-doc-title" id="previewDocTitle">LAPORAN KEGIATAN BULANAN</div>
+              <div class="pdf-doc-sub" id="previewDocPeriode">Periode: April 2025 — Semua Unit</div>
+            </div>
+            <div class="pdf-divider"></div>
+            <div class="pdf-content">
+              <div class="pdf-stat-row">
+                <div class="pdf-stat-box"><div class="pdf-stat-val">16</div><div class="pdf-stat-lbl">Total Kegiatan</div></div>
+                <div class="pdf-stat-box"><div class="pdf-stat-val">169</div><div class="pdf-stat-lbl">Total Foto</div></div>
+                <div class="pdf-stat-box"><div class="pdf-stat-val">4</div><div class="pdf-stat-lbl">Unit Aktif</div></div>
+              </div>
+              <div class="pdf-divider"></div>
+              <!-- Mock table rows -->
+              <div class="pdf-table-mock">
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(79,70,229,.3);"></div><div class="pdf-td-status" style="background:rgba(16,185,129,.3);"></div></div>
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(16,185,129,.3);"></div><div class="pdf-td-status" style="background:rgba(16,185,129,.3);"></div></div>
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(245,158,11,.3);"></div><div class="pdf-td-status" style="background:rgba(16,185,129,.3);"></div></div>
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(6,182,212,.3);"></div><div class="pdf-td-status" style="background:rgba(79,70,229,.3);"></div></div>
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(236,72,153,.3);"></div><div class="pdf-td-status" style="background:rgba(245,158,11,.3);"></div></div>
+                <div class="pdf-tr"><div class="pdf-td-no"></div><div class="pdf-td-name"></div><div class="pdf-td-kat" style="background:rgba(79,70,229,.3);"></div><div class="pdf-td-status" style="background:rgba(16,185,129,.3);"></div></div>
+              </div>
+            </div>
+            <div class="pdf-footer-band">
+              <div class="pdf-footer-text">DokaKegiatan — Kota Pekalongan &copy; 2025</div>
+              <div class="pdf-page-num">Hal. 1 dari 8</div>
+            </div>
+          </div>
+
+          <!-- Export Progress (shown during export) -->
+          <div class="export-progress-wrap" id="exportProgress">
+            <div class="ep-bar-wrap"><div class="ep-bar-fill" id="epBar" style="width:0%;"></div></div>
+            <div class="ep-pct" id="epPct">0%</div>
+            <div class="ep-steps" id="epSteps"></div>
+          </div>
+
+          <!-- Export buttons -->
+          <button class="btn-export-now" id="btnExportNow" onclick="doExport()">
+            <i class="bi bi-file-earmark-pdf-fill" style="font-size:1.1rem;"></i>
+            Export PDF Sekarang
+          </button>
+          <button class="btn-preview" onclick="previewFull()"><i class="bi bi-eye-fill"></i> Preview Full</button>
+        </div>
+      </div>
+
+      <!-- Estimasi Info -->
+      <div class="preview-card">
+        <div class="pc-head"><div class="pc-title"><i class="bi bi-info-circle-fill"></i> Informasi Export</div></div>
+        <div class="pc-body">
+          <div class="qi-row">
+            <i class="bi bi-file-earmark-pdf-fill qi-icon" style="color:var(--c-red);"></i>
+            <span class="qi-label">Jenis Dokumen</span>
+            <span class="qi-val" id="qiJenis">Laporan Bulanan</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-calendar3 qi-icon"></i>
+            <span class="qi-label">Periode</span>
+            <span class="qi-val" id="qiPeriode">April 2025</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-building-fill qi-icon"></i>
+            <span class="qi-label">Unit Kerja</span>
+            <span class="qi-val" id="qiUnit">Semua Unit</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-calendar3-fill qi-icon"></i>
+            <span class="qi-label">Estimasi Data</span>
+            <span class="qi-val" id="qiData">~16 kegiatan</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-file-break qi-icon"></i>
+            <span class="qi-label">Estimasi Halaman</span>
+            <span class="qi-val" id="qiHalaman">~8 halaman</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-hdd-fill qi-icon"></i>
+            <span class="qi-label">Estimasi Ukuran</span>
+            <span class="qi-val" id="qiUkuran">~2.4 MB</span>
+          </div>
+          <div class="qi-row">
+            <i class="bi bi-clock-fill qi-icon"></i>
+            <span class="qi-label">Estimasi Waktu</span>
+            <span class="qi-val" id="qiWaktu">~8 detik</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="preview-card">
+        <div class="pc-head"><div class="pc-title"><i class="bi bi-lightbulb-fill" style="color:var(--c-accent);"></i> Tips Export</div></div>
+        <div class="pc-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--c-primary),var(--c-secondary));display:grid;place-items:center;color:#fff;font-size:.75rem;flex-shrink:0;"><i class="bi bi-filter-circle-fill"></i></div>
+            <div><div style="font-size:.82rem;font-weight:700;color:var(--c-text);">Filter spesifik = file lebih kecil</div><div style="font-size:.75rem;color:var(--c-muted);margin-top:2px;">Pilih unit atau kategori tertentu untuk hasil yang lebih relevan.</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--c-green),#34d399);display:grid;place-items:center;color:#fff;font-size:.75rem;flex-shrink:0;"><i class="bi bi-images"></i></div>
+            <div><div style="font-size:.82rem;font-weight:700;color:var(--c-text);">Kompresi foto = hemat ukuran</div><div style="font-size:.75rem;color:var(--c-muted);margin-top:2px;">Aktifkan kompresi gambar untuk laporan dengan banyak foto.</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--c-accent),var(--c-orange));display:grid;place-items:center;color:#fff;font-size:.75rem;flex-shrink:0;"><i class="bi bi-clock-fill"></i></div>
+            <div><div style="font-size:.82rem;font-weight:700;color:var(--c-text);">Export besar butuh waktu lebih</div><div style="font-size:.75rem;color:var(--c-muted);margin-top:2px;">Laporan dengan banyak foto mungkin memerlukan beberapa menit.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan Kota Pekalongan.</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a><a href="#">Ketentuan Layanan</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+<script>
+/* ════════════════════════════════════
+   HISTORY DATA
+════════════════════════════════════ */
+const HIST_TYPES = {
+  'laporan-bulanan': { cls:'htp-bulanan',  label:'Laporan Bulanan', icon:'bi-bar-chart-fill', grad:'linear-gradient(135deg,#4f46e5,#7c3aed)' },
+  'daftar-kegiatan': { cls:'htp-kegiatan', label:'Daftar Kegiatan', icon:'bi-calendar3-fill', grad:'linear-gradient(135deg,#10b981,#06b6d4)' },
+  'galeri-foto'    : { cls:'htp-galeri',   label:'Galeri Foto',     icon:'bi-images',          grad:'linear-gradient(135deg,#ec4899,#f472b6)' },
+  'rekap-unit'     : { cls:'htp-rekap',    label:'Rekap Unit',      icon:'bi-building-fill',   grad:'linear-gradient(135deg,#f59e0b,#f97316)' },
+  'kustom'         : { cls:'htp-kustom',   label:'Kustom',          icon:'bi-sliders2',        grad:'linear-gradient(135deg,#64748b,#94a3b8)' },
+};
+
+const BULAN_STR = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+let HISTORY = [
+  { id:1, nama:'Laporan_Bulanan_April_2025.pdf', type:'laporan-bulanan', periode:'April 2025',    ukuran:'2.4 MB', waktu:'Hari ini 14:23',    halaman:8  },
+  { id:2, nama:'Laporan_Bulanan_Maret_2025.pdf', type:'laporan-bulanan', periode:'Maret 2025',    ukuran:'2.1 MB', waktu:'Kemarin 09:15',     halaman:7  },
+  { id:3, nama:'Daftar_Kegiatan_April_2025.pdf', type:'daftar-kegiatan', periode:'April 2025',    ukuran:'0.8 MB', waktu:'Kemarin 16:40',     halaman:3  },
+  { id:4, nama:'Galeri_Foto_Rapat_Kominfo.pdf',  type:'galeri-foto',     periode:'April 2025',    ukuran:'8.2 MB', waktu:'3 hari lalu',       halaman:12 },
+  { id:5, nama:'Rekap_Unit_TW1_2025.pdf',        type:'rekap-unit',      periode:'Jan–Mar 2025',  ukuran:'1.5 MB', waktu:'1 minggu lalu',     halaman:5  },
+  { id:6, nama:'Laporan_Bulanan_Feb_2025.pdf',   type:'laporan-bulanan', periode:'Februari 2025', ukuran:'1.9 MB', waktu:'15 Feb 2025',       halaman:7  },
+  { id:7, nama:'Kustom_Export_Jan_2025.pdf',     type:'kustom',          periode:'Januari 2025',  ukuran:'3.1 MB', waktu:'10 Jan 2025',       halaman:10 },
+];
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+let selectedDocType = 'laporan-bulanan';
+
+/* ════════════════════════════════════
+   STATS
+════════════════════════════════════ */
+function animC(id, t) {
+  const el=document.getElementById(id); if(!el) return;
+  let c=0, inc=t/50;
+  const tm=setInterval(()=>{ c+=inc; if(c>=t){c=t;clearInterval(tm);} el.textContent=Math.floor(c).toLocaleString('id-ID'); },16);
+}
+function updateStats() {
+  animC('sc1', HISTORY.length);
+  animC('sc2', HISTORY.filter(h => h.waktu.includes('Hari ini')||h.waktu.includes('Kemarin')||h.waktu.includes('hari lalu')).length);
+  animC('sc3', Math.round(HISTORY.reduce((s,h)=>s+(+h.ukuran.split(' ')[0]),0) * 10) / 10);
+  animC('sc4', HISTORY.filter(h=>h.waktu.includes('Hari ini')).length);
+}
+updateStats();
+
+/* ════════════════════════════════════
+   HISTORY TABLE
+════════════════════════════════════ */
+function renderHistory() {
+  document.getElementById('historyCount').textContent = `${HISTORY.length} dokumen`;
+  document.getElementById('historyBody').innerHTML = HISTORY.map(h => {
+    const t = HIST_TYPES[h.type] || HIST_TYPES['kustom'];
+    return `
+      <tr>
+        <td>
+          <div class="ht-file">
+            <div class="ht-file-icon" style="background:${t.grad};"><i class="bi ${t.icon}" style="font-size:.82rem;"></i></div>
+            <div>
+              <div class="ht-file-name">${h.nama}</div>
+              <div class="ht-file-size">${h.halaman} hal · ${h.ukuran}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="ht-type-pill ${t.cls}">${t.label}</span></td>
+        <td style="font-size:.82rem;white-space:nowrap;">${h.periode}</td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:.78rem;font-weight:600;">${h.ukuran}</span></td>
+        <td style="font-size:.78rem;color:var(--c-muted);white-space:nowrap;">${h.waktu}</td>
+        <td>
+          <div class="ht-actions">
+            <button class="ht-btn htb-dl"  onclick="downloadHist(${h.id})" title="Unduh"><i class="bi bi-download"></i></button>
+            <button class="ht-btn htb-del" onclick="deleteHist(${h.id})"   title="Hapus"><i class="bi bi-trash3-fill"></i></button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('') || `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-muted);">Belum ada riwayat export.</td></tr>`;
+}
+renderHistory();
+
+/* ════════════════════════════════════
+   DOC TYPE SELECTOR
+════════════════════════════════════ */
+const DOC_LABELS = {
+  'laporan-bulanan': 'Laporan Kegiatan Bulanan',
+  'daftar-kegiatan': 'Daftar Kegiatan',
+  'galeri-foto'    : 'Album Foto Kegiatan',
+  'rekap-unit'     : 'Rekap Per Unit Kerja',
+  'detail-kegiatan': 'Detail Kegiatan',
+  'kustom'         : 'Laporan Kustom',
+};
+
+const DOC_PAGES = { 'laporan-bulanan':8, 'daftar-kegiatan':3, 'galeri-foto':14, 'rekap-unit':5, 'detail-kegiatan':2, 'kustom':6 };
+const DOC_MB    = { 'laporan-bulanan':'2.4', 'daftar-kegiatan':'0.8', 'galeri-foto':'8.2', 'rekap-unit':'1.5', 'detail-kegiatan':'0.5', 'kustom':'3.1' };
+const DOC_SECS  = { 'laporan-bulanan':8, 'daftar-kegiatan':3, 'galeri-foto':18, 'rekap-unit':5, 'detail-kegiatan':2, 'kustom':10 };
+
+function selectDocType(card, type) {
+  document.querySelectorAll('.doc-type-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedDocType = type;
+  updatePreviewInfo();
+}
+
+/* ════════════════════════════════════
+   PREVIEW INFO UPDATE
+════════════════════════════════════ */
+function updatePreviewInfo() {
+  const bulanM = +document.getElementById('fBulanMulai').value;
+  const bulanA = +document.getElementById('fBulanAkhir').value;
+  const tahun  = document.getElementById('fTahun').value;
+  const unit   = document.getElementById('fUnit').value || 'Semua Unit';
+  const judul  = document.getElementById('fJudul').value;
+
+  const bulanStr = bulanM === bulanA
+    ? `${BULAN_STR[bulanM]} ${tahun}`
+    : `${BULAN_STR[bulanM]}–${BULAN_STR[bulanA]} ${tahun}`;
+
+  /* Update preview box */
+  const docTitle = judul || DOC_LABELS[selectedDocType] || 'LAPORAN';
+  document.getElementById('previewDocTitle').textContent = docTitle.toUpperCase();
+  document.getElementById('previewDocPeriode').textContent = `Periode: ${bulanStr} — ${unit}`;
+
+  /* Quick info */
+  document.getElementById('qiJenis').textContent   = DOC_LABELS[selectedDocType];
+  document.getElementById('qiPeriode').textContent = bulanStr;
+  document.getElementById('qiUnit').textContent    = unit;
+  document.getElementById('qiHalaman').textContent = `~${DOC_PAGES[selectedDocType]} halaman`;
+  document.getElementById('qiUkuran').textContent  = `~${DOC_MB[selectedDocType]} MB`;
+  document.getElementById('qiWaktu').textContent   = `~${DOC_SECS[selectedDocType]} detik`;
+
+  const estimData = { 'laporan-bulanan':16, 'daftar-kegiatan':16, 'galeri-foto':187, 'rekap-unit':12, 'detail-kegiatan':1, 'kustom':20 };
+  const unit_label = { 'laporan-bulanan':'kegiatan', 'daftar-kegiatan':'kegiatan', 'galeri-foto':'foto', 'rekap-unit':'unit', 'detail-kegiatan':'kegiatan', 'kustom':'item' };
+  document.getElementById('qiData').textContent = `~${estimData[selectedDocType]} ${unit_label[selectedDocType]}`;
+}
+updatePreviewInfo();
+
+/* ════════════════════════════════════
+   EXPORT STEPS
+════════════════════════════════════ */
+const EXPORT_STEPS_CFG = [
+  { icon:'bi-search',          label:'Memvalidasi parameter'    },
+  { icon:'bi-database-fill',   label:'Mengambil data kegiatan'  },
+  { icon:'bi-images',          label:'Memproses foto & gambar'  },
+  { icon:'bi-graph-up-arrow',  label:'Membuat grafik statistik' },
+  { icon:'bi-file-text-fill',  label:'Menyusun halaman PDF'     },
+  { icon:'bi-file-zip-fill',   label:'Finalisasi & kompresi'    },
+];
+
+function doExport() {
+  const btn = document.getElementById('btnExportNow');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses...';
+
+  /* Show progress */
+  const progWrap = document.getElementById('exportProgress');
+  progWrap.classList.add('show');
+
+  /* Build steps UI */
+  const stepsEl = document.getElementById('epSteps');
+  stepsEl.innerHTML = EXPORT_STEPS_CFG.map((s,i)=>`
+    <div class="ep-step pending" id="step-${i}">
+      <div class="ep-step-icon"><i class="bi ${s.icon}"></i></div>
+      <div class="ep-step-label">${s.label}</div>
+    </div>`).join('');
+
+  const bar = document.getElementById('epBar');
+  const pct = document.getElementById('epPct');
+  let currentStep = -1;
+  const stepCount = EXPORT_STEPS_CFG.length;
+  const totalDuration = DOC_SECS[selectedDocType] * 1000;
+  const stepDuration = totalDuration / stepCount;
+
+  function advanceStep() {
+    /* Done previous step */
+    if (currentStep >= 0) {
+      document.getElementById(`step-${currentStep}`)?.classList.replace('active','done');
+      const doneEl = document.getElementById(`step-${currentStep}`)?.querySelector('.ep-step-icon');
+      if (doneEl) doneEl.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+    }
+    currentStep++;
+    if (currentStep >= stepCount) {
+      /* All done */
+      const p = Math.round(((currentStep) / stepCount) * 100);
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setTimeout(finishExport, 500);
+      return;
+    }
+    /* Activate current step */
+    const stepEl = document.getElementById(`step-${currentStep}`);
+    stepEl?.classList.replace('pending','active');
+    const p = Math.round(((currentStep + 1) / stepCount) * 100);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+    setTimeout(advanceStep, stepDuration);
+  }
+  advanceStep();
+}
+
+function finishExport() {
+  const bulanM = +document.getElementById('fBulanMulai').value;
+  const bulanA = +document.getElementById('fBulanAkhir').value;
+  const tahun  = document.getElementById('fTahun').value;
+  const judul  = document.getElementById('fJudul').value;
+  const docLabel = DOC_LABELS[selectedDocType];
+  const bulanStr = bulanM === bulanA ? BULAN_STR[bulanM] : `${BULAN_STR[bulanM]}-${BULAN_STR[bulanA]}`;
+
+  const fileName = `${docLabel.replace(/ /g,'_')}_${bulanStr}_${tahun}.pdf`;
+  const newHist = {
+    id: Date.now(),
+    nama: fileName,
+    type: selectedDocType,
+    periode: bulanStr + ' ' + tahun,
+    ukuran: DOC_MB[selectedDocType] + ' MB',
+    waktu: 'Baru saja',
+    halaman: DOC_PAGES[selectedDocType],
+  };
+  HISTORY.unshift(newHist);
+  updateStats();
+  renderHistory();
+
+  /* Reset UI */
+  setTimeout(() => {
+    document.getElementById('exportProgress').classList.remove('show');
+    const btn = document.getElementById('btnExportNow');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill" style="font-size:1.1rem;"></i> Export PDF Sekarang';
+    document.getElementById('epBar').style.width = '0%';
+    document.getElementById('epPct').textContent = '0%';
+  }, 800);
+
+  DKA.notify({
+    type   : 'success',
+    title  : 'Export PDF Berhasil! 🎉',
+    message: `${fileName} (${DOC_MB[selectedDocType]} MB · ${DOC_PAGES[selectedDocType]} halaman) siap diunduh.`,
+    duration: 8000,
+  });
+}
+
+/* ════════════════════════════════════
+   HISTORY ACTIONS
+════════════════════════════════════ */
+function downloadHist(id) {
+  const h = HISTORY.find(x=>x.id===id); if(!h) return;
+  const l = DKA.loading({ title:'Menyiapkan unduhan...', message:`Mengemas ${h.nama}`, style:'dots' });
+  setTimeout(()=>{ l.close(); DKA.toast({ type:'success', title:'File Diunduh!', message:h.nama, position:'bottom-right', duration:4000 }); },1000);
+}
+
+function deleteHist(id) {
+  const h = HISTORY.find(x=>x.id===id); if(!h) return;
+  DKA.deleteConfirm({ title:'Hapus File Export?', message:'File ini akan dihapus permanen dari riwayat.', itemName:h.nama, confirm:'Ya, Hapus' })
+    .then(r=>{ if(!r) return; HISTORY=HISTORY.filter(x=>x.id!==id); updateStats(); renderHistory(); DKA.toast({type:'success',title:'File Dihapus',position:'top-right'}); });
+}
+
+function previewFull() {
+  DKA.dialog({ type:'info', title:'Preview Full Dokumen', message:'Preview lengkap akan membuka jendela baru dengan pratinjau PDF sebelum export resmi.', confirm:'Buka Preview' })
+    .then(r=>{ if(!r) return; DKA.toast({ type:'info', title:'Membuka preview...', message:'Pratinjau PDF sedang disiapkan.', position:'top-right', duration:3000 }); });
+}
+
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile=()=>window.innerWidth<=768;
+function toggleSidebar(){isMobile()?document.body.classList.toggle('mobile-open'):document.body.classList.toggle('collapsed');}
+function closeMobileSidebar(){document.body.classList.remove('mobile-open');}
+const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+function toggleUserDropdown(){const o=userDropdown.classList.toggle('show');userTrigger.classList.toggle('open',o);}
+document.addEventListener('click',e=>{ if(!document.querySelector('.user-dropdown-wrap').contains(e.target)){userDropdown.classList.remove('show');userTrigger.classList.remove('open');} });
+
+window.addEventListener('scroll',()=>document.getElementById('fabBtn').classList.toggle('visible',window.scrollY>280),{passive:true});
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
+</script>
+</body>
+</html>

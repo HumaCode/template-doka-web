@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DokaKegiatan — Akses & Role Permission</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dka-alert.css" />
+
+  <style>
+    /* ═══════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-collapsed: 72px;
+      --topbar-h: 64px;
+      --c-primary:   #4f46e5;
+      --c-secondary: #06b6d4;
+      --c-accent:    #f59e0b;
+      --c-pink:      #ec4899;
+      --c-green:     #10b981;
+      --c-orange:    #f97316;
+      --c-red:       #ef4444;
+      --c-purple:    #7c3aed;
+      --c-bg:        #f1f5f9;
+      --c-surface:   #ffffff;
+      --c-surface2:  #f8fafc;
+      --c-border:    #e2e8f0;
+      --c-text:      #1e293b;
+      --c-text-2:    #475569;
+      --c-muted:     #94a3b8;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,.14);
+      --trans:       .25s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--c-bg); color: var(--c-text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:#fff; border-right:1px solid var(--c-border); display:flex; flex-direction:column; z-index:300; transition:width var(--trans),transform var(--trans); overflow:hidden; box-shadow:var(--shadow-sm); }
+    body.collapsed .sidebar { width:var(--sidebar-w-collapsed); }
+    .sidebar-brand { height:var(--topbar-h); display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--c-border); flex-shrink:0; gap:12px; text-decoration:none; overflow:hidden; }
+    .brand-icon-wrap { width:40px; height:40px; flex-shrink:0; border-radius:12px; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); display:grid; place-items:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.35); animation:brandFloat 4s ease-in-out infinite; position:relative; }
+    .brand-icon-wrap::after { content:''; position:absolute; inset:-3px; border-radius:15px; border:2px dashed rgba(79,70,229,.25); animation:brandSpin 10s linear infinite; }
+    @keyframes brandFloat { 0%,100%{transform:translateY(0) rotate(0)} 33%{transform:translateY(-3px) rotate(4deg)} 66%{transform:translateY(2px) rotate(-3deg)} }
+    @keyframes brandSpin { to{transform:rotate(360deg)} }
+    .brand-text { overflow:hidden; white-space:nowrap; }
+    .brand-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); line-height:1; }
+    .brand-title span { color:var(--c-primary); }
+    .brand-sub { font-size:.68rem; color:var(--c-muted); letter-spacing:.5px; margin-top:2px; }
+    .sidebar-nav { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 0; }
+    .sidebar-nav::-webkit-scrollbar { width:4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:99px; }
+    .nav-category { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); padding:16px 20px 6px; white-space:nowrap; overflow:hidden; transition:opacity var(--trans); }
+    body.collapsed .nav-category { opacity:0; }
+    .nav-item-wrap { padding:2px 10px; }
+    .nav-link-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--c-text-2); font-size:.875rem; font-weight:600; white-space:nowrap; transition:background var(--trans),color var(--trans); position:relative; overflow:hidden; }
+    .nav-link-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 3px 3px 0; background:var(--c-primary); transform:scaleY(0); transition:transform var(--trans); }
+    .nav-link-item:hover { background:rgba(79,70,229,.07); color:var(--c-primary); }
+    .nav-link-item.active { background:linear-gradient(90deg,rgba(79,70,229,.12),rgba(79,70,229,.04)); color:var(--c-primary); font-weight:700; }
+    .nav-link-item.active::before { transform:scaleY(1); }
+    .nav-icon { font-size:1.1rem; flex-shrink:0; width:24px; text-align:center; transition:transform var(--trans); }
+    .nav-link-item:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+    .nav-label { overflow:hidden; transition:opacity var(--trans),max-width var(--trans); }
+    body.collapsed .nav-label { opacity:0; max-width:0; }
+    body.collapsed .nav-link-item { justify-content:center; padding:10px; }
+    body.collapsed .nav-item-wrap { padding:2px 8px; }
+    .nav-badge { margin-left:auto; flex-shrink:0; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--c-primary); color:#fff; transition:opacity var(--trans); }
+    body.collapsed .nav-badge { opacity:0; }
+    body.collapsed .nav-link-item::after { content:attr(data-label); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) scale(.85); background:var(--c-text); color:#fff; font-size:.78rem; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s,transform .15s; }
+    body.collapsed .nav-link-item:hover::after { opacity:1; transform:translateY(-50%) scale(1); }
+    .sidebar-footer { padding:12px; border-top:1px solid var(--c-border); flex-shrink:0; }
+    .sidebar-user-mini { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); overflow:hidden; }
+    .sidebar-avatar-sm { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-size:.85rem; font-weight:700; }
+    .sidebar-user-info { overflow:hidden; white-space:nowrap; transition:opacity var(--trans); }
+    .sidebar-user-name { font-size:.8rem; font-weight:700; color:var(--c-text); }
+    .sidebar-user-role { font-size:.7rem; color:var(--c-muted); }
+    body.collapsed .sidebar-user-info { opacity:0; }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar { position:fixed; top:0; right:0; left:var(--sidebar-w); height:var(--topbar-h); background:#fff; border-bottom:1px solid var(--c-border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:200; transition:left var(--trans); box-shadow:var(--shadow-sm); }
+    body.collapsed .topbar { left:var(--sidebar-w-collapsed); }
+    .btn-hamburger { width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; flex-shrink:0; }
+    .btn-hamburger:hover { background:var(--c-surface2); }
+    .hline { display:block; height:2px; border-radius:99px; background:var(--c-text-2); transition:transform var(--trans),opacity var(--trans),width var(--trans); }
+    .hline:nth-child(1){width:18px;} .hline:nth-child(2){width:14px;} .hline:nth-child(3){width:18px;}
+    body.collapsed .hline:nth-child(1){transform:translateY(7px) rotate(45deg);width:18px;}
+    body.collapsed .hline:nth-child(2){opacity:0;width:0;}
+    body.collapsed .hline:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:18px;}
+    .topbar-search { flex:1; max-width:360px; position:relative; }
+    .topbar-search input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans); }
+    .topbar-search input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .topbar-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.95rem; pointer-events:none; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .topbar-icon-btn { width:38px; height:38px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--c-text-2); font-size:1.1rem; position:relative; transition:background var(--trans),color var(--trans); }
+    .topbar-icon-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--c-pink); border:2px solid #fff; animation:dotPulse 2s ease infinite; }
+    @keyframes dotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.5)} 50%{box-shadow:0 0 0 5px rgba(236,72,153,0)} }
+    .user-dropdown-wrap { position:relative; }
+    .user-trigger { display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); border:none; background:transparent; cursor:pointer; transition:background var(--trans); }
+    .user-trigger:hover { background:var(--c-surface2); }
+    .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; box-shadow:0 2px 8px rgba(79,70,229,.3); position:relative; }
+    .user-avatar::after { content:''; position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; background:var(--c-green); border:2px solid #fff; }
+    .user-info-t { text-align:left; }
+    .user-name-t { font-size:.82rem; font-weight:700; color:var(--c-text); line-height:1.2; }
+    .user-email-t { font-size:.7rem; color:var(--c-muted); }
+    .user-trigger i { color:var(--c-muted); font-size:.8rem; transition:transform var(--trans); }
+    .user-trigger.open i { transform:rotate(180deg); }
+    .user-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; width:240px; background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:500; opacity:0; pointer-events:none; transform:translateY(-8px) scale(.97); transition:opacity .2s,transform .2s; overflow:hidden; }
+    .user-dropdown-menu.show { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    .dd-header { padding:16px; background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(6,182,212,.04)); border-bottom:1px solid var(--c-border); }
+    .dd-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-pink)); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.2rem; margin-bottom:8px; }
+    .dd-name { font-weight:700; font-size:.9rem; color:var(--c-text); }
+    .dd-email { font-size:.75rem; color:var(--c-muted); margin-top:2px; }
+    .dd-items { padding:8px; }
+    .dd-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:8px; border:none; background:transparent; cursor:pointer; font-size:.875rem; font-weight:600; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:background var(--trans),color var(--trans); text-align:left; }
+    .dd-btn i { font-size:1rem; width:18px; text-align:center; }
+    .dd-btn:hover { background:var(--c-surface2); color:var(--c-primary); }
+    .dd-btn.danger { color:var(--c-red); }
+    .dd-btn.danger:hover { background:#fef2f2; }
+    .dd-divider { height:1px; background:var(--c-border); margin:4px 0; }
+
+    /* ═══ MAIN ═══ */
+    .main-wrapper { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--trans); }
+    body.collapsed .main-wrapper { margin-left:var(--sidebar-w-collapsed); }
+    .main-content { flex:1; padding:24px; }
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:250; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes iconWiggle { 0%,80%,100%{transform:rotate(0)} 85%{transform:rotate(-8deg)} 90%{transform:rotate(8deg)} 95%{transform:rotate(-4deg)} }
+
+    /* ═══ PAGE HEADER ═══ */
+    .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:20px 24px; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--c-border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+    .page-header::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .ph-left h1 { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); margin-bottom:2px; display:flex; align-items:center; gap:10px; }
+    .ph-left h1 i { font-size:1.3rem; color:var(--c-primary); animation:iconWiggle 3s ease infinite; }
+    .ph-left p { font-size:.82rem; color:var(--c-muted); }
+    .breadcrumb-nav { display:flex; align-items:center; gap:6px; font-size:.8rem; }
+    .breadcrumb-nav a { color:var(--c-muted); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:4px; transition:color var(--trans); }
+    .breadcrumb-nav a:hover { color:var(--c-primary); }
+    .bc-sep { color:var(--c-muted); font-size:.7rem; }
+    .bc-current { color:var(--c-primary); font-weight:700; display:flex; align-items:center; gap:4px; }
+
+    /* ═══ MINI STATS ═══ */
+    .mini-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; animation:fadeUp .45s ease .05s both; }
+    .mini-stat { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); padding:16px 18px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-sm); transition:transform var(--trans),box-shadow var(--trans); cursor:default; position:relative; overflow:hidden; }
+    .mini-stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .mini-stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
+    .ms1::after { background:linear-gradient(90deg,var(--c-primary),var(--c-secondary)); }
+    .ms2::after { background:linear-gradient(90deg,var(--c-green),#34d399); }
+    .ms3::after { background:linear-gradient(90deg,var(--c-accent),var(--c-orange)); }
+    .ms4::after { background:linear-gradient(90deg,var(--c-pink),#f472b6); }
+    .ms-icon { width:42px; height:42px; border-radius:11px; display:grid; place-items:center; font-size:1.15rem; color:#fff; flex-shrink:0; }
+    .ms1 .ms-icon { background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); box-shadow:0 3px 10px rgba(79,70,229,.28); }
+    .ms2 .ms-icon { background:linear-gradient(135deg,var(--c-green),#34d399); box-shadow:0 3px 10px rgba(16,185,129,.28); }
+    .ms3 .ms-icon { background:linear-gradient(135deg,var(--c-accent),var(--c-orange)); box-shadow:0 3px 10px rgba(245,158,11,.28); }
+    .ms4 .ms-icon { background:linear-gradient(135deg,var(--c-pink),#f472b6); box-shadow:0 3px 10px rgba(236,72,153,.28); }
+    .ms-val { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.5rem; color:var(--c-text); line-height:1; }
+    .ms-lbl { font-size:.75rem; color:var(--c-muted); font-weight:600; margin-top:2px; }
+
+    /* ═══ ROLE CARDS ═══ */
+    .role-section-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); margin-bottom:14px; display:flex; align-items:center; gap:8px; animation:fadeUp .4s ease .1s both; }
+    .role-section-title i { color:var(--c-primary); }
+
+    .role-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-bottom:28px; animation:fadeUp .45s ease .1s both; }
+
+    .role-card {
+      background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md);
+      box-shadow:var(--shadow-sm); overflow:hidden; cursor:pointer;
+      transition:transform var(--trans),box-shadow var(--trans),border-color var(--trans);
+      position:relative;
+    }
+    .role-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+    .role-card.selected { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.15),var(--shadow-md); }
+
+    .role-card-top { padding:20px 20px 14px; position:relative; }
+    .role-card-bar { position:absolute; top:0; left:0; right:0; height:4px; }
+    .role-icon-wrap {
+      width:54px; height:54px; border-radius:14px; display:grid; place-items:center;
+      font-size:1.4rem; color:#fff; margin-bottom:12px;
+      box-shadow:0 4px 14px rgba(0,0,0,.15);
+      animation:roleIconFloat 4s ease-in-out infinite;
+      transition:transform var(--trans);
+    }
+    @keyframes roleIconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    .role-card:hover .role-icon-wrap { transform:scale(1.08) rotate(-5deg); animation:none; }
+    .role-name { font-family:'Nunito',sans-serif; font-weight:900; font-size:1rem; color:var(--c-text); margin-bottom:4px; }
+    .role-desc { font-size:.75rem; color:var(--c-muted); line-height:1.5; }
+
+    .role-card-stats { display:flex; gap:0; border-top:1px solid var(--c-border); }
+    .role-stat { flex:1; padding:10px 12px; text-align:center; border-right:1px solid var(--c-border); }
+    .role-stat:last-child { border-right:none; }
+    .role-stat-val { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.1rem; color:var(--c-text); }
+    .role-stat-lbl { font-size:.62rem; color:var(--c-muted); font-weight:600; margin-top:1px; }
+
+    .role-card-footer { padding:10px 14px; background:var(--c-surface2); border-top:1px solid var(--c-border); display:flex; align-items:center; justify-content:space-between; }
+    .role-status-dot { width:7px; height:7px; border-radius:50%; background:var(--c-green); animation:dotPulse 2s ease infinite; }
+    .role-actions { display:flex; gap:5px; }
+    .role-btn { width:28px; height:28px; border-radius:7px; border:1.5px solid var(--c-border); background:#fff; cursor:pointer; display:grid; place-items:center; font-size:.82rem; transition:all var(--trans); }
+    .role-btn:hover { transform:scale(1.1); }
+    .rb-edit   { color:var(--c-primary); }
+    .rb-copy   { color:var(--c-green); }
+    .rb-delete { color:var(--c-red); }
+    .rb-edit:hover   { background:var(--c-primary); color:#fff; border-color:var(--c-primary); }
+    .rb-copy:hover   { background:var(--c-green);   color:#fff; border-color:var(--c-green); }
+    .rb-delete:hover { background:var(--c-red);     color:#fff; border-color:var(--c-red); }
+
+    .selected-badge { font-size:.65rem; font-weight:800; padding:2px 8px; border-radius:99px; background:var(--c-primary); color:#fff; }
+
+    /* ═══ PERMISSION MATRIX ═══ */
+    .matrix-card { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; animation:fadeUp .45s ease .15s both; }
+    .matrix-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--c-border); flex-wrap:wrap; gap:10px; }
+    .matrix-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem; color:var(--c-text); display:flex; align-items:center; gap:8px; }
+    .matrix-title i { color:var(--c-primary); }
+    .matrix-role-tabs { display:flex; gap:5px; flex-wrap:wrap; }
+    .matrix-tab { display:flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; border:1.5px solid var(--c-border); background:#fff; cursor:pointer; font-size:.75rem; font-weight:700; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; transition:all var(--trans); }
+    .matrix-tab:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; }
+    .matrix-tab.active { border-color:var(--c-primary); background:var(--c-primary); color:#fff; }
+    .matrix-tab .tab-dot { width:8px; height:8px; border-radius:50%; }
+
+    /* Permission table */
+    .perm-wrap { overflow-x:auto; }
+    table.perm-table { width:100%; border-collapse:collapse; }
+    .perm-table thead tr { border-bottom:2px solid var(--c-border); }
+    .perm-table thead th { padding:11px 16px; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--c-muted); background:var(--c-surface2); text-align:left; white-space:nowrap; }
+    .perm-table thead th:not(:first-child) { text-align:center; min-width:90px; }
+
+    /* Role header cells */
+    .role-th { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .role-th-icon { width:32px; height:32px; border-radius:8px; display:grid; place-items:center; font-size:.85rem; color:#fff; }
+    .role-th-name { font-size:.68rem; font-weight:800; color:var(--c-text); }
+
+    .perm-table tbody tr { border-bottom:1px solid var(--c-border); transition:background var(--trans); }
+    .perm-table tbody tr:last-child { border-bottom:none; }
+    .perm-table tbody tr:hover { background:rgba(79,70,229,.025); }
+    .perm-table tbody td { padding:12px 16px; vertical-align:middle; }
+
+    /* Module group row */
+    .module-group-row { background:linear-gradient(90deg,rgba(79,70,229,.05),rgba(79,70,229,.02)); }
+    .module-group-row td { padding:9px 16px !important; }
+    .module-group-label { font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--c-primary); display:flex; align-items:center; gap:6px; }
+    .module-group-label i { font-size:.8rem; }
+
+    /* Permission cell */
+    .perm-name { font-size:.85rem; font-weight:600; color:var(--c-text); display:flex; align-items:center; gap:8px; }
+    .perm-name-sub { font-size:.72rem; color:var(--c-muted); margin-top:2px; }
+    .perm-code { font-family:'DM Mono',monospace; font-size:.68rem; background:rgba(79,70,229,.08); color:var(--c-primary); padding:2px 7px; border-radius:5px; }
+
+    /* Toggle switch in table */
+    .perm-toggle { display:flex; justify-content:center; }
+    .ts-wrap { position:relative; width:40px; height:22px; cursor:pointer; }
+    .ts-wrap input { display:none; }
+    .ts-track { position:absolute; inset:0; border-radius:99px; background:var(--c-border); transition:background var(--trans); }
+    .ts-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform var(--trans); }
+    .ts-wrap input:checked ~ .ts-track { background:var(--c-green); }
+    .ts-wrap input:checked ~ .ts-track .ts-thumb { transform:translateX(18px); }
+
+    /* Read-only check icon */
+    .perm-check-yes { color:var(--c-green); font-size:1.1rem; }
+    .perm-check-no  { color:var(--c-border); font-size:1.1rem; }
+
+    /* Save bar */
+    .save-bar { position:sticky; bottom:0; background:rgba(255,255,255,.95); backdrop-filter:blur(8px); border-top:1px solid var(--c-border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .save-bar-info { font-size:.82rem; color:var(--c-muted); display:flex; align-items:center; gap:6px; }
+    .save-bar-info i { color:var(--c-accent); }
+    .save-bar-btns { display:flex; gap:8px; }
+    .btn-save-perm { display:inline-flex; align-items:center; gap:7px; padding:10px 20px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--c-green),var(--c-secondary)); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,.3); transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-save-perm:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(16,185,129,.45); }
+    .btn-reset-perm { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border-radius:10px; border:1.5px solid var(--c-border); background:#fff; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; transition:all var(--trans); }
+    .btn-reset-perm:hover { border-color:var(--c-primary); color:var(--c-primary); }
+
+    /* ═══ MODAL ROLE ═══ */
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); z-index:1000; display:grid; place-items:center; opacity:0; pointer-events:none; transition:opacity .25s; padding:16px; overflow-y:auto; }
+    .modal-overlay.show { opacity:1; pointer-events:all; }
+    .modal-box { background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); width:100%; max-width:540px; transform:translateY(24px) scale(.96); transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .modal-overlay.show .modal-box { transform:translateY(0) scale(1); }
+    .modal-head { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--c-border); border-radius:var(--radius-lg) var(--radius-lg) 0 0; position:relative; }
+    .modal-head::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:var(--radius-lg) var(--radius-lg) 0 0; background:linear-gradient(90deg,var(--c-primary),var(--c-secondary),var(--c-pink)); }
+    .modal-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:1.05rem; color:var(--c-text); display:flex; align-items:center; gap:10px; }
+    .modal-head-icon { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:1rem; color:#fff; transition:background var(--trans); }
+    .btn-close-modal { width:32px; height:32px; border-radius:8px; border:none; background:var(--c-surface2); cursor:pointer; display:grid; place-items:center; color:var(--c-muted); font-size:.95rem; transition:all var(--trans); }
+    .btn-close-modal:hover { background:#fef2f2; color:var(--c-red); }
+    .modal-body { padding:24px; max-height:calc(90vh - 140px); overflow-y:auto; }
+    .modal-foot { padding:16px 24px; border-top:1px solid var(--c-border); display:flex; gap:10px; justify-content:flex-end; background:var(--c-surface2); border-radius:0 0 var(--radius-lg) var(--radius-lg); }
+
+    /* Form */
+    .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .fgroup { margin-bottom:16px; }
+    .fgroup:last-child { margin-bottom:0; }
+    .flabel { font-size:.8rem; font-weight:700; color:var(--c-text); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+    .flabel .req { color:var(--c-pink); }
+    .fwrap { position:relative; }
+    .f-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--c-muted); font-size:.9rem; pointer-events:none; transition:color var(--trans); }
+    .fwrap:focus-within .f-icon { color:var(--c-primary); }
+    .fctrl { width:100%; padding:11px 13px 11px 38px; border:1.5px solid var(--c-border); border-radius:10px; font-size:.875rem; font-family:'Plus Jakarta Sans',sans-serif; background:var(--c-surface2); color:var(--c-text); outline:none; transition:border-color var(--trans),box-shadow var(--trans),background var(--trans); }
+    .fctrl:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(79,70,229,.1); background:#fff; }
+    .fctrl.no-icon { padding-left:13px; }
+    .fctrl.is-invalid { border-color:var(--c-red); }
+    select.fctrl { cursor:pointer; }
+    textarea.fctrl { resize:vertical; padding-top:10px; min-height:72px; }
+    .fgroup.has-err .fctrl { border-color:var(--c-red); }
+    .finvalid { font-size:.72rem; color:var(--c-red); margin-top:4px; display:none; }
+    .fgroup.has-err .finvalid { display:block; }
+
+    /* Color/Icon preview in modal */
+    .role-preview-box { display:flex; align-items:center; gap:14px; padding:14px; background:var(--c-surface2); border:1px solid var(--c-border); border-radius:12px; margin-bottom:18px; }
+    .rp-icon { width:56px; height:56px; border-radius:14px; display:grid; place-items:center; font-size:1.4rem; color:#fff; flex-shrink:0; transition:background var(--trans); animation:roleIconFloat 4s ease-in-out infinite; }
+    .rp-name { font-weight:800; font-size:.9rem; color:var(--c-text); }
+    .rp-desc { font-size:.72rem; color:var(--c-muted); margin-top:2px; }
+    .rp-hint { font-size:.7rem; color:var(--c-muted); margin-top:4px; }
+
+    /* Icon mini grid */
+    .icon-grid-mini { display:grid; grid-template-columns:repeat(8,1fr); gap:5px; margin-top:8px; }
+    .icon-btn-mini { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--c-border); background:#fff; cursor:pointer; display:grid; place-items:center; font-size:.9rem; color:var(--c-text-2); transition:all var(--trans); }
+    .icon-btn-mini:hover { border-color:var(--c-primary); color:var(--c-primary); background:#f5f3ff; transform:scale(1.08); }
+    .icon-btn-mini.selected { border-color:var(--c-primary); background:var(--c-primary); color:#fff; }
+
+    /* Color swatches */
+    .c-swatches { display:flex; flex-wrap:wrap; gap:7px; margin-top:8px; }
+    .c-sw { width:32px; height:32px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:transform var(--trans),box-shadow var(--trans); position:relative; }
+    .c-sw:hover { transform:scale(1.15); }
+    .c-sw.selected { border-color:#fff; box-shadow:0 0 0 3px var(--c-primary); }
+    .c-sw.selected::after { content:'\F26A'; font-family:'bootstrap-icons'; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:.68rem; }
+
+    /* Btn modal */
+    .btn-m-primary { display:inline-flex; align-items:center; gap:7px; padding:11px 22px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; box-shadow:0 4px 12px rgba(79,70,229,.3); transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-m-primary:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(79,70,229,.45); }
+    .btn-m-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-m-secondary { display:inline-flex; align-items:center; gap:7px; padding:11px 18px; border-radius:10px; border:1.5px solid var(--c-border); background:#fff; color:var(--c-text-2); font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.875rem; cursor:pointer; transition:all var(--trans); }
+    .btn-m-secondary:hover { border-color:var(--c-primary); color:var(--c-primary); }
+
+    /* Toolbar button */
+    .btn-tb { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border-radius:10px; font-size:.875rem; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer; border:none; transition:transform var(--trans),box-shadow var(--trans); }
+    .btn-tb:hover { transform:translateY(-1px); }
+    .btn-add { background:linear-gradient(135deg,var(--c-primary),var(--c-purple)); color:#fff; box-shadow:0 4px 12px rgba(79,70,229,.3); }
+    .btn-add:hover { box-shadow:0 6px 18px rgba(79,70,229,.45); }
+
+    /* FAB */
+    .fab { position:fixed; bottom:28px; right:28px; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--c-primary),var(--c-secondary)); color:#fff; font-size:1.3rem; border:none; cursor:pointer; display:grid; place-items:center; box-shadow:0 6px 20px rgba(79,70,229,.45); z-index:400; transition:transform var(--trans),box-shadow var(--trans),opacity var(--trans); opacity:0; transform:scale(0) translateY(20px); }
+    .fab.visible { opacity:1; transform:scale(1) translateY(0); }
+    .fab:hover { transform:scale(1.1) translateY(-3px); box-shadow:0 10px 28px rgba(79,70,229,.6); }
+    .fab i { animation:fabBounce 2s ease-in-out infinite; }
+    @keyframes fabBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Footer */
+    .main-footer { padding:16px 24px; border-top:1px solid var(--c-border); background:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .footer-left { font-size:.78rem; color:var(--c-muted); }
+    .footer-left strong { color:var(--c-primary); font-weight:700; }
+    .footer-links { display:flex; gap:16px; }
+    .footer-links a { font-size:.75rem; color:var(--c-muted); text-decoration:none; font-weight:600; transition:color var(--trans); }
+    .footer-links a:hover { color:var(--c-primary); }
+
+    /* Responsive */
+    @media(max-width:1200px) { .mini-stats{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:992px)  { :root{--sidebar-w:240px;} .frow2{grid-template-columns:1fr} }
+    @media(max-width:768px) {
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;box-shadow:var(--shadow-lg);}
+      body.mobile-open .sidebar{transform:translateX(0);}
+      body.mobile-open .sidebar-overlay{display:block;}
+      .topbar{left:0!important;} .main-wrapper{margin-left:0!important;}
+      .topbar-search{display:none;} .user-info-t{display:none;}
+      .main-content{padding:14px;}
+      .fab{bottom:20px;right:20px;width:46px;height:46px;font-size:1.1rem;}
+      .perm-wrap { overflow-x: scroll; }
+      .icon-grid-mini{grid-template-columns:repeat(6,1fr);}
+      .save-bar{flex-direction:column;align-items:flex-start;}
+    }
+    @media(max-width:576px) {
+      .mini-stats{grid-template-columns:1fr;}
+      .page-header{flex-direction:column;align-items:flex-start;}
+      .main-footer{flex-direction:column;align-items:flex-start;}
+      .modal-foot{flex-direction:column;}
+      .role-grid{grid-template-columns:1fr;}
+      .matrix-role-tabs{width:100%;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <a href="dashboard.html" class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-camera-reels-fill"></i></div>
+    <div class="brand-text">
+      <div class="brand-title">Doka<span>Kegiatan</span></div>
+      <div class="brand-sub">DOKUMENTASI</div>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-category">MAIN</div>
+    <div class="nav-item-wrap"><a href="dashboard.html" class="nav-link-item" data-label="Dashboard"><i class="bi bi-grid-1x2-fill nav-icon"></i><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-category">MASTER</div>
+    <div class="nav-item-wrap"><a href="pengguna.html" class="nav-link-item" data-label="Pengguna"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Pengguna</span><span class="nav-badge">32</span></a></div>
+    <div class="nav-item-wrap"><a href="kategori.html" class="nav-link-item" data-label="Kategori"><i class="bi bi-tags-fill nav-icon"></i><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item-wrap"><a href="unit-kerja.html" class="nav-link-item" data-label="Unit Kerja"><i class="bi bi-building-fill nav-icon"></i><span class="nav-label">Unit Kerja</span></a></div>
+    <div class="nav-category">KEGIATAN</div>
+    <div class="nav-item-wrap"><a href="semua-kegiatan.html" class="nav-link-item" data-label="Semua Kegiatan"><i class="bi bi-calendar3-fill nav-icon"></i><span class="nav-label">Semua Kegiatan</span><span class="nav-badge" style="background:var(--c-green);">24</span></a></div>
+    <div class="nav-item-wrap"><a href="tambah-kegiatan.html" class="nav-link-item" data-label="Tambah Kegiatan"><i class="bi bi-plus-circle-fill nav-icon"></i><span class="nav-label">Tambah Kegiatan</span></a></div>
+    <div class="nav-item-wrap"><a href="galeri-foto.html" class="nav-link-item" data-label="Galeri Foto"><i class="bi bi-images nav-icon"></i><span class="nav-label">Galeri Foto</span></a></div>
+    <div class="nav-category">LAPORAN</div>
+    <div class="nav-item-wrap"><a href="laporan-bulanan.html" class="nav-link-item" data-label="Laporan Bulanan"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Laporan Bulanan</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item" data-label="Export PDF"><i class="bi bi-file-earmark-pdf-fill nav-icon"></i><span class="nav-label">Export PDF</span></a></div>
+    <div class="nav-category">PENGATURAN</div>
+    <div class="nav-item-wrap"><a href="profile.html" class="nav-link-item" data-label="Profil Saya"><i class="bi bi-person-fill-gear nav-icon"></i><span class="nav-label">Profil Saya</span></a></div>
+    <div class="nav-item-wrap"><a href="#" class="nav-link-item active" data-label="Akses & Role"><i class="bi bi-shield-lock-fill nav-icon"></i><span class="nav-label">Akses & Role</span></a></div>
+    <div class="nav-item-wrap"><a href="pengaturan-sistem.html" class="nav-link-item" data-label="Pengaturan Sistem"><i class="bi bi-gear-wide-connected nav-icon"></i><span class="nav-label">Pengaturan Sistem</span></a></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user-mini">
+      <div class="sidebar-avatar-sm">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin Doka</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <button class="btn-hamburger" onclick="toggleSidebar()">
+    <span class="hline"></span><span class="hline"></span><span class="hline"></span>
+  </button>
+  <div class="topbar-search"><i class="bi bi-search"></i><input type="text" placeholder="Cari role atau permission..." /></div>
+  <div class="topbar-right">
+    <button class="topbar-icon-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></button>
+    <button class="topbar-icon-btn"><i class="bi bi-chat-dots-fill"></i></button>
+    <div class="user-dropdown-wrap">
+      <button class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+        <div class="user-avatar">A</div>
+        <div class="user-info-t"><div class="user-name-t">Admin Doka</div><div class="user-email-t">admin@dokaKegiatan.id</div></div>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+      <div class="user-dropdown-menu" id="userDropdown">
+        <div class="dd-header"><div class="dd-avatar">A</div><div class="dd-name">Admin Doka</div><div class="dd-email">admin@dokaKegiatan.id</div></div>
+        <div class="dd-items">
+          <button class="dd-btn"><i class="bi bi-person-fill"></i> Profil Saya</button>
+          <button class="dd-btn"><i class="bi bi-gear-fill"></i> Pengaturan</button>
+          <div class="dd-divider"></div>
+          <button class="dd-btn danger"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrapper">
+<main class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1><i class="bi bi-shield-lock-fill"></i> Akses & Role Permission</h1>
+      <p>Kelola peran pengguna dan atur hak akses setiap fitur dalam sistem DokaKegiatan.</p>
+    </div>
+    <nav class="breadcrumb-nav">
+      <a href="dashboard.html"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <a href="#">Pengaturan</a>
+      <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+      <span class="bc-current"><i class="bi bi-shield-lock-fill"></i> Akses & Role</span>
+    </nav>
+  </div>
+
+  <!-- Mini Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat ms1"><div class="ms-icon"><i class="bi bi-person-badge-fill"></i></div><div><div class="ms-val" id="sc1">0</div><div class="ms-lbl">Total Role</div></div></div>
+    <div class="mini-stat ms2"><div class="ms-icon"><i class="bi bi-shield-fill-check"></i></div><div><div class="ms-val" id="sc2">0</div><div class="ms-lbl">Total Permission</div></div></div>
+    <div class="mini-stat ms3"><div class="ms-icon"><i class="bi bi-people-fill"></i></div><div><div class="ms-val" id="sc3">0</div><div class="ms-lbl">Pengguna Aktif</div></div></div>
+    <div class="mini-stat ms4"><div class="ms-icon"><i class="bi bi-calendar-check-fill"></i></div><div><div class="ms-val" id="sc4">0</div><div class="ms-lbl">Login Hari Ini</div></div></div>
+  </div>
+
+  <!-- Section: Roles -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;animation:fadeUp .4s ease .1s both;">
+    <div class="role-section-title" style="margin-bottom:0;"><i class="bi bi-person-badge-fill"></i> Daftar Role</div>
+    <button class="btn-tb btn-add" onclick="openAddRoleModal()"><i class="bi bi-plus-lg"></i> Tambah Role</button>
+  </div>
+
+  <div class="role-grid" id="roleGrid"></div>
+
+  <!-- Permission Matrix -->
+  <div class="matrix-card">
+    <div class="matrix-head">
+      <div>
+        <div class="matrix-title"><i class="bi bi-grid-3x3-gap-fill"></i> Matrix Hak Akses</div>
+        <div style="font-size:.75rem;color:var(--c-muted);margin-top:2px;">Klik toggle untuk mengubah akses per role. Perubahan belum tersimpan sampai klik Simpan.</div>
+      </div>
+      <div class="matrix-role-tabs" id="matrixRoleTabs"></div>
+    </div>
+
+    <div class="perm-wrap">
+      <table class="perm-table" id="permTable">
+        <thead id="permHead"></thead>
+        <tbody id="permBody"></tbody>
+      </table>
+    </div>
+
+    <div class="save-bar">
+      <div class="save-bar-info"><i class="bi bi-exclamation-triangle-fill"></i> Perubahan permission akan diterapkan setelah pengguna login ulang.</div>
+      <div class="save-bar-btns">
+        <button class="btn-reset-perm" onclick="resetPermissions()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+        <button class="btn-save-perm" onclick="savePermissions()"><i class="bi bi-check2-circle"></i> Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-left">&copy; 2025 <strong>DokaKegiatan</strong> — Sistem Dokumentasi Kegiatan.</div>
+  <div class="footer-links"><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a></div>
+</footer>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="scrollToTop()"><i class="bi bi-arrow-up"></i></button>
+
+<!-- ═══════════ MODAL ADD/EDIT ROLE ═══════════ -->
+<div class="modal-overlay" id="modalRole">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">
+        <div class="modal-head-icon" id="mHeadIcon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-purple));"><i class="bi bi-person-badge-fill" id="mHeadIconI"></i></div>
+        <span id="mTitleText">Tambah Role Baru</span>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Preview -->
+      <div class="role-preview-box">
+        <div class="rp-icon" id="rpIcon" style="background:linear-gradient(135deg,var(--c-primary),var(--c-purple));"><i class="bi bi-person-badge-fill" id="rpIconI"></i></div>
+        <div>
+          <div class="rp-name" id="rpName">Nama Role</div>
+          <div class="rp-desc" id="rpDesc">Deskripsi singkat role</div>
+          <div class="rp-hint">Preview tampilan role</div>
+        </div>
+      </div>
+
+      <div class="frow2">
+        <div class="fgroup" id="grp-rname">
+          <div class="flabel"><i class="bi bi-type" style="color:var(--c-muted);font-size:.85rem;"></i> Nama Role <span class="req">*</span></div>
+          <div class="fwrap">
+            <i class="bi bi-type f-icon"></i>
+            <input type="text" class="fctrl" id="f-rname" placeholder="Contoh: Operator"
+              oninput="document.getElementById('rpName').textContent=this.value||'Nama Role';clearErr('grp-rname')" maxlength="30" />
+          </div>
+          <div class="finvalid">Nama role wajib diisi.</div>
+        </div>
+        <div class="fgroup" id="grp-rslug">
+          <div class="flabel"><i class="bi bi-hash" style="color:var(--c-muted);font-size:.85rem;"></i> Kode Role <span class="req">*</span></div>
+          <div class="fwrap">
+            <i class="bi bi-hash f-icon"></i>
+            <input type="text" class="fctrl" id="f-rslug" placeholder="operator" maxlength="20"
+              oninput="clearErr('grp-rslug')" />
+          </div>
+          <div class="finvalid">Kode role wajib diisi.</div>
+          <div style="font-size:.7rem;color:var(--c-muted);margin-top:4px;">Huruf kecil, tanpa spasi. Contoh: super-admin</div>
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <div class="flabel"><i class="bi bi-card-text" style="color:var(--c-muted);font-size:.85rem;"></i> Deskripsi <span style="color:var(--c-muted);font-weight:500;font-size:.72rem;">(opsional)</span></div>
+        <textarea class="fctrl no-icon" id="f-rdesc" rows="2" placeholder="Deskripsi singkat hak akses role ini..."
+          oninput="document.getElementById('rpDesc').textContent=this.value||'Deskripsi singkat role'"></textarea>
+      </div>
+
+      <!-- Icon picker -->
+      <div class="fgroup" style="margin-bottom:10px;">
+        <div class="flabel"><i class="bi bi-emoji-smile" style="color:var(--c-primary);font-size:.85rem;"></i> Pilih Ikon</div>
+        <div class="icon-grid-mini" id="roleIconGrid"></div>
+      </div>
+
+      <!-- Color picker -->
+      <div class="fgroup" style="margin-bottom:0;">
+        <div class="flabel"><i class="bi bi-palette-fill" style="color:var(--c-primary);font-size:.85rem;"></i> Pilih Warna</div>
+        <div class="c-swatches" id="roleColorGrid"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-m-secondary" onclick="closeModal()"><i class="bi bi-x-circle"></i> Batal</button>
+      <button class="btn-m-primary" id="btnSaveRole" onclick="saveRole()"><i class="bi bi-check2-circle"></i> Simpan Role</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dka-alert.js"></script>
+<script>
+/* ════════════════════════════════════
+   DATA: ROLES
+════════════════════════════════════ */
+const ROLE_GRADS = [
+  'linear-gradient(135deg,#4f46e5,#7c3aed)',
+  'linear-gradient(135deg,#10b981,#06b6d4)',
+  'linear-gradient(135deg,#f59e0b,#f97316)',
+  'linear-gradient(135deg,#ec4899,#f472b6)',
+  'linear-gradient(135deg,#8b5cf6,#a78bfa)',
+  'linear-gradient(135deg,#ef4444,#f87171)',
+  'linear-gradient(135deg,#0891b2,#22d3ee)',
+  'linear-gradient(135deg,#059669,#34d399)',
+  'linear-gradient(135deg,#d97706,#fbbf24)',
+  'linear-gradient(135deg,#1d4ed8,#38bdf8)',
+];
+
+const ROLE_ICONS = [
+  'bi-shield-fill','bi-shield-lock-fill','bi-person-fill','bi-person-badge-fill',
+  'bi-person-workspace','bi-people-fill','bi-eye-fill','bi-pencil-fill',
+  'bi-camera-fill','bi-images','bi-building-fill','bi-gear-fill',
+  'bi-star-fill','bi-trophy-fill','bi-clipboard-fill','bi-lock-fill',
+];
+
+let ROLES = [
+  { id:1, nama:'Super Admin',  kode:'super-admin', desc:'Akses penuh ke seluruh fitur dan pengaturan sistem.',        icon:'bi-shield-fill',        gradId:0, pengguna:2,  login:5,  locked:true  },
+  { id:2, nama:'Administrator',kode:'administrator',desc:'Mengelola data, pengguna, dan konfigurasi umum sistem.',      icon:'bi-shield-lock-fill',   gradId:1, pengguna:3,  login:8,  locked:false },
+  { id:3, nama:'Operator',     kode:'operator',     desc:'Menginput dan mengelola data kegiatan serta foto.',           icon:'bi-person-badge-fill',  gradId:2, pengguna:12, login:18, locked:false },
+  { id:4, nama:'Fotografer',   kode:'fotografer',   desc:'Upload foto, mengelola galeri, dan mengakses laporan.',       icon:'bi-camera-fill',        gradId:3, pengguna:8,  login:12, locked:false },
+  { id:5, nama:'Viewer',       kode:'viewer',       desc:'Hanya dapat melihat data dan laporan. Tidak dapat mengedit.', icon:'bi-eye-fill',           gradId:4, pengguna:5,  login:7,  locked:false },
+];
+
+/* ════════════════════════════════════
+   DATA: PERMISSIONS
+════════════════════════════════════ */
+const PERM_MODULES = [
+  {
+    group: 'Dashboard', icon: 'bi-grid-1x2-fill',
+    perms: [
+      { id:'dashboard.view',  name:'Lihat Dashboard', code:'dashboard.view',  desc:'Akses halaman dashboard utama' },
+      { id:'dashboard.stats', name:'Lihat Statistik',  code:'dashboard.stats', desc:'Melihat data statistik ringkasan' },
+    ]
+  },
+  {
+    group: 'Kegiatan', icon: 'bi-calendar3-fill',
+    perms: [
+      { id:'kegiatan.view',    name:'Lihat Kegiatan',    code:'kegiatan.view',    desc:'Melihat daftar dan detail kegiatan' },
+      { id:'kegiatan.create',  name:'Tambah Kegiatan',   code:'kegiatan.create',  desc:'Membuat dokumentasi kegiatan baru' },
+      { id:'kegiatan.edit',    name:'Edit Kegiatan',     code:'kegiatan.edit',    desc:'Mengubah data kegiatan yang ada' },
+      { id:'kegiatan.delete',  name:'Hapus Kegiatan',    code:'kegiatan.delete',  desc:'Menghapus kegiatan dari sistem' },
+      { id:'kegiatan.publish', name:'Publikasi Kegiatan',code:'kegiatan.publish', desc:'Mengubah status draft ke selesai' },
+    ]
+  },
+  {
+    group: 'Foto & Galeri', icon: 'bi-images',
+    perms: [
+      { id:'foto.view',   name:'Lihat Galeri',      code:'foto.view',   desc:'Mengakses halaman galeri foto' },
+      { id:'foto.upload', name:'Upload Foto',        code:'foto.upload', desc:'Mengunggah foto kegiatan baru' },
+      { id:'foto.delete', name:'Hapus Foto',         code:'foto.delete', desc:'Menghapus foto dari galeri' },
+      { id:'foto.dl',     name:'Unduh Foto',         code:'foto.dl',     desc:'Mengunduh foto secara individual atau massal' },
+    ]
+  },
+  {
+    group: 'Laporan', icon: 'bi-bar-chart-fill',
+    perms: [
+      { id:'laporan.view',   name:'Lihat Laporan',    code:'laporan.view',   desc:'Mengakses halaman laporan bulanan' },
+      { id:'laporan.export', name:'Export Laporan',   code:'laporan.export', desc:'Export laporan ke PDF atau Excel' },
+      { id:'laporan.print',  name:'Cetak Laporan',    code:'laporan.print',  desc:'Mencetak laporan bulanan' },
+    ]
+  },
+  {
+    group: 'Master Data', icon: 'bi-database-fill',
+    perms: [
+      { id:'kategori.manage', name:'Kelola Kategori',  code:'kategori.manage', desc:'CRUD kategori kegiatan' },
+      { id:'unitkerja.manage',name:'Kelola Unit Kerja', code:'unitkerja.manage',desc:'CRUD unit kerja / OPD' },
+    ]
+  },
+  {
+    group: 'Pengguna', icon: 'bi-people-fill',
+    perms: [
+      { id:'user.view',   name:'Lihat Pengguna',   code:'user.view',   desc:'Melihat daftar pengguna' },
+      { id:'user.create', name:'Tambah Pengguna',  code:'user.create', desc:'Menambah akun pengguna baru' },
+      { id:'user.edit',   name:'Edit Pengguna',    code:'user.edit',   desc:'Mengubah data pengguna' },
+      { id:'user.delete', name:'Hapus Pengguna',   code:'user.delete', desc:'Menghapus akun pengguna' },
+      { id:'user.role',   name:'Atur Role Pengguna',code:'user.role',  desc:'Mengubah role / hak akses pengguna' },
+    ]
+  },
+  {
+    group: 'Pengaturan Sistem', icon: 'bi-gear-fill',
+    perms: [
+      { id:'settings.view',   name:'Lihat Pengaturan', code:'settings.view',   desc:'Mengakses halaman pengaturan sistem' },
+      { id:'settings.edit',   name:'Edit Pengaturan',  code:'settings.edit',   desc:'Mengubah konfigurasi sistem' },
+      { id:'settings.role',   name:'Kelola Role',      code:'settings.role',   desc:'Menambah/mengubah/menghapus role' },
+      { id:'settings.backup', name:'Kelola Backup',    code:'settings.backup', desc:'Membuat dan restore backup data' },
+    ]
+  },
+];
+
+/* Default permissions per role (semua id) */
+const ALL_PERM_IDS = PERM_MODULES.flatMap(m => m.perms.map(p => p.id));
+
+const DEFAULT_PERMS = {
+  1: new Set(ALL_PERM_IDS),                        // Super Admin — semua
+  2: new Set(ALL_PERM_IDS.filter(p => !p.startsWith('settings.role') && !p.startsWith('settings.backup'))), // Admin
+  3: new Set(['dashboard.view','dashboard.stats','kegiatan.view','kegiatan.create','kegiatan.edit','foto.view','foto.upload','foto.dl','laporan.view','user.view']), // Operator
+  4: new Set(['dashboard.view','kegiatan.view','foto.view','foto.upload','foto.delete','foto.dl','laporan.view']), // Fotografer
+  5: new Set(['dashboard.view','dashboard.stats','kegiatan.view','foto.view','foto.dl','laporan.view']), // Viewer
+};
+
+// Mutable copy
+let permState = {};
+ROLES.forEach(r => { permState[r.id] = new Set(DEFAULT_PERMS[r.id] || []); });
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+let activeRoleId = 1;
+let editingRoleId = null;
+let selIcon  = 'bi-person-badge-fill';
+let selColor = 1;
+
+/* ════════════════════════════════════
+   STATS
+════════════════════════════════════ */
+function animC(id, t) {
+  const el=document.getElementById(id); if(!el) return;
+  let c=0, inc=t/50;
+  const tm=setInterval(()=>{ c+=inc; if(c>=t){c=t;clearInterval(tm);} el.textContent=Math.floor(c).toLocaleString('id-ID'); },16);
+}
+function updateStats() {
+  animC('sc1', ROLES.length);
+  animC('sc2', ALL_PERM_IDS.length);
+  animC('sc3', ROLES.reduce((s,r)=>s+r.pengguna,0));
+  animC('sc4', ROLES.reduce((s,r)=>s+r.login,0));
+}
+updateStats();
+
+/* ════════════════════════════════════
+   ROLE CARDS
+════════════════════════════════════ */
+function renderRoleCards() {
+  document.getElementById('roleGrid').innerHTML = ROLES.map(r => {
+    const grad = ROLE_GRADS[r.gradId];
+    const permCount = (permState[r.id] || new Set()).size;
+    return `
+      <div class="role-card ${r.id===activeRoleId?'selected':''}" onclick="selectRole(${r.id})">
+        <div class="role-card-bar" style="background:${grad};"></div>
+        <div class="role-card-top">
+          <div class="role-icon-wrap" style="background:${grad};"><i class="bi ${r.icon}"></i></div>
+          <div class="role-name">
+            ${r.nama}
+            ${r.id===activeRoleId?'<span class="selected-badge" style="margin-left:6px;">Aktif</span>':''}
+          </div>
+          <div class="role-desc">${r.desc}</div>
+        </div>
+        <div class="role-card-stats">
+          <div class="role-stat"><div class="role-stat-val">${r.pengguna}</div><div class="role-stat-lbl">Pengguna</div></div>
+          <div class="role-stat"><div class="role-stat-val">${permCount}</div><div class="role-stat-lbl">Permission</div></div>
+          <div class="role-stat"><div class="role-stat-val">${r.login}</div><div class="role-stat-lbl">Login/hari</div></div>
+        </div>
+        <div class="role-card-footer">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div class="role-status-dot"></div>
+            <span style="font-size:.72rem;font-weight:600;color:var(--c-muted);">Aktif</span>
+          </div>
+          <div class="role-actions">
+            <button class="role-btn rb-edit"   onclick="event.stopPropagation();openEditRoleModal(${r.id})" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+            <button class="role-btn rb-copy"   onclick="event.stopPropagation();copyRole(${r.id})" title="Duplikat"><i class="bi bi-copy"></i></button>
+            ${r.locked ? '' : `<button class="role-btn rb-delete" onclick="event.stopPropagation();deleteRole(${r.id})" title="Hapus"><i class="bi bi-trash3-fill"></i></button>`}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  renderMatrixTabs();
+  renderMatrix();
+}
+
+/* ════════════════════════════════════
+   MATRIX TABS
+════════════════════════════════════ */
+function renderMatrixTabs() {
+  document.getElementById('matrixRoleTabs').innerHTML = ROLES.map(r => `
+    <button class="matrix-tab ${r.id===activeRoleId?'active':''}" onclick="selectRole(${r.id})">
+      <div class="tab-dot" style="background:${ROLE_GRADS[r.gradId]};border-radius:50%;width:8px;height:8px;"></div>
+      ${r.nama}
+    </button>`).join('');
+}
+
+function selectRole(id) {
+  activeRoleId = id;
+  renderRoleCards();
+}
+
+/* ════════════════════════════════════
+   PERMISSION MATRIX TABLE
+════════════════════════════════════ */
+function renderMatrix() {
+  /* Header */
+  const thead = document.getElementById('permHead');
+  thead.innerHTML = `<tr>
+    <th style="min-width:280px;">Permission / Fitur</th>
+    ${ROLES.map(r => `
+      <th>
+        <div class="role-th">
+          <div class="role-th-icon" style="background:${ROLE_GRADS[r.gradId]};"><i class="bi ${r.icon}" style="font-size:.8rem;"></i></div>
+          <div class="role-th-name">${r.nama}</div>
+        </div>
+      </th>`).join('')}
+  </tr>`;
+
+  /* Body — static HTML rows */
+  const rows = [];
+  PERM_MODULES.forEach(mod => {
+    /* Group header */
+    rows.push(`
+      <tr class="module-group-row">
+        <td colspan="${ROLES.length + 1}">
+          <div class="module-group-label"><i class="bi ${mod.icon}"></i> ${mod.group}</div>
+        </td>
+      </tr>`);
+
+    /* Permission rows */
+    mod.perms.forEach(perm => {
+      const isSuperAdmin = activeRoleId === 1;
+      rows.push(`
+        <tr>
+          <td>
+            <div class="perm-name">
+              <code class="perm-code">${perm.code}</code>
+              ${perm.name}
+            </div>
+            <div class="perm-name-sub">${perm.desc}</div>
+          </td>
+          ${ROLES.map(r => {
+            const has = (permState[r.id] || new Set()).has(perm.id);
+            const locked = r.id === 1; // super admin always has all
+            if (locked) {
+              return `<td><div class="perm-toggle"><i class="bi bi-check-circle-fill perm-check-yes"></i></div></td>`;
+            }
+            return `<td>
+              <div class="perm-toggle">
+                <label class="ts-wrap" title="${r.nama}">
+                  <input type="checkbox" ${has?'checked':''} onchange="togglePerm(${r.id},'${perm.id}',this.checked)" />
+                  <div class="ts-track"><div class="ts-thumb"></div></div>
+                </label>
+              </div>
+            </td>`;
+          }).join('')}
+        </tr>`);
+    });
+  });
+
+  document.getElementById('permBody').innerHTML = rows.join('');
+}
+
+function togglePerm(roleId, permId, checked) {
+  if (!permState[roleId]) permState[roleId] = new Set();
+  checked ? permState[roleId].add(permId) : permState[roleId].delete(permId);
+  // update card count (no full re-render needed)
+  const card = document.querySelector(`[onclick="selectRole(${roleId})"] .role-stat-val:nth-child(1)`);
+}
+
+/* ════════════════════════════════════
+   SAVE / RESET PERMISSIONS
+════════════════════════════════════ */
+function savePermissions() {
+  const btn = document.querySelector('.btn-save-perm');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    renderRoleCards();
+    DKA.notify({ type:'success', title:'Permission Berhasil Disimpan!', message:'Semua perubahan hak akses telah diterapkan. Pengguna perlu login ulang untuk merasakan perubahan.', duration:7000 });
+  }, 1400);
+}
+
+function resetPermissions() {
+  DKA.dialog({ type:'warning', title:'Reset Permission?', message:'Semua perubahan yang belum disimpan akan dikembalikan ke pengaturan default.', confirm:'Ya, Reset' })
+    .then(r => {
+      if (!r) return;
+      ROLES.forEach(role => { permState[role.id] = new Set(DEFAULT_PERMS[role.id] || []); });
+      renderMatrix();
+      renderRoleCards();
+      DKA.toast({ type:'info', title:'Permission direset', message:'Semua permission dikembalikan ke default.', position:'top-right' });
+    });
+}
+
+/* ════════════════════════════════════
+   ROLE ACTIONS
+════════════════════════════════════ */
+function copyRole(id) {
+  const r = ROLES.find(x=>x.id===id); if (!r) return;
+  DKA.dialog({ type:'info', title:'Duplikat Role', message:`Role "<strong>${r.nama}</strong>" akan diduplikat dengan nama "${r.nama} (Copy)". Anda bisa mengubah nama setelahnya.`, confirm:'Ya, Duplikat' })
+    .then(res => {
+      if (!res) return;
+      const newId = Date.now();
+      const copy = { ...r, id:newId, nama:`${r.nama} (Copy)`, kode:`${r.kode}-copy`, locked:false, pengguna:0, login:0 };
+      ROLES.push(copy);
+      permState[newId] = new Set(permState[r.id]);
+      updateStats();
+      renderRoleCards();
+      DKA.toast({ type:'success', title:'Role Diduplikat!', message:`"${copy.nama}" berhasil dibuat. Edit sesuai kebutuhan.`, position:'top-right', duration:4000 });
+    });
+}
+
+function deleteRole(id) {
+  const r = ROLES.find(x=>x.id===id); if (!r || r.locked) return;
+  if (r.pengguna > 0) {
+    DKA.dialog({ type:'warning', title:'Role Masih Digunakan', message:`Role "<strong>${r.nama}</strong>" masih digunakan oleh <strong>${r.pengguna} pengguna</strong>. Hapus role ini akan melepas semua pengguna dari role ini.`, confirm:'Ya, Hapus Tetap' })
+      .then(res => { if (res) doDeleteRole(id); });
+  } else {
+    DKA.deleteConfirm({ title:'Hapus Role?', message:'Role ini tidak memiliki pengguna aktif. Aman untuk dihapus.', itemName:r.nama, confirm:'Ya, Hapus' })
+      .then(res => { if (res) doDeleteRole(id); });
+  }
+}
+
+function doDeleteRole(id) {
+  const loader = DKA.loading({ title:'Menghapus role...', message:'Membersihkan data terkait.', style:'dots' });
+  setTimeout(() => {
+    ROLES = ROLES.filter(r => r.id !== id);
+    delete permState[id];
+    if (activeRoleId === id) activeRoleId = ROLES[0]?.id || 1;
+    loader.close(); updateStats(); renderRoleCards();
+    DKA.toast({ type:'success', title:'Role Dihapus', message:'Role berhasil dihapus dari sistem.', position:'top-right' });
+  }, 1200);
+}
+
+/* ════════════════════════════════════
+   MODAL ADD / EDIT ROLE
+════════════════════════════════════ */
+function buildIconGrid() {
+  document.getElementById('roleIconGrid').innerHTML = ROLE_ICONS.map(ic => `
+    <button type="button" class="icon-btn-mini ${ic===selIcon?'selected':''}" onclick="pickRoleIcon('${ic}')">
+      <i class="bi ${ic}"></i>
+    </button>`).join('');
+}
+function pickRoleIcon(ic) {
+  selIcon = ic;
+  buildIconGrid();
+  document.getElementById('rpIconI').className  = `bi ${ic}`;
+  document.getElementById('mHeadIconI').className = `bi ${ic}`;
+}
+
+function buildColorGrid() {
+  document.getElementById('roleColorGrid').innerHTML = ROLE_GRADS.map((g, i) => `
+    <div class="c-sw ${i===selColor?'selected':''}" style="background:${g};" onclick="pickRoleColor(${i})"></div>`).join('');
+}
+function pickRoleColor(id) {
+  selColor = id;
+  buildColorGrid();
+  const g = ROLE_GRADS[id];
+  document.getElementById('rpIcon').style.background     = g;
+  document.getElementById('mHeadIcon').style.background  = g;
+}
+
+function resetRoleForm() {
+  ['f-rname','f-rslug','f-rdesc'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('.fgroup').forEach(g=>g.classList.remove('has-err'));
+  document.getElementById('rpName').textContent = 'Nama Role';
+  document.getElementById('rpDesc').textContent = 'Deskripsi singkat role';
+}
+
+function openAddRoleModal() {
+  editingRoleId = null; selIcon='bi-person-badge-fill'; selColor=1;
+  document.getElementById('mTitleText').textContent          = 'Tambah Role Baru';
+  document.getElementById('btnSaveRole').innerHTML           = '<i class="bi bi-check2-circle"></i> Simpan';
+  document.getElementById('rpIconI').className               = 'bi bi-person-badge-fill';
+  document.getElementById('mHeadIconI').className            = 'bi bi-person-badge-fill';
+  const g=ROLE_GRADS[selColor];
+  document.getElementById('rpIcon').style.background         = g;
+  document.getElementById('mHeadIcon').style.background      = g;
+  resetRoleForm(); buildIconGrid(); buildColorGrid();
+  document.getElementById('modalRole').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function openEditRoleModal(id) {
+  const r = ROLES.find(x=>x.id===id); if(!r) return;
+  editingRoleId=id; selIcon=r.icon; selColor=r.gradId;
+  document.getElementById('mTitleText').textContent          = 'Edit Role';
+  document.getElementById('btnSaveRole').innerHTML           = '<i class="bi bi-check2-circle"></i> Perbarui';
+  document.getElementById('rpIconI').className               = `bi ${r.icon}`;
+  document.getElementById('mHeadIconI').className            = `bi ${r.icon}`;
+  const g=ROLE_GRADS[r.gradId];
+  document.getElementById('rpIcon').style.background         = g;
+  document.getElementById('mHeadIcon').style.background      = g;
+  resetRoleForm();
+  document.getElementById('f-rname').value  = r.nama;
+  document.getElementById('f-rslug').value  = r.kode;
+  document.getElementById('f-rdesc').value  = r.desc;
+  document.getElementById('rpName').textContent = r.nama;
+  document.getElementById('rpDesc').textContent = r.desc;
+  buildIconGrid(); buildColorGrid();
+  document.getElementById('modalRole').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalRole').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.getElementById('modalRole').addEventListener('click', e => { if(e.target===document.getElementById('modalRole')) closeModal(); });
+
+function clearErr(id) { document.getElementById(id)?.classList.remove('has-err'); }
+function setErr(id)   { document.getElementById(id)?.classList.add('has-err'); }
+
+function saveRole() {
+  const nama = document.getElementById('f-rname').value.trim();
+  const kode = document.getElementById('f-rslug').value.trim();
+  let ok=true;
+  if (!nama) { setErr('grp-rname'); ok=false; } else clearErr('grp-rname');
+  if (!kode) { setErr('grp-rslug'); ok=false; } else clearErr('grp-rslug');
+  if (!ok) { DKA.toast({ type:'danger', title:'Form belum lengkap', message:'Harap isi semua field wajib.', position:'top-right' }); return; }
+
+  const btn = document.getElementById('btnSaveRole');
+  const orig = btn.innerHTML;
+  btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+
+  setTimeout(()=>{
+    btn.disabled=false;
+    const payload = {
+      nama, kode,
+      desc : document.getElementById('f-rdesc').value.trim(),
+      icon : selIcon, gradId: selColor,
+    };
+    if (editingRoleId) {
+      const r = ROLES.find(x=>x.id===editingRoleId);
+      Object.assign(r, payload);
+      DKA.toast({ type:'success', title:'Role Diperbarui!', message:`"${nama}" berhasil diperbarui.`, position:'top-right', duration:4000 });
+    } else {
+      const newId = Date.now();
+      ROLES.push({ id:newId, ...payload, pengguna:0, login:0, locked:false });
+      permState[newId] = new Set(['dashboard.view','kegiatan.view']);
+      DKA.toast({ type:'success', title:'Role Ditambahkan!', message:`"${nama}" berhasil dibuat. Atur permission-nya di tabel bawah.`, position:'top-right', duration:4500 });
+    }
+    btn.innerHTML=orig;
+    updateStats(); renderRoleCards(); closeModal();
+  }, 1000);
+}
+
+/* ════════════════════════════════════
+   SIDEBAR / TOPBAR
+════════════════════════════════════ */
+const isMobile=()=>window.innerWidth<=768;
+function toggleSidebar(){isMobile()?document.body.classList.toggle('mobile-open'):document.body.classList.toggle('collapsed');}
+function closeMobileSidebar(){document.body.classList.remove('mobile-open');}
+const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+function toggleUserDropdown(){const o=userDropdown.classList.toggle('show');userTrigger.classList.toggle('open',o);}
+document.addEventListener('click',e=>{if(!document.querySelector('.user-dropdown-wrap').contains(e.target)){userDropdown.classList.remove('show');userTrigger.classList.remove('open');}});
+
+window.addEventListener('scroll',()=>document.getElementById('fabBtn').classList.toggle('visible',window.scrollY>280),{passive:true});
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
+
+/* ── INIT ── */
+renderRoleCards();
+</script>
+</body>
+</html>
